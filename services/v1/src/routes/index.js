@@ -2,7 +2,6 @@
  * Express Routing module.
  * @module src/routes/index.js
  */
-
 const Router = require('express').Router();
 const SessionsController = require('../controllers/Sessions');
 

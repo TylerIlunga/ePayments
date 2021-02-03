@@ -1,6 +1,6 @@
 /**
  * Sessions Controller module.
- * @module app.js
+ * @module src/controllers/Sessions/index.js
  */
 module.exports = {
   /**
