@@ -9,20 +9,11 @@ module.exports = {
     },
   },
   Network: {
-    apiError(service, error) {
-      return `Error from "${service}" web service: ` + error;
-    },
-    invalidMessage() {
-      return 'Invalid Message';
-    },
     invalidRequest() {
       return 'Invalid Request';
     },
     missingApiKey() {
       return 'API key is missing';
-    },
-    invalidRecords() {
-      return 'Invalid record(s)';
     },
     sessionExists() {
       return 'Session exists';
