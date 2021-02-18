@@ -10,6 +10,7 @@ module.exports = {
     issuer: process.env.JWT_ISSUER || 'urn:local_service',
     secret: process.env.JWT_SECRET || 'secret',
     expiration: process.env.JWT_EXPIRATION || '30m',
+    expirationInSecs: 30 * 60 * 1000,
   },
   PORT: process.env.PORT || 7777,
   SERVICE_NAME: 'API (V1)',

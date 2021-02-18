@@ -23,26 +23,16 @@ module.exports = {
   signToken(data) {
     return jwt.sign({ data }, JWT.secret, {
       expiresIn: JWT.expiration,
-      issuer: JWT.issuer,
-      audience: JWT.audience,
     });
   },
   verifyToken(token, cb) {
-    jwt.verify(
-      token,
-      JWT.secret,
-      { audience: JWT.audience, issuer: JWT.issuer },
-      (error, decoded) => {
-        if (error) {
-          Errors.General.logError(error);
-          return cb({ session: false });
-        }
-        console.log('Token decoded:::', decoded);
-        return cb({
-          session: decoded ? true : false,
-          user: decoded.data,
-        });
-      },
-    );
+    jwt.verify(token, JWT.secret, null, (error, decoded) => {
+      if (error) {
+        Errors.General.logError(error);
+        return cb({ error: error.message });
+      }
+      console.log('Token decoded:::', decoded);
+      return cb(decoded);
+    });
   },
 };
