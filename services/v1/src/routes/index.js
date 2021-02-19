@@ -12,5 +12,6 @@ Router.get('/healthcheck', (req, res) => res.sendStatus(200));
 Router.get('/api/v1/sessions/review', SessionsController.reviewSession);
 Router.post('/api/v1/sessions/signup', SessionsController.signUp);
 Router.post('/api/v1/sessions/login', SessionsController.logIn);
+Router.get('/api/v1/sessions/logout', SessionsController.logOut);
 
 module.exports = Router;

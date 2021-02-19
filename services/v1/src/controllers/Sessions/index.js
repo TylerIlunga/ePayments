@@ -33,7 +33,7 @@ module.exports = {
    * @param {object} req - Express.js Request
    * @param {object} res - Express.js Response
    *
-   * @return {number} Network Status number
+   * @return {object} JSON object
    */
   async reviewSession(req, res) {
     tokenHasExpired(req.headers.authorization, async (rsp) => {
@@ -114,7 +114,7 @@ module.exports = {
    * @param {object} req - Express.js Request
    * @param {object} res - Express.js Response
    *
-   * @return {number} JSON object
+   * @return {object} JSON object
    */
   async logIn(req, res) {
     // Validate
@@ -160,5 +160,17 @@ module.exports = {
       Errors.General.logError(error);
       return res.json(error);
     }
+  },
+  /**
+   * Logs a user out by destoying their session token cookie.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {number} HTTP Status Code
+   */
+  async logOut(req, res) {
+    res.clearCookie('ut');
+    res.sendStatus(200);
   },
 };
