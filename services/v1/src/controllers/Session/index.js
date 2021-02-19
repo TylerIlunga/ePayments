@@ -1,16 +1,15 @@
 /**
- * Sessions Controller module.
- * @module src/controllers/Sessions/index.js
+ * Session Controller module.
+ * @module src/controllers/Session/index.js
  */
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const generalConfig = require('../../config');
 const { User } = require('../../dal/config');
-const { Errors, Generators, Tokens } = require('../../utils');
+const { Errors, Generators, Tokens, Validation } = require('../../utils');
 const {
   tokenHasExpired,
   signUpLogInBodySchema,
-  extractErrorMessage,
 } = require('../Middleware/Session/validation');
 const EmailSender = require('../../email');
 
@@ -66,17 +65,12 @@ module.exports = {
    * @return {object} JSON object
    */
   async signUp(req, res) {
-    // 1) Create User(service)
-    // 2) Send out email(service) to verify user account
-    // 3) End
-    const validationResult = signUpLogInBodySchema.validate(req.body);
+    const validationResult = Validation.validateRequestBody(
+      signUpLogInBodySchema,
+      req.body,
+    );
     if (validationResult.error) {
-      Errors.General.logError(validationResult.error);
-      let error = extractErrorMessage(validationResult.error);
-      if (error == null) {
-        error = Errors.Network.invalidRequest();
-      }
-      return res.json({ error });
+      return res.json({ error: validationResult.error });
     }
     try {
       let { email, password } = validationResult.value;
@@ -101,7 +95,7 @@ module.exports = {
         throw eRes.error;
       }
 
-      console.log('email sent to new user!');
+      console.log('activateAccount email sent to new user!');
       return res.json({ error: null, user });
     } catch (error) {
       Errors.General.logError(error);
@@ -118,14 +112,12 @@ module.exports = {
    */
   async logIn(req, res) {
     // Validate
-    const validationResult = signUpLogInBodySchema.validate(req.body);
+    const validationResult = Validation.validateRequestBody(
+      signUpLogInBodySchema,
+      req.body,
+    );
     if (validationResult.error) {
-      Errors.General.logError(validationResult.error);
-      let error = extractErrorMessage(validationResult.error);
-      if (error == null) {
-        error = Errors.Network.invalidRequest();
-      }
-      return res.json({ error });
+      return res.json({ error: validationResult.error });
     }
     try {
       const { email, password } = validationResult.value;
@@ -141,10 +133,10 @@ module.exports = {
       // Check if password matches
       bcrypt.compare(password, user.password, async (error, isMatch) => {
         if (error) {
-          throw { error: 'Error comparing passwords:' + error };
+          return res.json({ error: 'Error comparing passwords:' + error });
         }
         if (!isMatch) {
-          throw { error: 'Incorrect password. Please try again.' };
+          return res.json({ error: 'Incorrect password. Please try again.' });
         }
         // Create session token (JWT)
         const sessionToken = Tokens.signToken({ id: user.id });

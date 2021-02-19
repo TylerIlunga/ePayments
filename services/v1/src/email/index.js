@@ -16,7 +16,7 @@ module.exports = {
     });
   },
   async sendResetPasswordEmail(user) {
-    const { subject, html } = templates['activateAccount'](user);
+    const { subject, html } = templates['resetPassword'](user);
     return sgMail.send({
       subject,
       html,

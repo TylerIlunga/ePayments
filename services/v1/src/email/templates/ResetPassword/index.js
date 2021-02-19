@@ -1,7 +1,7 @@
 module.exports = ({ user }) => {
   return `
-    <p>Below is your Reset Token:</p>
-    <h3>${user.passwordResetToken}</h3>
+    <p>Copy and paste your Reset Token below:</p>
+    <h3>${user.password_reset_token}</h3>
     <br/><br/>
     <b>Mizu Team</b>
   `;
