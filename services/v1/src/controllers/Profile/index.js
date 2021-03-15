@@ -14,6 +14,7 @@ const {
 
 module.exports = {
   async customerCreation(req, res) {
+    // Validate Input
     const validationResult = Validation.validateRequestBody(
       customerCreationSchema,
       req.body,
@@ -28,14 +29,14 @@ module.exports = {
         username,
         userID,
       } = validationResult.value;
-      // Store image in cloud
+      // Store image in the cloud (AWS)
       const s3ImgUrl = await S3Utils.upload(
         null,
         'customer',
         userID,
         profileImage,
       );
-      // Store link, country, username;
+      // Persist a new customer profile
       const newCustomerProfile = await CustomerProfile.create({
         country,
         username,
@@ -53,8 +54,8 @@ module.exports = {
       return res.json(error);
     }
   },
-  businessCreation(req, res) {
-    // NEED: User ID, address, phone_number, public_email, etc.
+  async businessCreation(req, res) {
+    // Validate Input
     const validationResult = Validation.validateRequestBody(
       businessCreationSchema,
       req.body,
@@ -63,7 +64,34 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      res.json({});
+      const {
+        profileImage,
+        address,
+        phoneNumber,
+        publicEmail,
+        userID,
+      } = validationResult.value;
+      // Store image in the cloud (AWS)
+      const s3ImgUrl = await S3Utils.upload(
+        null,
+        'business',
+        userID,
+        profileImage,
+      );
+      // Persist a new business profile
+      const newBusinessProfile = await BusinessProfile.create({
+        address,
+        phone_number: phoneNumber,
+        public_email: publicEmail,
+        user_id: userID,
+        profile_image_url: s3ImgUrl,
+      });
+      console.log('new business profile created! ID:', newBusinessProfile.id);
+      res.json({
+        error: null,
+        success: true,
+        businessProfileID: newBusinessProfile.id,
+      });
     } catch (error) {
       Errors.General.logError(error);
       return res.json(error);
