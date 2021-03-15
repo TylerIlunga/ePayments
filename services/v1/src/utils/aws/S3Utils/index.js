@@ -10,15 +10,15 @@ const s3 = new AWS.S3({
 });
 
 module.exports = {
-  upload(options = {}, type, userId, base64Data) {
+  profileImageUpload(options = {}, type, userId, base64Data) {
     return new Promise((resolve, reject) => {
       console.log('Uploading image to AWS S3...');
       base64Data = base64Data.replace(/^data:image\/\w+;base64,/, '');
       s3.upload(
         {
           ACL: 'public-read',
-          Key: `${type}_profile_image:user_id_${userId}`,
-          Bucket: `${config.AWS.S3.bucket}/${config.AWS.S3.bucketPIFolder}`,
+          Key: `profile_image:user_id_${userId}`,
+          Bucket: `${config.AWS.S3.bucket}/${type}/${config.AWS.S3.bucketPIFolder}`,
           Body: Buffer.from(base64Data, 'base64'),
           ContentEncoding: 'base64',
         },

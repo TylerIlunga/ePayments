@@ -30,9 +30,9 @@ module.exports = {
         userID,
       } = validationResult.value;
       // Store image in the cloud (AWS)
-      const s3ImgUrl = await S3Utils.upload(
+      const s3ImgUrl = await S3Utils.profileImageUpload(
         null,
-        'customer',
+        'customers',
         userID,
         profileImage,
       );
@@ -72,9 +72,9 @@ module.exports = {
         userID,
       } = validationResult.value;
       // Store image in the cloud (AWS)
-      const s3ImgUrl = await S3Utils.upload(
+      const s3ImgUrl = await S3Utils.profileImageUpload(
         null,
-        'business',
+        'businesses',
         userID,
         profileImage,
       );
