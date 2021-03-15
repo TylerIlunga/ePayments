@@ -9,6 +9,7 @@ const {
 const {
   AWS: { S3Utils },
   Errors,
+  Strings,
   Validation,
 } = require('../../utils');
 
@@ -121,7 +122,6 @@ module.exports = {
           updates[profileFeature] !== null &&
           updates[profileFeature] !== undefined
         ) {
-          console.log('hit!');
           customerProfile[profileFeature] = updates[profileFeature];
         }
       });
@@ -134,7 +134,7 @@ module.exports = {
     }
   },
   async businessUpdate(req, res) {
-    // NOTE: Just check to see that body contains valid properties in database schema w/ validation schema
+    // Validate Input
     const validationResult = Validation.validateRequestBody(
       businessUpdateSchema,
       req.body,
@@ -143,7 +143,27 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      res.json({});
+      const { userID, profileID, updates } = validationResult.value;
+      // Locate Business Profile
+      const businessProfile = await BusinessProfile.findOne({
+        where: { id: profileID, user_id: userID },
+      });
+      if (businessProfile === null) {
+        throw { error: 'Profile does not exist for the given ID.' };
+      }
+      // Iterate through updated profile features and apply to existing profile
+      Object.keys(updates).forEach((profileFeature) => {
+        if (
+          updates[profileFeature] !== null &&
+          updates[profileFeature] !== undefined
+        ) {
+          businessProfile[Strings.camelToSnake(profileFeature)] =
+            updates[profileFeature];
+        }
+      });
+      // Persist updated Customer Profile
+      await businessProfile.save();
+      return res.json({ error: null, success: true });
     } catch (error) {
       Errors.General.logError(error);
       return res.json(error);

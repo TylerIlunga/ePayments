@@ -7,6 +7,7 @@ module.exports = {
   Errors: require('./errors'),
   Network: require('./network'),
   Generators: require('./generators'),
+  Strings: require('./strings'),
   Validation: require('./validation'),
   Tokens: require('./tokens'),
 };
