@@ -97,8 +97,8 @@ module.exports = {
       return res.json(error);
     }
   },
-  customerUpdate(req, res) {
-    // NOTE: Just check to see that body contains valid properties in database schema w/ validation schema
+  async customerUpdate(req, res) {
+    // Validate Input
     const validationResult = Validation.validateRequestBody(
       customerUpdateSchema,
       req.body,
@@ -107,13 +107,33 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      res.json({});
+      const { userID, profileID, updates } = validationResult.value;
+      // Locate Customer Profile
+      const customerProfile = await CustomerProfile.findOne({
+        where: { id: profileID, user_id: userID },
+      });
+      if (customerProfile === null) {
+        throw { error: 'Profile does not exist for the given ID.' };
+      }
+      // Iterate through updated profile features and apply to existing profile
+      Object.keys(updates).forEach((profileFeature) => {
+        if (
+          updates[profileFeature] !== null &&
+          updates[profileFeature] !== undefined
+        ) {
+          console.log('hit!');
+          customerProfile[profileFeature] = updates[profileFeature];
+        }
+      });
+      // Persist updated Customer Profile
+      await customerProfile.save();
+      return res.json({ error: null, success: true });
     } catch (error) {
       Errors.General.logError(error);
       return res.json(error);
     }
   },
-  businessUpdate(req, res) {
+  async businessUpdate(req, res) {
     // NOTE: Just check to see that body contains valid properties in database schema w/ validation schema
     const validationResult = Validation.validateRequestBody(
       businessUpdateSchema,

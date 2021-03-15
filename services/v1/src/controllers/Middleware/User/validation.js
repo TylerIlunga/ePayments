@@ -17,10 +17,12 @@ module.exports = {
       .required(),
   }),
   resetPasswordSchema: Joi.object({
-    email: Joi.string().email({
-      minDomainSegments: 2,
-      tlds: { allow: ['com', 'net', 'org', 'edu'] },
-    }),
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ['com', 'net', 'org', 'edu'] },
+      })
+      .required(),
     resetPasswordToken: Joi.string().required(),
     oldPassword: Joi.string()
       .pattern(new RegExp('^[a-zA-Z0-9]{10,30}$'))
