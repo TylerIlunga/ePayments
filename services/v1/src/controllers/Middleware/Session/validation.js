@@ -1,21 +1,7 @@
 const Joi = require('joi');
 const { Errors, Tokens } = require('../../../utils');
 
-const extractErrorMessage = (errorObject) => {
-  const { details } = errorObject;
-  if (
-    details.length === 0 ||
-    details[0].message === undefined ||
-    details[0].message === null
-  ) {
-    return null;
-  }
-  // NOTE: Escape characters included in message;
-  return details[0].message;
-};
-
 module.exports = {
-  extractErrorMessage,
   tokenHasExpired(authorization, cb) {
     const tRes = Tokens.extractJWTFromHeaders(authorization);
     if (tRes.error) {
