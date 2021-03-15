@@ -22,8 +22,14 @@ Router.post('/api/v1/user/forgotPassword', UserController.forgotPassword);
 Router.post('/api/v1/user/resetPassword', UserController.resetPassword);
 
 /** API Endpoints related to handling user profile business logic */
-Router.post('/api/v1/profile/customer/create', ProfileController.customerCreation);
-Router.post('/api/v1/profile/business/create', ProfileController.businessCreation);
+Router.post(
+  '/api/v1/profile/customer/create',
+  ProfileController.customerCreation,
+);
+Router.post(
+  '/api/v1/profile/business/create',
+  ProfileController.businessCreation,
+);
 Router.put('/api/v1/profile/business/update', ProfileController.businessUpdate);
 Router.put('/api/v1/profile/customer/update', ProfileController.customerUpdate);
 

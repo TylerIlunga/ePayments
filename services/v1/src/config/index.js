@@ -4,6 +4,17 @@
  */
 module.exports = {
   API_KEY: process.env.API_KEY || 'API_KEY',
+  AWS: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'AKIAJFFJCL3B2QQR2MPQ',
+    secretAccessKey:
+      process.env.AWS_SECRET_ACCESS_KEY ||
+      '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',
+    region: process.env.AWS_REGION || 'us-west-1',
+    S3: {
+      bucket: process.env.AWS_BUCKET || 'epay-bucket-dev',
+      bucketPIFolder: process.env.AWS_BUCKET_PI_FOLDER || 'profileImages',
+    },
+  },
   JWT: {
     algorithm: process.env.JWT_ALGORITHM || 'RS256',
     audience: process.env.JWT_AUDIENCE || 'urn:localhost',

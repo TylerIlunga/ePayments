@@ -2,22 +2,25 @@ const Joi = require('joi');
 
 module.exports = {
   customerCreationSchema: Joi.object({
-    profileImageFile: Joi.func().required(),
+    profileImage: Joi.string().required(),
+    country: Joi.string().required(),
     username: Joi.string().required(),
+    userID: Joi.number().required(),
   }),
+  // NEED: User ID, address, phone_number, public_email, etc.
   businessCreationSchema: Joi.object({
-    profileImageFile: Joi.func().required(),
+    profileImage: Joi.func().required(),
     username: Joi.string().required(),
   }),
   customerUpdateSchema: Joi.object().keys({
     updates: Joi.object().keys({
-      profileImageFile: Joi.func(),
+      profileImage: Joi.func(),
       username: Joi.string(),
     }),
   }),
   businessUpdateSchema: Joi.object().keys({
     updates: Joi.object().keys({
-      profileImageFile: Joi.func(),
+      profileImage: Joi.func(),
       username: Joi.string(),
     }),
   }),
