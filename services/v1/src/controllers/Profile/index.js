@@ -1,4 +1,3 @@
-const generalConfig = require('../../config');
 const { BusinessProfile, CustomerProfile } = require('../../dal/config');
 const {
   customerCreationSchema,

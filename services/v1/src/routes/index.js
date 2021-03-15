@@ -6,6 +6,7 @@ const Router = require('express').Router();
 const SessionController = require('../controllers/Session');
 const UserController = require('../controllers/User');
 const ProfileController = require('../controllers/Profile');
+const BusinessProductController = require('../controllers/BusinessProduct');
 
 /** Service Health Check */
 Router.get('/healthcheck', (req, res) => res.sendStatus(200));
@@ -32,5 +33,27 @@ Router.post(
 );
 Router.put('/api/v1/profile/business/update', ProfileController.businessUpdate);
 Router.put('/api/v1/profile/customer/update', ProfileController.customerUpdate);
+
+/** API Endpoints related to handling business product business logic */
+Router.post(
+  '/api/v1/products/business/create',
+  BusinessProductController.createBusinessProduct,
+);
+Router.get(
+  '/api/v1/products/business/list',
+  BusinessProductController.listBusinessProducts,
+);
+Router.get(
+  '/api/v1/products/business/fetch',
+  BusinessProductController.fetchBusinessProduct,
+);
+Router.put(
+  '/api/v1/products/business/update',
+  BusinessProductController.updateBusinessProduct,
+);
+Router.delete(
+  '/api/v1/products/business/delete',
+  BusinessProductController.deleteBusinessProduct,
+);
 
 module.exports = Router;

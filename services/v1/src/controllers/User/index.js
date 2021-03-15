@@ -13,7 +13,6 @@ const {
   resetPasswordSchema,
 } = require('../Middleware/User/validation');
 const EmailSender = require('../../email');
-const { use } = require('../../routes');
 
 module.exports = {
   /**
