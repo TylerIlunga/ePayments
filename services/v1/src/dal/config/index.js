@@ -1,4 +1,6 @@
+// TODO: JSDOC Module Header
 require('pg');
+
 const Sequelize = require('sequelize');
 const dbConfig = {
   database: process.env.PGDATABASE || 'epaydb_dev',
