@@ -1,4 +1,6 @@
+// TODO: JSDOC Module Header
 const bcrypt = require('bcrypt-nodejs');
+
 module.exports = {
   generatePassword(password) {
     return new Promise(function (resolve, reject) {

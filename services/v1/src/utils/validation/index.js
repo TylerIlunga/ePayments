@@ -1,3 +1,4 @@
+// TODO: JSDOC Module Header
 const Errors = require('../errors');
 
 const extractErrorMessage = (errorObject) => {

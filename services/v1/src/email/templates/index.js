@@ -1,3 +1,5 @@
+// TODO: JSDOC Module Header
+
 module.exports = {
   activateAccount(user) {
     return {
