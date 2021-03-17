@@ -17,13 +17,19 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      product_image_url: Sequelize.STRING,
+      sku: Sequelize.STRING,
       label: Sequelize.STRING,
       description: Sequelize.STRING,
-      price: Sequelize.STRING,
+      price: Sequelize.DECIMAL(10, 2),
       inventory_count: Sequelize.STRING,
-      view_count: Sequelize.INTEGER,
-      purchased_count: Sequelize.INTEGER,
+      view_count: {
+        type: Sequelize.INTEGER,
+        default: 0,
+      },
+      purchased_count: {
+        type: Sequelize.INTEGER,
+        default: 0,
+      },
       created_at: {
         type: Sequelize.BIGINT,
         defaultValue: Date.now(),
