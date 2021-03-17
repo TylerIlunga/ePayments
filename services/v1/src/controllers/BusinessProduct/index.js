@@ -151,6 +151,82 @@ module.exports = {
       return res.json(error);
     }
   },
-  async updateBusinessProduct(req, res) {},
-  async deleteBusinessProduct(req, res) {},
+  /**
+   * Updates a Business Product for the given attributes.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {object} JSON object
+   */
+  async updateBusinessProduct(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      updateBusinessProductSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const {
+        userID,
+        businessProductID,
+        sku,
+        updates,
+      } = validationResult.value;
+      // Locate Business Product
+      const businessProduct = await BusinessProduct.findOne({
+        where: { sku, id: businessProductID, user_id: userID },
+      });
+      if (businessProduct === null) {
+        throw { error: 'Product does not exist for the given information.' };
+      }
+      // Iterate through updated product features and apply to existing product
+      Object.keys(updates).forEach((productFeature) => {
+        if (
+          updates[productFeature] !== null &&
+          updates[productFeature] !== undefined
+        ) {
+          businessProduct[Strings.camelToSnake(productFeature)] =
+            updates[productFeature];
+        }
+      });
+      // Persist updated Business Product
+      await businessProduct.save();
+      return res.json({ error: null, success: true });
+    } catch (error) {
+      Errors.General.logError(error);
+      return res.json(error);
+    }
+  },
+  /**
+   * Deletes a Business Product.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {object} JSON object
+   */
+  async deleteBusinessProduct(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      updateBusinessProductSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const { userID, businessProductID, sku } = validationResult.value;
+      // Delete Business Product
+      await BusinessProduct.destroy({
+        where: { sku, id: businessProductID, user_id: userID },
+      });
+      return res.json({ error: null, success: true });
+    } catch (error) {
+      Errors.General.logError(error);
+      return res.json(error);
+    }
+  },
 };
