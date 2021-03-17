@@ -3,11 +3,16 @@
  * @module src/controllers/BusinessProduct/index.js
  */
 const generalConfig = require('../../config');
-const { BusinessProduct, User } = require('../../dal/config');
-const { Errors, Validation } = require('../../utils');
+const { getSqlizeModule, BusinessProduct, User } = require('../../dal/config');
+const { Errors, Strings, Validation } = require('../../utils');
 const {
   createBusinessProductSchema,
+  listBusinessProductsSchema,
+  fetchBusinessProductSchema,
+  updateBusinessProductSchema,
+  deleteBusinessProductSchema,
 } = require('../Middleware/BusinessProduct/validation');
+const Op = getSqlizeModule().Op;
 
 module.exports = {
   /**
@@ -62,7 +67,45 @@ module.exports = {
       return res.json(error);
     }
   },
-  async listBusinessProducts(req, res) {},
+  async listBusinessProducts(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      listBusinessProductsSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const { userID, queryAttributes } = validationResult.value;
+      // Verify User
+      const businessUser = await User.findOne({ where: { id: userID } });
+      if (businessUser === null) {
+        throw { error: 'Account not found for the given user ID.' };
+      }
+      // List Products
+      // NOTE: String attributes should contain the proper query (ex: "%GUM" or "GUM%")
+      const whereAttributes = {};
+      Object.keys(queryAttributes).forEach((attribute) => {
+        let whereAttribute = {};
+        console.log('typeof attribute', typeof attribute);
+        if (typeof attribute === 'string') {
+          whereAttribute[Op.like] = queryAttributes[attribute];
+        }
+        if (typeof attribute === 'number') {
+          whereAttribute[Op.contains] = queryAttributes[attribute];
+        }
+        whereAttributes[Strings.camelToSnake(attribute)] = whereAttribute;
+      });
+      const products = await BusinessProduct.findAll({
+        where: whereAttributes,
+      });
+      return res.json({ error: null, success: true, products });
+    } catch (error) {
+      Errors.General.logError(error);
+      return res.json(error);
+    }
+  },
   async fetchBusinessProduct(req, res) {},
   async updateBusinessProduct(req, res) {},
   async deleteBusinessProduct(req, res) {},

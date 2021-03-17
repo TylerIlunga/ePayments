@@ -59,5 +59,5 @@ Object.keys(models).forEach((key) => {
 module.exports = {
   ...models,
   getConnection: () => sequelize,
-  getModule: () => Sequelize,
+  getSqlizeModule: () => Sequelize,
 };

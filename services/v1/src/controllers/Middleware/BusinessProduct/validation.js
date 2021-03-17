@@ -10,4 +10,21 @@ module.exports = {
     price: Joi.number().required(),
     inventoryCount: Joi.number().required(),
   }),
+  listBusinessProductsSchema: Joi.object({
+    userID: Joi.number().required(),
+    queryAttributes: Joi.object()
+      .keys({
+        sku: Joi.string().length(16),
+        label: Joi.string(),
+        description: Joi.string(),
+        price: Joi.number(),
+        inventoryCount: Joi.number(),
+        viewCount: Joi.number(),
+        purchasedCount: Joi.number(),
+      })
+      .required(),
+  }),
+  fetchBusinessProductSchema: Joi.object({}),
+  updateBusinessProductSchema: Joi.object({}),
+  deleteBusinessProductSchema: Joi.object({}),
 };
