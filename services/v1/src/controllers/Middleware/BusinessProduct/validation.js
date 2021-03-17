@@ -29,6 +29,22 @@ module.exports = {
     businessProductID: Joi.number().required(),
     sku: Joi.string().length(16).required(),
   }),
-  updateBusinessProductSchema: Joi.object({}),
-  deleteBusinessProductSchema: Joi.object({}),
+  updateBusinessProductSchema: Joi.object({
+    userID: Joi.number().required(),
+    businessProductID: Joi.number().required(),
+    sku: Joi.string().length(16).required(),
+    updates: Joi.object()
+      .keys({
+        label: Joi.string(),
+        description: Joi.string(),
+        price: Joi.number(),
+        inventoryCount: Joi.number(),
+      })
+      .required(),
+  }),
+  deleteBusinessProductSchema: Joi.object({
+    userID: Joi.number().required(),
+    businessProductID: Joi.number().required(),
+    sku: Joi.string().length(16).required(),
+  }),
 };

@@ -31,7 +31,7 @@ module.exports = {
       })
       .required(),
   }),
-  businessUpdateSchema: Joi.object().keys({
+  businessUpdateSchema: Joi.object({
     userID: Joi.number().required(),
     profileID: Joi.number().required(),
     updates: Joi.object()
