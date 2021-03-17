@@ -8,6 +8,8 @@ const UserController = require('../controllers/User');
 const ProfileController = require('../controllers/Profile');
 const BusinessProductController = require('../controllers/BusinessProduct');
 
+// TODO: Protected / Authenticated Middleware for certain routes
+
 /** Service Health Check */
 Router.get('/healthcheck', (req, res) => res.sendStatus(200));
 
