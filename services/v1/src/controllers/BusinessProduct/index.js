@@ -67,6 +67,14 @@ module.exports = {
       return res.json(error);
     }
   },
+  /**
+   * Lists Business Products based on the given query attributes.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {Array} list of JSON objects
+   */
   async listBusinessProducts(req, res) {
     // Validate Input
     const validationResult = Validation.validateRequestBody(
@@ -106,7 +114,43 @@ module.exports = {
       return res.json(error);
     }
   },
-  async fetchBusinessProduct(req, res) {},
+  /**
+   * Fetches a Business Product for given ids and sku.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {object} JSON object
+   */
+  async fetchBusinessProduct(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      fetchBusinessProductSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const { userID, businessProductID, sku } = validationResult.value;
+      // Verify User
+      const businessUser = await User.findOne({ where: { id: userID } });
+      if (businessUser === null) {
+        throw { error: 'Account not found for the given user ID.' };
+      }
+      // Fetch Business Proudct
+      const businessProduct = await BusinessProduct.findOne({
+        where: { sku, id: businessProductID, user_id: userID },
+      });
+      if (businessProduct === null) {
+        throw { error: 'Product does not exist for the given information.' };
+      }
+      return res.json({ error: null, success: true, product: businessProduct });
+    } catch (error) {
+      Errors.General.logError(error);
+      return res.json(error);
+    }
+  },
   async updateBusinessProduct(req, res) {},
   async deleteBusinessProduct(req, res) {},
 };

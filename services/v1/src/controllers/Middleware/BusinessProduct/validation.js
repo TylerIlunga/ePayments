@@ -24,7 +24,11 @@ module.exports = {
       })
       .required(),
   }),
-  fetchBusinessProductSchema: Joi.object({}),
+  fetchBusinessProductSchema: Joi.object({
+    userID: Joi.number().required(),
+    businessProductID: Joi.number().required(),
+    sku: Joi.string().length(16).required(),
+  }),
   updateBusinessProductSchema: Joi.object({}),
   deleteBusinessProductSchema: Joi.object({}),
 };
