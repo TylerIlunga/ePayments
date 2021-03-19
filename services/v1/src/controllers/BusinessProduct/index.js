@@ -211,7 +211,7 @@ module.exports = {
   async deleteBusinessProduct(req, res) {
     // Validate Input
     const validationResult = Validation.validateRequestBody(
-      updateBusinessProductSchema,
+      deleteBusinessProductSchema,
       req.body,
     );
     if (validationResult.error) {
