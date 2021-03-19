@@ -7,6 +7,7 @@ const SessionController = require('../controllers/Session');
 const UserController = require('../controllers/User');
 const ProfileController = require('../controllers/Profile');
 const BusinessProductController = require('../controllers/BusinessProduct');
+const PaymentAccountController = require('../controllers/PaymentAccount');
 
 // TODO: Protected / Authenticated Middleware for certain routes
 
@@ -56,6 +57,24 @@ Router.put(
 Router.delete(
   '/api/v1/products/business/delete',
   BusinessProductController.deleteBusinessProduct,
+);
+
+/** API Endpoints related to handling connected payment account business logic */
+Router.get(
+  '/api/v1/payment/accounts/fetch',
+  PaymentAccountController.fetchPaymentAccount,
+);
+Router.post(
+  '/api/v1/payment/accounts/create',
+  PaymentAccountController.createPaymentAccount,
+);
+Router.put(
+  '/api/v1/payment/accounts/update',
+  PaymentAccountController.updatePaymentAccount,
+);
+Router.delete(
+  '/api/v1/payment/accounts/delete',
+  PaymentAccountController.deletePaymentAccount,
 );
 
 module.exports = Router;
