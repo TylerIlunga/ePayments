@@ -4,6 +4,7 @@
  */
 module.exports = {
   AWS: require('./aws'),
+  Coinbase: require('./coinbase'),
   Errors: require('./errors'),
   Network: require('./network'),
   Generators: require('./generators'),

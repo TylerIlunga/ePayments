@@ -15,6 +15,29 @@ module.exports = {
       bucketPIFolder: process.env.AWS_BUCKET_PI_FOLDER || 'profileImages',
     },
   },
+  // TODO: Setup CB Notification Webhooks on Coinbase Dev App
+  COINBASE: {
+    API_KEY: process.env.COINBASE_CLIENT_ID || 'CB_API_KEY',
+    API_SECRET_KEY: process.env.COINBASE_CLIENT_SECRET || 'CB_API_SECRET_KEY',
+    SCOPES: [
+      'wallet:accounts:read',
+      'wallet:accounts:update',
+      'wallet:addresses:read',
+      'wallet:addresses:create',
+      'wallet:buys:read',
+      'wallet:buys:create',
+      'wallet:deposits:read',
+      'wallet:payment-methods:read',
+      'wallet:payment-methods:limits',
+      'wallet:transactions:send', // **
+      'wallet:transactions:request', //**
+      'wallet:transactions:transfer', //**
+      'wallet:user:read',
+      'wallet:user:email',
+      'wallet:withdrawals:read', // **
+      'wallet:withdrawals:create', //**
+    ],
+  },
   JWT: {
     algorithm: process.env.JWT_ALGORITHM || 'RS256',
     audience: process.env.JWT_AUDIENCE || 'urn:localhost',

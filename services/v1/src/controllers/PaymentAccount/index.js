@@ -8,6 +8,7 @@ const { Validation } = require('../../utils');
 const {
   fetchPaymentAccountSchema,
   createPaymentAccountSchema,
+  createPaymentAccountOauthCallbackSchema,
   updatePaymentAccountSchema,
   deletePaymentAccountSchema,
 } = require('../Middleware/PaymentAccount/validation');
@@ -51,6 +52,31 @@ module.exports = {
     const validationResult = Validation.validateRequestBody(
       createPaymentAccountSchema,
       req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      return res.json({ error: null, success: true });
+    } catch (error) {
+      Errors.General.logError(error);
+      return res.json(error);
+    }
+  },
+  /**
+   * (POST CB-OAUTH CALLBACK) Creates a new payment account for the given user
+   * and connects to third-party (Stripe, Coinbase) services.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {object} JSON object
+   */
+  async createPaymentAccountOAuthCallback(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      createPaymentAccountOauthCallbackSchema,
+      req.query,
     );
     if (validationResult.error) {
       return res.json({ error: validationResult.error });
