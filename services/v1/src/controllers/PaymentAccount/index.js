@@ -74,7 +74,7 @@ module.exports = {
    *
    * @return {object} JSON object
    */
-  async createPaymentAccountOAuthCallback(req, res) {
+  async createPaymentAccountOAuthCodeCallback(req, res) {
     // Validate Input
     // const validationResult = Validation.validateRequestBody(
     //   createPaymentAccountOauthCallbackSchema,
@@ -83,13 +83,24 @@ module.exports = {
     // if (validationResult.error) {
     //   return res.json({ error: validationResult.error });
     // }
-    return res.send(req.query.code);
-    try {
-      return res.json({ error: null, success: true });
-    } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
-    }
+    const coinbaseAPI = new CoinbaseAPIHelper();
+    coinbaseAPI
+      .getAccessToken(req.query.code)
+      .then((cbRes) => {
+        console.log('coinbaseAPI.getAccessToken() then:', cbRes);
+        if (cbRes.error) {
+          Errors.General.logError(cbRes.error);
+          return res.json(cbRes.error);
+        }
+        const accessTokenData = cbRes.data;
+        // TODO: Persist accessTokenData.access_token, accessTokenData.expires_in, accessTokenData.refresh_token
+        return res.json({ error: null, success: true, accessTokenData });
+      })
+      .catch((error) => {
+        console.log('coinbaseAPI.getAccessToken() error:', error);
+        Errors.General.logError(error);
+        return res.json(error);
+      });
   },
   /**
    * Updates a given user's persisted payment account.

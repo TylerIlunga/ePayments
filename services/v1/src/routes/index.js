@@ -69,8 +69,8 @@ Router.get(
   PaymentAccountController.createPaymentAccountStart,
 );
 Router.get(
-  '/api/v1/payment/accounts/create/oauth/callback',
-  PaymentAccountController.createPaymentAccountOAuthCallback,
+  '/api/v1/payment/accounts/create/oauthcallback/code',
+  PaymentAccountController.createPaymentAccountOAuthCodeCallback,
 );
 Router.put(
   '/api/v1/payment/accounts/update',

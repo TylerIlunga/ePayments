@@ -8,10 +8,11 @@ class CoinbaseAPIHelper {
     this.apiKey = coinbaseConfig.API_KEY;
     this.apiSecretKey = coinbaseConfig.API_SECRET_KEY;
     this.oauth_url = 'https://www.coinbase.com/oauth';
-    this.auth_redirectURI = coinbaseConfig.AUTH_REDIRECT_URI;
+    this.authcode_redirectURI = coinbaseConfig.AUTHCODE_REDIRECT_URI;
     this.api_url = 'https://api.coinbase.com/v2';
 
     this.authorizeUser = this.authorizeUser.bind(this);
+    this.getAccessToken = this.getAccessToken.bind(this);
   }
 
   generateMessageSignature(secret) {
@@ -50,8 +51,14 @@ class CoinbaseAPIHelper {
       params: reqOptions.queryParams,
       data: reqOptions.body,
     })
-      .then((res) => res)
-      .catch((error) => ({ error }));
+      .then((res) => {
+        console.log('request() then:', res);
+        return res;
+      })
+      .catch((error) => {
+        console.log('request() error:', error);
+        throw error;
+      });
   }
 
   authorizeUser(res, state = '') {
@@ -64,14 +71,28 @@ class CoinbaseAPIHelper {
         state,
         responseType: 'code',
         clientID: coinbaseConfig.API_KEY,
-        redirectURI: this.auth_redirectURI,
+        redirectURI: this.authcode_redirectURI,
         scopes: coinbaseConfig.SCOPES.toString(),
       },
     };
     let url = `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&scope=${opts.queryParams.scopes}`;
     return res.redirect(url);
   }
-  getAccessToken() {}
+  getAccessToken(oauthCallbackCode) {
+    return this.request({
+      method: 'POST',
+      baseURL: this.oauth_url,
+      path: 'token',
+      queryParams: {
+        grant_type: 'authorization_code',
+        code: oauthCallbackCode,
+        client_id: coinbaseConfig.API_KEY,
+        client_secret: coinbaseConfig.API_SECRET_KEY,
+        redirect_uri: this.authcode_redirectURI,
+        scopes: coinbaseConfig.SCOPES.toString(),
+      },
+    });
+  }
 }
 
 module.exports = CoinbaseAPIHelper;
