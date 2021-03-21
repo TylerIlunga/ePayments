@@ -64,9 +64,9 @@ Router.get(
   '/api/v1/payment/accounts/fetch',
   PaymentAccountController.fetchPaymentAccount,
 );
-Router.post(
-  '/api/v1/payment/accounts/create',
-  PaymentAccountController.createPaymentAccount,
+Router.get(
+  '/api/v1/payment/accounts/create/start',
+  PaymentAccountController.createPaymentAccountStart,
 );
 Router.get(
   '/api/v1/payment/accounts/create/oauth/callback',

@@ -4,7 +4,7 @@
  */
 const generalConfig = require('../../config');
 const { PaymentAccount } = require('../../dal/config');
-const { Validation } = require('../../utils');
+const { Validation, CoinbaseAPIHelper } = require('../../utils');
 const {
   fetchPaymentAccountSchema,
   createPaymentAccountSchema,
@@ -47,15 +47,17 @@ module.exports = {
    *
    * @return {object} JSON object
    */
-  async createPaymentAccount(req, res) {
+  async createPaymentAccountStart(req, res) {
     // Validate Input
-    const validationResult = Validation.validateRequestBody(
-      createPaymentAccountSchema,
-      req.body,
-    );
-    if (validationResult.error) {
-      return res.json({ error: validationResult.error });
-    }
+    // const validationResult = Validation.validateRequestBody(
+    //   createPaymentAccountSchema,
+    //   req.body,
+    // );
+    // if (validationResult.error) {
+    //   return res.json({ error: validationResult.error });
+    // }
+    const coinbaseAPI = new CoinbaseAPIHelper();
+    return coinbaseAPI.authorizeUser(res);
     try {
       return res.json({ error: null, success: true });
     } catch (error) {
@@ -74,13 +76,14 @@ module.exports = {
    */
   async createPaymentAccountOAuthCallback(req, res) {
     // Validate Input
-    const validationResult = Validation.validateRequestBody(
-      createPaymentAccountOauthCallbackSchema,
-      req.query,
-    );
-    if (validationResult.error) {
-      return res.json({ error: validationResult.error });
-    }
+    // const validationResult = Validation.validateRequestBody(
+    //   createPaymentAccountOauthCallbackSchema,
+    //   req.query,
+    // );
+    // if (validationResult.error) {
+    //   return res.json({ error: validationResult.error });
+    // }
+    return res.send(req.query.code);
     try {
       return res.json({ error: null, success: true });
     } catch (error) {

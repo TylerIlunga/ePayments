@@ -19,6 +19,9 @@ module.exports = {
   COINBASE: {
     API_KEY: process.env.COINBASE_CLIENT_ID || 'CB_API_KEY',
     API_SECRET_KEY: process.env.COINBASE_CLIENT_SECRET || 'CB_API_SECRET_KEY',
+    AUTH_REDIRECT_URI:
+      process.env.COINBASE_AUTH_REDIRECT_URI ||
+      'http://localhost:7777/api/v1/payment/accounts/create/oauth/callback',
     SCOPES: [
       'wallet:accounts:read',
       'wallet:accounts:update',
@@ -29,7 +32,7 @@ module.exports = {
       'wallet:deposits:read',
       'wallet:payment-methods:read',
       'wallet:payment-methods:limits',
-      'wallet:transactions:send', // **
+      // 'wallet:transactions:send', // **
       'wallet:transactions:request', //**
       'wallet:transactions:transfer', //**
       'wallet:user:read',
