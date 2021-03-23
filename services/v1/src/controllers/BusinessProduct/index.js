@@ -11,7 +11,7 @@ const {
   fetchBusinessProductSchema,
   updateBusinessProductSchema,
   deleteBusinessProductSchema,
-} = require('../Middleware/BusinessProduct/validation');
+} = require('../middleware/BusinessProduct/validation');
 const Op = getSqlizeModule().Op;
 
 module.exports = {

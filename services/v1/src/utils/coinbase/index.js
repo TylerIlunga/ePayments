@@ -4,11 +4,12 @@ const coinbaseConfig = require('../../config').COINBASE;
 const crypto = require('crypto');
 
 class CoinbaseAPIHelper {
-  constructor() {
+  constructor(userAccessToken = '') {
+    this.userAccessToken = userAccessToken;
     this.apiKey = coinbaseConfig.API_KEY;
     this.apiSecretKey = coinbaseConfig.API_SECRET_KEY;
-    this.oauth_url = 'https://www.coinbase.com/oauth';
     this.authcode_redirectURI = coinbaseConfig.AUTHCODE_REDIRECT_URI;
+    this.oauth_url = 'https://www.coinbase.com/oauth';
     this.api_url = 'https://api.coinbase.com/v2';
 
     this.authorizeUser = this.authorizeUser.bind(this);
@@ -30,11 +31,12 @@ class CoinbaseAPIHelper {
     //  res.request.method,
     const ts = new Date().getTime();
     return {
-      'CB-ACCESS-KEY': this.apiKey,
-      'CB-ACCESS-SIGN': this.generateMessageSignature(
-        String(ts) + reqMethod + reqPath + reqBodyAsString,
-      ),
-      'CB-ACCESS-TIMESTAMP': ts,
+      Authorization: `Bearer ${this.userAccessToken}`,
+      // 'CB-ACCESS-KEY': this.apiKey,
+      // 'CB-ACCESS-SIGN': this.generateMessageSignature(
+      //   String(ts) + reqMethod + reqPath + reqBodyAsString,
+      // ),
+      // 'CB-ACCESS-TIMESTAMP': ts,
     };
   }
 
