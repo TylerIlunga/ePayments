@@ -90,9 +90,11 @@ module.exports = {
     }
     try {
       const { code, state } = req.query;
-      const { userID, profileID } = JSON.parse(state);
+      const { email, userID, profileID } = JSON.parse(state);
       // Validate userID + profileID from state
-      const user = await dbModels.User.findOne({ where: { id: userID } });
+      const user = await dbModels.User.findOne({
+        where: { email, id: userID },
+      });
       if (user == null) {
         throw { error: 'Account does not exist for the given user ID' };
       }
