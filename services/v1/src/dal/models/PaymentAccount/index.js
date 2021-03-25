@@ -17,8 +17,10 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      user_id: Sequelize.STRING,
-      profile_id: Sequelize.STRING,
+      profile_id: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       coinbase_access_token: Sequelize.STRING,
       coinbase_access_token_expiry: Sequelize.STRING,
       coinbase_refresh_token: Sequelize.STRING,

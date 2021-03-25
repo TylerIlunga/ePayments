@@ -3,8 +3,13 @@
  * @module src/controllers/PaymentAccount/index.js
  */
 const generalConfig = require('../../config');
-const { PaymentAccount } = require('../../dal/config');
-const { Validation, CoinbaseAPIHelper } = require('../../utils');
+const dbModels = require('../../dal/config');
+const {
+  Validation,
+  CoinbaseAPIHelper,
+  Strings,
+  Errors,
+} = require('../../utils');
 const {
   fetchPaymentAccountSchema,
   createPaymentAccountSchema,
@@ -51,14 +56,14 @@ module.exports = {
     // Validate Input
     const validationResult = Validation.validateRequestBody(
       createPaymentAccountSchema,
-      req.body,
+      req.query,
     );
     if (validationResult.error) {
       return res.json({ error: validationResult.error });
     }
     try {
       const coinbaseAPI = new CoinbaseAPIHelper();
-      return coinbaseAPI.authorizeUser(res);
+      return coinbaseAPI.authorizeUser(res, JSON.stringify(req.query));
     } catch (error) {
       Errors.General.logError(error);
       return res.json(error);
@@ -83,24 +88,52 @@ module.exports = {
     if (validationResult.error) {
       return res.json({ error: validationResult.error });
     }
-    const coinbaseAPI = new CoinbaseAPIHelper();
-    coinbaseAPI
-      .getAccessToken(req.query.code)
-      .then((cbRes) => {
-        console.log('coinbaseAPI.getAccessToken() then:', cbRes);
-        if (cbRes.error) {
-          Errors.General.logError(cbRes.error);
-          return res.json(cbRes.error);
-        }
-        const accessTokenData = cbRes.data;
-        // TODO: Persist accessTokenData.access_token, accessTokenData.expires_in, accessTokenData.refresh_token
-        return res.json({ error: null, success: true, accessTokenData });
-      })
-      .catch((error) => {
-        console.log('coinbaseAPI.getAccessToken() error:', error);
-        Errors.General.logError(error);
-        return res.json(error);
+    try {
+      const { code, state } = req.query;
+      const { userID, profileID } = JSON.parse(state);
+      // Validate userID + profileID from state
+      const user = await dbModels.User.findOne({ where: { id: userID } });
+      if (user == null) {
+        throw { error: 'Account does not exist for the given user ID' };
+      }
+      const profileType = `${Strings.capitalize(user.type)}Profile`;
+      console.log('user profile type:', profileType);
+      const userProfile = await dbModels[profileType].findOne({
+        where: { id: profileID, user_id: user.id },
       });
+      if (userProfile == null) {
+        throw { error: 'Profile does not exist for the given IDs' };
+      }
+
+      // Persist Coinbase Access Token Data
+      const coinbaseAPI = new CoinbaseAPIHelper();
+      coinbaseAPI
+        .getAccessToken(code)
+        .then(async (cbRes) => {
+          if (cbRes.error) {
+            Errors.General.logError(cbRes.error);
+            return res.json(cbRes.error);
+          }
+          const accessTokenData = cbRes.data;
+          const newPaymentAccount = await dbModels.PaymentAccount.create({
+            user_id: userID,
+            profile_id: profileID,
+            coinbase_access_token: accessTokenData.access_token,
+            coinbase_access_token_expiry: accessTokenData.expires_in,
+            coinbase_refresh_token: accessTokenData.refresh_token,
+          });
+          console.log('New Payment Account created!', newPaymentAccount.id);
+          return res.json({ error: null, success: true });
+        })
+        .catch((error) => {
+          console.log('coinbaseAPI.getAccessToken() error:', error);
+          Errors.General.logError(error);
+          return res.json(error);
+        });
+    } catch (error) {
+      Errors.General.logError(error);
+      return res.json(error);
+    }
   },
   /**
    * Updates a given user's persisted payment account.

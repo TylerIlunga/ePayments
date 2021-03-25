@@ -54,7 +54,7 @@ class CoinbaseAPIHelper {
       data: reqOptions.body,
     })
       .then((res) => {
-        console.log('request() then:', res);
+        // console.log('request() then:', res);
         return res;
       })
       .catch((error) => {
@@ -65,7 +65,7 @@ class CoinbaseAPIHelper {
 
   authorizeUser(res, state = '') {
     // TODO: Handle 'state' query parameter
-    // state = this.generateMessageSignature((String(Math.random() * 2)) + new Date().getTime())
+    console.log('CoinbaseAPIHelper.authorizeUser():', state);
     const opts = {
       baseURL: this.oauth_url,
       path: 'authorize',
@@ -77,7 +77,7 @@ class CoinbaseAPIHelper {
         scopes: coinbaseConfig.SCOPES.toString(),
       },
     };
-    let url = `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&scope=${opts.queryParams.scopes}`;
+    let url = `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&state=${state}&scope=${opts.queryParams.scopes}`;
     return res.redirect(url);
   }
   getAccessToken(oauthCallbackCode) {
