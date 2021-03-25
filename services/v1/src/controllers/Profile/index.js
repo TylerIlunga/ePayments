@@ -5,7 +5,7 @@ const {
   businessCreationSchema,
   customerUpdateSchema,
   businessUpdateSchema,
-} = require('../Middleware/Profile/validation');
+} = require('../middleware/Profile/validation');
 const {
   AWS: { S3Utils },
   Errors,

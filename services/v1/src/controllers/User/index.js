@@ -11,7 +11,7 @@ const {
   activateAccountSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
-} = require('../Middleware/User/validation');
+} = require('../middleware/User/validation');
 const EmailSender = require('../../email');
 
 module.exports = {

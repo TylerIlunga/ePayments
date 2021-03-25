@@ -10,7 +10,7 @@ const { Errors, Generators, Tokens, Validation } = require('../../utils');
 const {
   tokenHasExpired,
   signUpLogInBodySchema,
-} = require('../Middleware/Session/validation');
+} = require('../middleware/Session/validation');
 const EmailSender = require('../../email');
 
 // NOTE: Use .mjs for new syntax? Or newer version of Node.js
