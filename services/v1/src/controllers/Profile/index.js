@@ -54,8 +54,7 @@ module.exports = {
         customerProfileID: newCustomerProfile.id,
       });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   async businessCreation(req, res) {
@@ -97,8 +96,7 @@ module.exports = {
         businessProfileID: newBusinessProfile.id,
       });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   async customerUpdate(req, res) {
@@ -132,8 +130,7 @@ module.exports = {
       await customerProfile.save();
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   async businessUpdate(req, res) {
@@ -168,8 +165,7 @@ module.exports = {
       await businessProfile.save();
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
 };

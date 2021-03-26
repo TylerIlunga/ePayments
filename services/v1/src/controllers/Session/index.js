@@ -98,8 +98,7 @@ module.exports = {
       console.log('activateAccount email sent to new user!');
       return res.json({ error: null, user });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -149,8 +148,7 @@ module.exports = {
         return res.json({ user: removeSensitiveUserData(user), error: null });
       });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**

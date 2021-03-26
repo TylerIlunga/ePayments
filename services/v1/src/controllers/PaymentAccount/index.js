@@ -39,8 +39,7 @@ module.exports = {
     try {
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -65,8 +64,7 @@ module.exports = {
       const coinbaseAPI = new CoinbaseAPIHelper();
       return coinbaseAPI.authorizeUser(res, JSON.stringify(req.query));
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -129,12 +127,10 @@ module.exports = {
         })
         .catch((error) => {
           console.log('coinbaseAPI.getAccessToken() error:', error);
-          Errors.General.logError(error);
-          return res.json(error);
+          return Errors.General.serveResponse(error);
         });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -157,8 +153,7 @@ module.exports = {
     try {
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -182,8 +177,7 @@ module.exports = {
     try {
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
 };

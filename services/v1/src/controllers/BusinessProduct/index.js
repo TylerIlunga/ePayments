@@ -63,8 +63,7 @@ module.exports = {
       console.log('new business product created! ID: ', newBusinessProduct.id);
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -111,8 +110,7 @@ module.exports = {
       });
       return res.json({ error: null, success: true, products });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -148,8 +146,7 @@ module.exports = {
       }
       return res.json({ error: null, success: true, product: businessProduct });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -197,8 +194,7 @@ module.exports = {
       await businessProduct.save();
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -226,8 +222,7 @@ module.exports = {
       });
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
 };

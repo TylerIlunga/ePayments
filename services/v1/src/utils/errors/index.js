@@ -2,10 +2,16 @@
  * Module for exporting utility methods related to application errors.
  * @module src/utils/errors/index.js
  */
+const logError = (error) => {
+  console.error('ERROR:', error);
+};
+
 module.exports = {
   General: {
-    logError(error) {
-      console.log('ERROR:', error);
+    logError,
+    serveResponse(res) {
+      logError(error);
+      return res.json(error);
     },
   },
   Network: {

@@ -47,8 +47,7 @@ module.exports = {
 
       return res.json({ success: true, error: null });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -93,8 +92,7 @@ module.exports = {
       console.log('resetPassword email sent to new user!');
       return res.json({ error: null, success: true });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
   /**
@@ -153,8 +151,7 @@ module.exports = {
         return res.json({ error: null, success: true });
       });
     } catch (error) {
-      Errors.General.logError(error);
-      return res.json(error);
+      return Errors.General.serveResponse(error);
     }
   },
 };
