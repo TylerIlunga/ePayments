@@ -20,7 +20,7 @@ const {
 
 module.exports = {
   /**
-   * Fetches connected third-party (Stripe, Coinbase) payment account information
+   * (TODO): Fetches connected third-party (Stripe, Coinbase) payment account information
    *
    * @param {object} req - Express.js Request
    * @param {object} res - Express.js Response
@@ -138,7 +138,7 @@ module.exports = {
     }
   },
   /**
-   * Updates a given user's persisted payment account.
+   * (TODO): Updates a given user's persisted payment account.
    *
    * @param {object} req - Express.js Request
    * @param {object} res - Express.js Response
@@ -162,7 +162,7 @@ module.exports = {
     }
   },
   /**
-   * Deletes a persisted payment account for a given user
+   * (TODO): Deletes a persisted payment account for a given user
    * along with any created third-party information.
    *
    * @param {object} req - Express.js Request
