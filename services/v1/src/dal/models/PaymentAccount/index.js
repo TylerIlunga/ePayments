@@ -21,9 +21,18 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      coinbase_access_token: Sequelize.STRING,
-      coinbase_access_token_expiry: Sequelize.STRING,
-      coinbase_refresh_token: Sequelize.STRING,
+      coinbase_access_token: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      coinbase_access_token_expiry: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+      coinbase_refresh_token: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
       created_at: {
         type: Sequelize.BIGINT,
         defaultValue: Date.now(),

@@ -115,6 +115,11 @@ module.exports = {
             return res.json(cbRes.error);
           }
           const accessTokenData = cbRes.data;
+          const currentDate = new Date();
+
+          currentDate.setSeconds(accessTokenData.expires_in);
+          accessTokenData.expires_in = currentDate.getTime();
+
           const newPaymentAccount = await dbModels.PaymentAccount.create({
             user_id: userID,
             profile_id: profileID,

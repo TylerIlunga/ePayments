@@ -6,11 +6,9 @@ const Joi = require('joi');
 
 const updateDeleteRequirements = {
   transactionID: Joi.number().required(),
-  userID: Joi.number().required(),
+  customerID: Joi.number().required(),
   businessID: Joi.number().required(),
   productID: Joi.number().required(),
-  pageNumber: Joi.number().required(),
-  pageSize: Joi.number().required(),
 };
 const listFetchRequirements = {
   ...updateDeleteRequirements,
@@ -20,10 +18,11 @@ const listFetchRequirements = {
 
 module.exports = {
   createBusinessTransactionSchema: Joi.object({
-    userID: Joi.number().required(),
+    customerID: Joi.number().required(),
     businessID: Joi.number().required(),
     productID: Joi.number().required(),
-    amount: Joi.number().required(),
+    sku: Joi.string().required(),
+    currency: Joi.number().required(),
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),
   }),

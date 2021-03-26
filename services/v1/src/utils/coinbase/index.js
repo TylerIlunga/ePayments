@@ -23,47 +23,29 @@ class CoinbaseAPIHelper {
     return crypto.createHash('sha256').update(secret).digest('hex');
   }
 
-  getHeaders(reqMethod, reqPath, reqBodyAsString) {
-    /**
-     * ak = access key, ts = timestamp (must be within 30 seconds of the API service time)
-     * method = "GET", "POST", "PUT", etc., requestPath = (ex)"/v2/exchange-rates?currency=USD"
-     * body = JSON.stringify(requestBody)
-     */
-
-    //  res.request.path,
-    //  res.request.method,
-    const ts = new Date().getTime();
-    return {
-      Authorization: `Bearer ${this.userAccessToken}`,
-      // 'CB-ACCESS-KEY': this.apiKey,
-      // 'CB-ACCESS-SIGN': this.generateMessageSignature(
-      //   String(ts) + reqMethod + reqPath + reqBodyAsString,
-      // ),
-      // 'CB-ACCESS-TIMESTAMP': ts,
-    };
+  getHeaders() {
+    return { Authorization: `Bearer ${this.userAccessToken}` };
   }
 
   request(reqOptions) {
-    return axios({
-      method: reqOptions.method,
-      baseURL: reqOptions.baseURL,
-      url: reqOptions.path,
-      headers: this.getHeaders(
-        reqOptions.method,
-        reqOptions.path,
-        JSON.stringify(reqOptions.body),
-      ),
-      params: reqOptions.queryParams,
-      data: reqOptions.body,
-    })
-      .then((res) => {
-        // console.log('request() then:', res);
-        return res;
+    return new Promise((resolve, reject) => {
+      axios({
+        method: reqOptions.method,
+        baseURL: reqOptions.baseURL,
+        url: reqOptions.path,
+        headers: this.getHeaders(),
+        params: reqOptions.queryParams,
+        data: reqOptions.body,
       })
-      .catch((error) => {
-        console.log('request() error:', error);
-        throw error;
-      });
+        .then((res) => {
+          // console.log('request() then:', res);
+          resolve(res);
+        })
+        .catch((error) => {
+          console.log('request() error:', error);
+          reject(error);
+        });
+    });
   }
 
   authorizeUser(res, state = '') {
@@ -82,6 +64,7 @@ class CoinbaseAPIHelper {
     let url = `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&state=${state}&scope=${opts.queryParams.scopes}`;
     return res.redirect(url);
   }
+
   getAccessToken(oauthCallbackCode) {
     return this.request({
       method: 'POST',
@@ -94,6 +77,20 @@ class CoinbaseAPIHelper {
         client_secret: coinbaseConfig.API_SECRET_KEY,
         redirect_uri: this.authcode_redirectURI,
         scopes: coinbaseConfig.SCOPES.toString(),
+      },
+    });
+  }
+
+  refreshAccessToken(refreshToken) {
+    return this.request({
+      method: 'POST',
+      baseURL: this.oauth_url,
+      path: 'token',
+      queryParams: {
+        grant_type: 'refresh_token',
+        client_id: coinbaseConfig.API_KEY,
+        client_secret: coinbaseConfig.API_SECRET_KEY,
+        refresh_token: refreshToken,
       },
     });
   }
