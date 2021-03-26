@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Request Validation module for Session endpoints.
+ * @module src/controllers/middleware/Session/validation.js
+ */
 const Joi = require('joi');
 const { Errors, Tokens } = require('../../../utils');
 

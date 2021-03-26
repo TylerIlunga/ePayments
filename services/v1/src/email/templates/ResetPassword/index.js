@@ -1,3 +1,7 @@
+/**
+ * Module for the email(s) generated for Resetting Passwords.
+ * @module src/email/templates/ResetPassword/index.js
+ */
 module.exports = ({ user }) => {
   return `
     <p>Copy and paste your Reset Token below:</p>

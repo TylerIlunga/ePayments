@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Module for utilities methods dedicated to manipulating strings.
+ * @module src/utils/strings/index.js
+ */
 const capitalize = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };

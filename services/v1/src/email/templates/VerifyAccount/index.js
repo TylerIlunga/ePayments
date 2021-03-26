@@ -1,3 +1,7 @@
+/**
+ * Module for the email(s) generated for verifying accounts.
+ * @module src/email/templates/VerifyAccount/index.js
+ */
 module.exports = ({ user }) => {
   return `
     Welcome to DigiCard!

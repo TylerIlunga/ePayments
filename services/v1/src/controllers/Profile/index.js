@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Controller module for user Profile endpoints.
+ * @module src/controllers/Profile/validation.js
+ */
 const { BusinessProfile, CustomerProfile } = require('../../dal/config');
 const {
   customerCreationSchema,

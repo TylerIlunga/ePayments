@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Database (DAL layer) Configuration module.
+ * @module src/dal/config.js
+ */
 require('pg');
 
 const Sequelize = require('sequelize');

@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Request Validation module for User endpoints.
+ * @module src/controllers/middleware/User/validation.js
+ */
 const Joi = require('joi');
 
 module.exports = {
@@ -26,10 +29,10 @@ module.exports = {
       .required(),
     resetPasswordToken: Joi.string().required(),
     oldPassword: Joi.string()
-      .pattern(new RegExp('^[a-zA-Z0-9]{10,30}$'))
+      .pattern(new RegExp('config.Validation.genericPasswordPattern'))
       .required(),
     newPassword: Joi.string()
-      .pattern(new RegExp('^[a-zA-Z0-9]{10,30}$'))
+      .pattern(new RegExp('config.Validation.genericPasswordPattern'))
       .required(),
   }),
 };

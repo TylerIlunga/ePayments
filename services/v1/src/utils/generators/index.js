@@ -1,4 +1,8 @@
-// TODO: JSDOC Module Header
+/**
+ * Module for utilities methods dedicated to
+ * generating/building unique values such as passwords.
+ * @module src/utils/generators/index.js
+ */
 const bcrypt = require('bcrypt-nodejs');
 
 module.exports = {

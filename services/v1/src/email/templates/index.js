@@ -1,5 +1,7 @@
-// TODO: JSDOC Module Header
-
+/**
+ * Module for generated Email templates.
+ * @module src/email/templates/index.js
+ */
 module.exports = {
   activateAccount(user) {
     return {

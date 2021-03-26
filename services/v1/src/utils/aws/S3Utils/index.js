@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Module devoted to interacting with AWS S3.
+ * @module src/utils/aws/S3Utils/index.js
+ */
 const config = require('../../../config');
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({

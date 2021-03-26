@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Module for utilities methods dedicated to managing errors.
+ * @module src/utils/validation/index.js
+ */
 const Errors = require('../errors');
 
 const extractErrorMessage = (errorObject) => {

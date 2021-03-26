@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Request Validation module for user Profile endpoints.
+ * @module src/controllers/middleware/Profile/validation.js
+ */
 const Joi = require('joi');
 
 module.exports = {

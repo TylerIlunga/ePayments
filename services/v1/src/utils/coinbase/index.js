@@ -1,4 +1,7 @@
-// TODO: JSDOC Module Header
+/**
+ * Module for the Coinbase API utility class.
+ * @module src/utils/coinbase/index.js
+ */
 const axios = require('axios');
 const coinbaseConfig = require('../../config').COINBASE;
 const crypto = require('crypto');
@@ -64,7 +67,6 @@ class CoinbaseAPIHelper {
   }
 
   authorizeUser(res, state = '') {
-    // TODO: Handle 'state' query parameter
     console.log('CoinbaseAPIHelper.authorizeUser():', state);
     const opts = {
       baseURL: this.oauth_url,
