@@ -9,7 +9,7 @@ const logError = (error) => {
 module.exports = {
   General: {
     logError,
-    serveResponse(res) {
+    serveResponse(error, res) {
       logError(error);
       return res.json(error);
     },

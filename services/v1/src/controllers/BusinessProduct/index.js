@@ -2,7 +2,6 @@
  * Controller module for BusinessProduct endpoints.
  * @module src/controllers/BusinessProduct/index.js
  */
-const generalConfig = require('../../config');
 const { getSqlizeModule, BusinessProduct, User } = require('../../dal/config');
 const { Errors, Strings, Validation } = require('../../utils');
 const {
@@ -63,7 +62,7 @@ module.exports = {
       console.log('new business product created! ID: ', newBusinessProduct.id);
       return res.json({ error: null, success: true });
     } catch (error) {
-      return Errors.General.serveResponse(error);
+      return Errors.General.serveResponse(error, res);
     }
   },
   /**
@@ -110,7 +109,7 @@ module.exports = {
       });
       return res.json({ error: null, success: true, products });
     } catch (error) {
-      return Errors.General.serveResponse(error);
+      return Errors.General.serveResponse(error, res);
     }
   },
   /**
@@ -146,7 +145,7 @@ module.exports = {
       }
       return res.json({ error: null, success: true, product: businessProduct });
     } catch (error) {
-      return Errors.General.serveResponse(error);
+      return Errors.General.serveResponse(error, res);
     }
   },
   /**
@@ -194,7 +193,7 @@ module.exports = {
       await businessProduct.save();
       return res.json({ error: null, success: true });
     } catch (error) {
-      return Errors.General.serveResponse(error);
+      return Errors.General.serveResponse(error, res);
     }
   },
   /**
@@ -222,7 +221,7 @@ module.exports = {
       });
       return res.json({ error: null, success: true });
     } catch (error) {
-      return Errors.General.serveResponse(error);
+      return Errors.General.serveResponse(error, res);
     }
   },
 };
