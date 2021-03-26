@@ -1,5 +1,5 @@
 /**
- * BusinessProduct Controller module.
+ * Controller module for BusinessProduct endpoints.
  * @module src/controllers/BusinessProduct/index.js
  */
 const generalConfig = require('../../config');

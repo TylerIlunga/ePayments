@@ -1,5 +1,5 @@
 /**
- * PaymentAccount Controller module.
+ * Controller module for PaymentAccount endpoints.
  * @module src/controllers/PaymentAccount/index.js
  */
 const generalConfig = require('../../config');

@@ -1,5 +1,5 @@
 /**
- * Session Controller module.
+ * Controller module for user Session endpoints.
  * @module src/controllers/Session/index.js
  */
 const bcrypt = require('bcrypt-nodejs');

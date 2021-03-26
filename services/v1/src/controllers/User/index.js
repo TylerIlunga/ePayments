@@ -1,5 +1,5 @@
 /**
- * User Controller module.
+ * Controller module for User endpoints.
  * @module src/controllers/User/index.js
  */
 const bcrypt = require('bcrypt-nodejs');
