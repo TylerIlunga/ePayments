@@ -8,6 +8,7 @@ const UserController = require('../controllers/User');
 const ProfileController = require('../controllers/Profile');
 const BusinessProductController = require('../controllers/BusinessProduct');
 const PaymentAccountController = require('../controllers/PaymentAccount');
+const BusinessTransactionController = require('../controllers/BusinessTransaction');
 
 // TODO: Protected / Authenticated Middleware for certain routes
 
@@ -20,12 +21,12 @@ Router.post('/api/v1/session/signup', SessionController.signUp);
 Router.post('/api/v1/session/login', SessionController.logIn);
 Router.get('/api/v1/session/logout', SessionController.logOut);
 
-/** API Endpoints related to handling user business logic */
+/** API Endpoints related to handling user accounts */
 Router.post('/api/v1/user/activateAccount', UserController.activateAccount);
 Router.post('/api/v1/user/forgotPassword', UserController.forgotPassword);
 Router.post('/api/v1/user/resetPassword', UserController.resetPassword);
 
-/** API Endpoints related to handling user profile business logic */
+/** API Endpoints related to handling user profiles */
 Router.post(
   '/api/v1/profile/customer/create',
   ProfileController.customerCreation,
@@ -37,7 +38,7 @@ Router.post(
 Router.put('/api/v1/profile/business/update', ProfileController.businessUpdate);
 Router.put('/api/v1/profile/customer/update', ProfileController.customerUpdate);
 
-/** API Endpoints related to handling business product business logic */
+/** API Endpoints related to handling business products */
 Router.post(
   '/api/v1/products/business/create',
   BusinessProductController.createBusinessProduct,
@@ -59,7 +60,7 @@ Router.delete(
   BusinessProductController.deleteBusinessProduct,
 );
 
-/** API Endpoints related to handling connected payment account business logic */
+/** API Endpoints related to handling connected payment accounts */
 Router.get(
   '/api/v1/payment/accounts/fetch',
   PaymentAccountController.fetchPaymentAccount,
@@ -79,6 +80,28 @@ Router.put(
 Router.delete(
   '/api/v1/payment/accounts/delete',
   PaymentAccountController.deletePaymentAccount,
+);
+
+/** API Endpoints related to handling business transactions */
+Router.post(
+  '/api/v1/transactions/create',
+  BusinessTransactionController.createBusinessTransaction,
+);
+Router.get(
+  '/api/v1/transactions/list',
+  BusinessTransactionController.listBusinessTransactions,
+);
+Router.get(
+  '/api/v1/transactions/fetch',
+  BusinessTransactionController.fetchBusinessTransaction,
+);
+Router.put(
+  '/api/v1/transactions/update',
+  BusinessTransactionController.updateBusinessTransaction,
+);
+Router.delete(
+  '/api/v1/transactions/delete',
+  BusinessTransactionController.deleteBusinessTransaction,
 );
 
 module.exports = Router;

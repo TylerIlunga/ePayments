@@ -76,6 +76,7 @@ module.exports = {
    * @return {Array} list of JSON objects
    */
   async listBusinessProducts(req, res) {
+    // TODO: Handle Pagination (just add pageNumber(offset), pageSize(limit) with bounds)
     // Validate Input
     const validationResult = Validation.validateRequestBody(
       listBusinessProductsSchema,
