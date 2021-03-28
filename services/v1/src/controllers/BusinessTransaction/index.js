@@ -45,7 +45,7 @@ module.exports = {
         currency,
         latitude,
         longitude,
-      } = validationResult.result;
+      } = validationResult.value;
       // Validate Business Account
       const businessAccount = await User.findOne({ where: { id: businessID } });
       if (businessAccount == null) {
@@ -85,54 +85,78 @@ module.exports = {
         throw { error: 'Customer payment account does not exist.' };
       }
       // Account for expired access tokens (refresh with refresh token and then fetch/store new accessToken data)
-      // Transfer Product's value from Customer's Coinbase Wallet to Business Wallet (via API map to current currency's wallet)
       const coinbaseAPIHelper = new CoinbaseAPIHelper();
       const currentDateTime = new Date();
       const businessAccessTokenExpiryDate = new Date(
-        businessPaymentAccount.coinbase_access_token_expiry,
+        Number(businessPaymentAccount.coinbase_access_token_expiry),
+      );
+      console.log(
+        'businessAccessTokenExpiryDate - currentDateTime:',
+        businessAccessTokenExpiryDate - currentDateTime,
       );
       if (businessAccessTokenExpiryDate - currentDateTime <= 0) {
         // Refresh Token + Persist Token
-        const newAccessTokenData = await coinbaseAPIHelper.refreshAccessToken(
+        await coinbaseAPIHelper.refreshAccessToken(
+          businessPaymentAccount,
           businessPaymentAccount.coinbase_refresh_token,
         );
-        businessPaymentAccount.coinbase_access_token =
-          newAccessTokenData.access_token;
-        businessPaymentAccount.coinbase_refresh_token =
-          newAccessTokenData.refresh_token;
-
-        const currentTimeAtPersistence = new Date();
-
-        currentTimeAtPersistence.setSeconds(newAccessTokenData.expires_in);
-        businessPaymentAccount.coinbase_access_token_expiry = currentTimeAtPersistence.getTime();
-
-        businessPaymentAccount.save();
       }
-
       const customerAccessTokenExpiryDate = new Date(
-        customerPaymentAccount.coinbase_access_token_expiry,
+        Number(customerPaymentAccount.coinbase_access_token_expiry),
       );
       if (customerAccessTokenExpiryDate - currentDateTime <= 0) {
         // Refresh Token + Persist Token
-        const newAccessTokenData = await coinbaseAPIHelper.refreshAccessToken(
+        await coinbaseAPIHelper.refreshAccessToken(
+          customerPaymentAccount,
           customerPaymentAccount.coinbase_refresh_token,
         );
-        customerPaymentAccount.coinbase_access_token =
-          newAccessTokenData.access_token;
-        customerPaymentAccount.coinbase_refresh_token =
-          newAccessTokenData.refresh_token;
-
-        const currentTimeAtPersistence = new Date();
-
-        currentTimeAtPersistence.setSeconds(newAccessTokenData.expires_in);
-        customerPaymentAccount.coinbase_access_token_expiry = currentTimeAtPersistence.getTime();
-
-        customerPaymentAccount.save();
       }
-      // TODO: LEFT OFF HERE...TIRED AF
-      // Account for lack of funds
-      // Convert Crypto value to Fiat Value if Business has auto_convert_to_fiat enabled
+
+      // return res.json({ businessPaymentAccount, customerPaymentAccount });
+      // Transfer Product's value from Customer's Coinbase Wallet to Business Wallet (via API map to current currency's wallet)
+      const cbTransactionResult = await coinbaseAPIHelper.transferFunds({
+        currency,
+        latitude,
+        longitude,
+        // price: priceToCurrnecyType(businessProduct.price),
+        price: businessProduct.price,
+        from: customerPaymentAccount,
+        to: businessPaymentAccount,
+      });
+
+      res.json({
+        error: false,
+        success: true,
+        transactionID: cbTransactionResult.id,
+      });
+
+      // (BACKGROUND) Convert Crypto value to Fiat Value for Business if they have auto_convert_to_fiat enabled
+      if (!businessPaymentAccount.auto_convert_to_fiat) {
+        return;
+      }
+      coinbaseAPIHelper
+        .convertToFiat({
+          account: businessPaymentAccount,
+          transactionID: cbTransactionResult.id,
+        })
+        .then((res) => {
+          const cbConversionResult = res.data;
+          console.log('cbConversionResult:', cbConversionResult);
+          console.log(
+            'Fiat conversion successful:',
+            cbConversionResult.cbWithdrawlID,
+          );
+        })
+        .catch((error) => {
+          console.log('coinbaseAPIHelper.convertToFiat() error:', error);
+          Errors.General.logError(error);
+        });
       // Respond
+      return res.json({
+        error: false,
+        success: true,
+        transactionID: cbTransactionResult.id,
+      });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
     }

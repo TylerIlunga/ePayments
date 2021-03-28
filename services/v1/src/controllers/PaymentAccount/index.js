@@ -114,15 +114,26 @@ module.exports = {
             Errors.General.logError(cbRes.error);
             return res.json(cbRes.error);
           }
+
           const accessTokenData = cbRes.data;
           const currentDate = new Date();
 
           currentDate.setSeconds(accessTokenData.expires_in);
           accessTokenData.expires_in = currentDate.getTime();
 
+          const cbAccountData = await coinbaseAPI.getAccountData(
+            accessTokenData.access_token,
+          );
+          const cbBitcoinWalletData = await coinbaseAPI.getWalletAddress(
+            accessTokenData.access_token,
+            cbAccountData.accountID,
+            'btc',
+          );
           const newPaymentAccount = await dbModels.PaymentAccount.create({
             user_id: userID,
             profile_id: profileID,
+            coinbase_account_id: cbAccountData.accountID,
+            coinbase_bitcoin_address: cbBitcoinWalletData.bitcoinAddress,
             coinbase_access_token: accessTokenData.access_token,
             coinbase_access_token_expiry: accessTokenData.expires_in,
             coinbase_refresh_token: accessTokenData.refresh_token,

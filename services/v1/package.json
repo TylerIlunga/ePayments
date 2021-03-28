@@ -28,7 +28,8 @@
     "pg": "^8.5.1",
     "pq": "0.0.3",
     "retry-axios": "^2.4.0",
-    "sequelize": "^6.5.0"
+    "sequelize": "^6.5.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "jest": "^24.9.0",

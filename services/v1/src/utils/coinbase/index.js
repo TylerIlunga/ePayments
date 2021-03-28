@@ -23,8 +23,9 @@ class CoinbaseAPIHelper {
     return crypto.createHash('sha256').update(secret).digest('hex');
   }
 
-  getHeaders() {
-    return { Authorization: `Bearer ${this.userAccessToken}` };
+  getHeaders(opts = {}) {
+    const headers = { ...opts };
+    return headers;
   }
 
   request(reqOptions) {
@@ -33,7 +34,7 @@ class CoinbaseAPIHelper {
         method: reqOptions.method,
         baseURL: reqOptions.baseURL,
         url: reqOptions.path,
-        headers: this.getHeaders(),
+        headers: reqOptions.headers,
         params: reqOptions.queryParams,
         data: reqOptions.body,
       })
@@ -70,6 +71,7 @@ class CoinbaseAPIHelper {
       method: 'POST',
       baseURL: this.oauth_url,
       path: 'token',
+      headers: this.getHeaders({}),
       queryParams: {
         grant_type: 'authorization_code',
         code: oauthCallbackCode,
@@ -81,17 +83,148 @@ class CoinbaseAPIHelper {
     });
   }
 
-  refreshAccessToken(refreshToken) {
-    return this.request({
-      method: 'POST',
-      baseURL: this.oauth_url,
-      path: 'token',
-      queryParams: {
-        grant_type: 'refresh_token',
-        client_id: coinbaseConfig.API_KEY,
-        client_secret: coinbaseConfig.API_SECRET_KEY,
-        refresh_token: refreshToken,
-      },
+  refreshAccessToken(currentPaymentAccount, refreshToken) {
+    return new Promise((resolve, reject) => {
+      console.log('refreshAccessToken()');
+      this.request({
+        method: 'POST',
+        baseURL: this.oauth_url,
+        path: 'token',
+        headers: this.getHeaders({}),
+        queryParams: {
+          grant_type: 'refresh_token',
+          client_id: coinbaseConfig.API_KEY,
+          client_secret: coinbaseConfig.API_SECRET_KEY,
+          refresh_token: refreshToken,
+        },
+      })
+        .then((response) => {
+          const newAccessTokenData = response.data;
+
+          currentPaymentAccount.coinbase_access_token =
+            newAccessTokenData.access_token;
+          currentPaymentAccount.coinbase_refresh_token =
+            newAccessTokenData.refresh_token;
+
+          const currentTimeAtPersistence = new Date();
+
+          currentTimeAtPersistence.setSeconds(newAccessTokenData.expires_in);
+          currentPaymentAccount.coinbase_access_token_expiry = currentTimeAtPersistence.getTime();
+
+          console.log(
+            'refreshAccessToken(): coinbase_access_token_expiry',
+            currentPaymentAccount.coinbase_access_token_expiry,
+          );
+
+          currentPaymentAccount.save();
+
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  getWalletAddress(accessToken, accountID, currencyType) {
+    // https://api.coinbase.com/v2/accounts/:account_id/addresses
+    return new Promise((resolve, reject) => {
+      this.request({
+        method: 'GET',
+        baseURL: this.api_url,
+        path: `/accounts/:${accountID}/addresses`,
+        headers: this.getHeaders({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+        queryParams: {},
+      })
+        .then((res) => {
+          const wallets = res.data.data;
+          console.log('getWalletAddress() wallets:', wallets);
+          const walletData = {};
+          for (let i = 0; i < wallets.length; i++) {
+            if (
+              wallets[i].network == currencyType &&
+              wallets[i].resource == 'address'
+            ) {
+              walletData['bitcoinAddress'] = wallets[i].address;
+              break;
+            }
+          }
+          console.log(
+            'getWalletAddress() walletData[bitcoinAddress]:',
+            walletData['bitcoinAddress'],
+          );
+          resolve(walletData);
+        })
+        .catch((error) => {
+          console.log('getWalletAddress() error:', error);
+          reject(error);
+        });
+    });
+  }
+
+  getAccountData(accessToken) {
+    return new Promise((resolve, reject) => {
+      this.request({
+        method: 'POST',
+        baseURL: this.api_url,
+        path: '/accounts',
+        headers: this.getHeaders({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+        queryParams: {},
+      })
+        .then((res) => {
+          const accounts = res.data.data;
+          console.log('getAccountData() accounts:', accounts);
+          const accountData = {};
+          for (let i = 0; i < accounts.length; i++) {
+            if (
+              accounts[i].type == 'wallet' &&
+              accounts[i].currency.toLowerCase() == 'btc'
+            ) {
+              accountData['accountID'] = accounts[i].id;
+              break;
+            }
+          }
+          console.log(
+            'getAccountData() accountData[accountID]:',
+            accountData['accountID'],
+          );
+          resolve(accountData);
+        })
+        .catch((error) => {
+          console.log('getAccountData() error:', error);
+          reject(error);
+        });
+    });
+  }
+
+  transferFunds(transactionData) {
+    return new Promise((resolve, reject) => {
+      // Use CB Transaction API methods...
+      // Account for lack of funds
+      this.request({
+        method: 'POST',
+        baseURL: this.api_url,
+        path: `/accounts/${transactionData.from.coinbase_account_id}/transactions`,
+        headers: this.getHeaders({
+          Authorization: `Bearer ${transactionData.from.coinbase_access_token}`,
+        }),
+        queryParams: {
+          type: 'send',
+          to: transactionData.to.coinbase_bitcoin_address,
+          amount: transactionData.price,
+          currency: transactionData.currency,
+        },
+      });
+    });
+  }
+
+  convertToFiat(account, transactionID) {
+    return new Promise((resolve, reject) => {
+      // Use CB Withdrawl API methods...
     });
   }
 }

@@ -18,11 +18,11 @@ const listFetchRequirements = {
 
 module.exports = {
   createBusinessTransactionSchema: Joi.object({
-    customerID: Joi.number().required(),
     businessID: Joi.number().required(),
+    customerID: Joi.number().required(),
     productID: Joi.number().required(),
     sku: Joi.string().required(),
-    currency: Joi.number().required(),
+    currency: Joi.string().required(),
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),
   }),

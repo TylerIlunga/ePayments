@@ -21,7 +21,6 @@ module.exports = (sequelize) => {
       address: Sequelize.STRING,
       phone_number: Sequelize.STRING,
       public_email: Sequelize.STRING,
-      auto_convert_to_fiat: Sequelize.BOOLEAN,
       created_at: {
         type: Sequelize.BIGINT,
         defaultValue: Date.now(),
