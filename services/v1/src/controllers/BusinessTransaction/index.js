@@ -143,7 +143,7 @@ module.exports = {
           const cbConversionResult = res.data;
           console.log('cbConversionResult:', cbConversionResult);
           console.log(
-            'Fiat conversion successful:',
+            'coinbaseAPIHelper.convertToFiat():',
             cbConversionResult.cbWithdrawlID,
           );
         })
@@ -151,12 +151,6 @@ module.exports = {
           console.log('coinbaseAPIHelper.convertToFiat() error:', error);
           Errors.General.logError(error);
         });
-      // Respond
-      return res.json({
-        error: false,
-        success: true,
-        transactionID: cbTransactionResult.id,
-      });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
     }
