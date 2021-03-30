@@ -124,7 +124,7 @@ module.exports = {
           const cbAccountData = await coinbaseAPI.getAccountData(
             accessTokenData.access_token,
           );
-          const cbBitcoinWalletData = await coinbaseAPI.getWalletAddress(
+          const cbBitcoinWalletData = await coinbaseAPI.createNewWalletAddress(
             accessTokenData.access_token,
             cbAccountData.accountID,
             'bitcoin',

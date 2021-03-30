@@ -126,39 +126,32 @@ class CoinbaseAPIHelper {
     });
   }
 
-  getWalletAddress(accessToken, accountID, currencyType) {
+  createNewWalletAddress(accessToken, accountID, currencyType) {
     // https://api.coinbase.com/v2/accounts/:account_id/addresses
     return new Promise((resolve, reject) => {
       this.request({
-        method: 'GET',
+        method: 'POST',
         baseURL: this.api_url,
         path: `/accounts/${accountID}/addresses`,
         headers: this.getHeaders({
           Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
         }),
         queryParams: {},
+        body: {
+          name: `ePayments ${currencyType} receive address`,
+        },
       })
         .then((res) => {
-          const wallets = res.data.data;
-          console.log('getWalletAddress() wallets:', wallets);
-          const walletData = {};
-          for (let i = 0; i < wallets.length; i++) {
-            if (
-              wallets[i].network == currencyType &&
-              wallets[i].resource == 'address'
-            ) {
-              walletData['bitcoinAddress'] = wallets[i].address;
-              break;
-            }
-          }
+          const newAddressData = res.data.data;
           console.log(
-            'getWalletAddress() walletData[bitcoinAddress]:',
-            walletData['bitcoinAddress'],
+            'createNewWalletAddress() newAddressData:',
+            newAddressData,
           );
-          resolve(walletData);
+          resolve({ bitcoinAddress: newAddressData.address });
         })
         .catch((error) => {
-          console.log('getWalletAddress() error:', error);
+          console.log('createNewWalletAddress() error:', error);
           reject(error);
         });
     });
