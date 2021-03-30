@@ -127,7 +127,7 @@ module.exports = {
           const cbBitcoinWalletData = await coinbaseAPI.getWalletAddress(
             accessTokenData.access_token,
             cbAccountData.accountID,
-            'btc',
+            'bitcoin',
           );
           const newPaymentAccount = await dbModels.PaymentAccount.create({
             user_id: userID,

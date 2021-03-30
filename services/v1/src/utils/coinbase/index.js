@@ -132,7 +132,7 @@ class CoinbaseAPIHelper {
       this.request({
         method: 'GET',
         baseURL: this.api_url,
-        path: `/accounts/:${accountID}/addresses`,
+        path: `/accounts/${accountID}/addresses`,
         headers: this.getHeaders({
           Authorization: `Bearer ${accessToken}`,
         }),
@@ -167,7 +167,7 @@ class CoinbaseAPIHelper {
   getAccountData(accessToken) {
     return new Promise((resolve, reject) => {
       this.request({
-        method: 'POST',
+        method: 'GET',
         baseURL: this.api_url,
         path: '/accounts',
         headers: this.getHeaders({
