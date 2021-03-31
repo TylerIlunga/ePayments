@@ -43,6 +43,7 @@ module.exports = {
       }
       // If so, remove resetToken + set Account to active
       user.activation_token = null;
+      user.active = true;
       await user.save();
 
       return res.json({ success: true, error: null });
