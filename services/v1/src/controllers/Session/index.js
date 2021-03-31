@@ -57,7 +57,7 @@ module.exports = {
     });
   },
   /**
-   * Creates a new account and a session for a new user.
+   * Creates a new account for a new user.
    *
    * @param {object} req - Express.js Request
    * @param {object} res - Express.js Response

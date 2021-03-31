@@ -34,9 +34,9 @@ module.exports = {
     }
     try {
       // Check to see if email and activation token exists for the given user.
-      const { email, resetToken } = validationResult.value;
+      const { email, activationToken } = validationResult.value;
       const user = await User.findOne({
-        where: { email, activation_token: resetToken },
+        where: { email, activation_token: activationToken },
       });
       if (user === null) {
         throw { error: 'Account can not be found for the given information.' };
