@@ -32,7 +32,7 @@ module.exports = {
       'wallet:deposits:read',
       'wallet:payment-methods:read',
       'wallet:payment-methods:limits',
-      // 'wallet:transactions:send', // **
+      'wallet:transactions:send', // **
       'wallet:transactions:request', //**
       'wallet:transactions:transfer', //**
       'wallet:user:read',
@@ -40,6 +40,9 @@ module.exports = {
       'wallet:withdrawals:read', // **
       'wallet:withdrawals:create', //**
     ],
+    currentTransactionSendLimitAmount: 1,
+    currentTransactionSendLimitCurrency: 'USD',
+    currentTransactionSendLimitPeriod: 'day',
   },
   JWT: {
     algorithm: process.env.JWT_ALGORITHM || 'RS256',

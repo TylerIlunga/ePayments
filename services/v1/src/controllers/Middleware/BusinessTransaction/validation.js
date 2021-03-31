@@ -21,6 +21,7 @@ module.exports = {
     businessID: Joi.number().required(),
     customerID: Joi.number().required(),
     productID: Joi.number().required(),
+    twoFactorAuthToken: Joi.string(), // Not required in case they don't have it set up
     sku: Joi.string().required(),
     currency: Joi.string().required(),
     latitude: Joi.number().required(),

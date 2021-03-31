@@ -60,10 +60,14 @@ class CoinbaseAPIHelper {
         clientID: coinbaseConfig.API_KEY,
         redirectURI: this.authcode_redirectURI,
         scopes: coinbaseConfig.SCOPES.toString(),
+        sendLimitAmount: coinbaseConfig.currentTransactionSendLimitAmount,
+        sendLimitCurrency: coinbaseConfig.currentTransactionSendLimitCurrency,
+        sendLimitPeriod: coinbaseConfig.currentTransactionSendLimitPeriod,
       },
     };
-    let url = `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&state=${state}&scope=${opts.queryParams.scopes}`;
-    return res.redirect(url);
+    return res.redirect(
+      `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&state=${state}&scope=${opts.queryParams.scopes}&meta[send_limit_amount]=${opts.queryParams.sendLimitAmount}&meta[send_limit_currency]=${opts.queryParams.sendLimitCurrency}&meta[send_limit_period]=${opts.queryParams.sendLimitPeriod}`,
+    );
   }
 
   getAccessToken(oauthCallbackCode) {
@@ -137,7 +141,6 @@ class CoinbaseAPIHelper {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         }),
-        queryParams: {},
         body: {
           name: `ePayments ${currencyType} receive address`,
         },
@@ -166,7 +169,6 @@ class CoinbaseAPIHelper {
         headers: this.getHeaders({
           Authorization: `Bearer ${accessToken}`,
         }),
-        queryParams: {},
       })
         .then((res) => {
           const accounts = res.data.data;
@@ -194,24 +196,63 @@ class CoinbaseAPIHelper {
     });
   }
 
-  transferFunds(transactionData) {
+  getCurrentBuyPriceFor(accessToken, currencyPair) {
     return new Promise((resolve, reject) => {
-      // Use CB Transaction API methods...
-      // Account for lack of funds
+      this.request({
+        method: 'GET',
+        baseURL: this.api_url,
+        path: `/prices/${currencyPair}/buy`,
+        headers: this.getHeaders({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+      })
+        .then((res) => {
+          console.log('getCurrentBuyPriceFor res.data:', res.data);
+          resolve(res.data.data);
+        })
+        .catch((error) => {
+          console.log('getCurrentBuyPriceFor() error:', error);
+          reject(error);
+        });
+    });
+  }
+
+  transferFunds(transactionData) {
+    return new Promise(async (resolve, reject) => {
+      const reqHeaders = this.getHeaders({
+        Authorization: `Bearer ${transactionData.from.coinbase_access_token}`,
+        'Content-Type': 'application/json',
+      });
+      if (
+        transactionData.twoFactorAuthToken !== null &&
+        transactionData.twoFactorAuthToken !== undefined
+      ) {
+        reqHeaders['CB-2FA-TOKEN'] = transactionData.twoFactorAuthToken;
+      }
       this.request({
         method: 'POST',
         baseURL: this.api_url,
         path: `/accounts/${transactionData.from.coinbase_account_id}/transactions`,
-        headers: this.getHeaders({
-          Authorization: `Bearer ${transactionData.from.coinbase_access_token}`,
-        }),
-        queryParams: {
+        headers: reqHeaders,
+        body: {
           type: 'send',
-          to: transactionData.to.coinbase_bitcoin_address,
-          amount: transactionData.price,
+          // TODO: UNCOMMENT THIS to: transactionData.to.coinbase_bitcoin_address,
+          to: 'bc1qegu60t0n6npt7vam36mur60zpyudz62pd3f4za',
+          amount: '0.00010003',
           currency: transactionData.currency,
         },
-      });
+      })
+        .then((res) => {
+          console.log('transferFunds res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('transferFunds() error:', error);
+          if (error.response.status === 402) {
+            return reject({ error: 'TFA Token required' });
+          }
+          reject(error.response.data);
+        });
     });
   }
 

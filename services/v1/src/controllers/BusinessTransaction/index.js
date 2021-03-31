@@ -51,19 +51,23 @@ module.exports = {
       if (businessAccount == null) {
         throw { error: 'Business account does not exist for the given ID' };
       }
-      // const businessProfile = await BusinessProfile.findOne({ where: { user_id: businessAccount.id } });
-      // if (businessProfile == null) {
-      //   throw { error: "Business profile does not exist for the given ID" };
-      // }
+      const businessProfile = await BusinessProfile.findOne({
+        where: { user_id: businessAccount.id },
+      });
+      if (businessProfile == null) {
+        throw { error: 'Business profile does not exist for the given ID' };
+      }
       // Validate Customer Account
       const customerAccount = await User.findOne({ where: { id: customerID } });
       if (customerAccount == null) {
         throw { error: 'Customer account does not exist for the given ID' };
       }
-      // const customerProfile = await CustomerProfile.findOne({ where: { user_id: customerAccount.id } });
-      // if (customerProfile == null) {
-      //   throw { error: "Customer profile does not exist for the given ID" };
-      // }
+      const customerProfile = await CustomerProfile.findOne({
+        where: { user_id: customerAccount.id },
+      });
+      if (customerProfile == null) {
+        throw { error: 'Customer profile does not exist for the given ID' };
+      }
       // Validate Product
       const businessProduct = await BusinessProduct.findOne({
         where: { sku, id: productID, user_id: businessAccount.id },
@@ -112,14 +116,28 @@ module.exports = {
         );
       }
 
-      // return res.json({ businessPaymentAccount, customerPaymentAccount });
+      // Convert Product Price to current currency buy price
+      const cbCurrentBTCBuyPrice = await coinbaseAPIHelper.getCurrentBuyPriceFor(
+        businessPaymentAccount.coinbase_access_token,
+        'BTC-USD',
+      );
+
+      businessProduct.price =
+        businessProduct.price / cbCurrentBTCBuyPrice.amount;
+
+      if (businessProduct.price <= 0.0001) {
+        throw {
+          error: `BTC Price (${businessProduct.price}) of product must be at least 0.0001 BTC (Coinbase Standard)`,
+        };
+      }
+
       // Transfer Product's value from Customer's Coinbase Wallet to Business Wallet (via API map to current currency's wallet)
       const cbTransactionResult = await coinbaseAPIHelper.transferFunds({
         currency,
         latitude,
         longitude,
-        // price: priceToCurrnecyType(businessProduct.price),
-        price: businessProduct.price,
+        twoFactorAuthToken: validationResult.value.twoFactorAuthToken,
+        price: String(businessProduct.price),
         from: customerPaymentAccount,
         to: businessPaymentAccount,
       });
@@ -130,6 +148,7 @@ module.exports = {
         transactionID: cbTransactionResult.id,
       });
 
+      // TODO: Handle this portion now...
       // (BACKGROUND) Convert Crypto value to Fiat Value for Business if they have auto_convert_to_fiat enabled
       if (!businessPaymentAccount.auto_convert_to_fiat) {
         return;
