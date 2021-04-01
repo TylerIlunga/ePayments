@@ -1,9 +1,9 @@
 /**
  * Request Validation module for Session endpoints.
- * @module src/controllers/middleware/Session/validation.js
+ * @module src/middleware/Session/validation.js
  */
 const Joi = require('joi');
-const { Errors, Tokens } = require('../../../utils');
+const { Errors, Tokens } = require('../../utils');
 
 module.exports = {
   tokenHasExpired(authorization, cb) {

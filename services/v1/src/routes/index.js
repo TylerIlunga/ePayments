@@ -3,6 +3,7 @@
  * @module src/routes/index.js
  */
 const Router = require('express').Router();
+const { evaluateSession } = require('../middleware/Auth');
 const SessionController = require('../controllers/Session');
 const UserController = require('../controllers/User');
 const ProfileController = require('../controllers/Profile');
@@ -10,7 +11,7 @@ const BusinessProductController = require('../controllers/BusinessProduct');
 const PaymentAccountController = require('../controllers/PaymentAccount');
 const BusinessTransactionController = require('../controllers/BusinessTransaction');
 
-// TODO: Protected / Authenticated Middleware for certain routes
+// TODO: Protected / Authenticated Middleware for certain routes (apply evaluateSession)
 
 /** Service Health Check */
 Router.get('/healthcheck', (req, res) => res.sendStatus(200));

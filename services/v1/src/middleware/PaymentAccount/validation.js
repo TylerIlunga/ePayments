@@ -1,6 +1,6 @@
 /**
  * PaymentAccount (request) Validation module
- * @module src/controllers/middleware/PaymentAccount/validation.js
+ * @module src/middleware/PaymentAccount/validation.js
  */
 const Joi = require('joi');
 

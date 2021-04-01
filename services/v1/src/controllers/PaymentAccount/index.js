@@ -16,7 +16,7 @@ const {
   createPaymentAccountOauthCallbackSchema,
   updatePaymentAccountSchema,
   deletePaymentAccountSchema,
-} = require('../middleware/PaymentAccount/validation');
+} = require('../../middleware/PaymentAccount/validation');
 
 module.exports = {
   /**

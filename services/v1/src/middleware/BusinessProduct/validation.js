@@ -1,6 +1,6 @@
 /**
  * Request Validation module for BusinessProduct endpoints.
- * @module src/controllers/middleware/BusinessProduct/validation.js
+ * @module src/middleware/BusinessProduct/validation.js
  */
 const Joi = require('joi');
 

@@ -1,6 +1,6 @@
 /**
  * Request Validation module for User endpoints.
- * @module src/controllers/middleware/User/validation.js
+ * @module src/middleware/User/validation.js
  */
 const Joi = require('joi');
 

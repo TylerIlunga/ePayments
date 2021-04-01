@@ -11,7 +11,7 @@ const { Errors, Generators, Tokens, Validation } = require('../../utils');
 const {
   tokenHasExpired,
   signUpLogInBodySchema,
-} = require('../middleware/Session/validation');
+} = require('../../middleware/Session/validation');
 const EmailSender = require('../../email');
 
 // NOTE: Use .mjs for new syntax? Or newer version of Node.js
@@ -139,7 +139,7 @@ module.exports = {
           return res.json({ error: 'Incorrect password. Please try again.' });
         }
         // Create session token (JWT)
-        const sessionToken = Tokens.signToken({ id: user.id });
+        const sessionToken = Tokens.signToken({ userID: user.id });
         const cookies = new Cookies();
         cookies.set('ut', sessionToken, {
           expires: new Date(Date.now() + generalConfig.JWT.expirationInSecs),

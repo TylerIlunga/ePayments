@@ -19,7 +19,7 @@ const {
   createBusinessTransactionSchema,
   listBusinessTransactionsSchema,
   fetchBusinessTransactionSchema,
-} = require('../middleware/BusinessTransaction/validation');
+} = require('../../middleware/BusinessTransaction/validation');
 const Op = getSqlizeModule().Op;
 
 module.exports = {
