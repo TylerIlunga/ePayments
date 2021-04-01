@@ -4,6 +4,7 @@
  */
 const uuid = require('uuid');
 const {
+  getSqlizeModule,
   BusinessProfile,
   BusinessProduct,
   CustomerProfile,
@@ -17,6 +18,8 @@ const {
   listBusinessTransactionsSchema,
   fetchBusinessTransactionSchema,
 } = require('../middleware/BusinessTransaction/validation');
+const Op = getSqlizeModule().Op;
+
 module.exports = {
   /**
    * Creates/Serves a new Business Transaction.
@@ -201,8 +204,61 @@ module.exports = {
     }
   },
   async listBusinessTransactions(req, res) {
-    // TODO: Handle Pagination (just add pageNumber(offset), pageSize(limit) with bounds)
-    res.send('list');
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      listBusinessTransactionsSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    if (
+      validationResult.value.businessID === undefined &&
+      validationResult.value.customerID === undefined
+    ) {
+      return res.json({ error: 'Missing business ID or customer ID' });
+    }
+    try {
+      const { queryAttributes } = validationResult.value;
+      // List Transactions from our Database based on query attributes
+      const sqlAttributes = {
+        where: {},
+        order: [['created_at', 'ASC']],
+      };
+      if (validationResult.value.businessID === undefined) {
+        sqlAttributes.where.customer_id = validationResult.value.customerID;
+      } else {
+        sqlAttributes.where.business_id = validationResult.value.businessID;
+      }
+
+      const attributes = Object.keys(queryAttributes);
+      for (let i = 0; i < attributes.length; i++) {
+        const attribute = attributes[i];
+        if (attribute === 'offset' || attribute === 'limit') {
+          sqlAttributes[attribute] = queryAttributes[attribute];
+          continue;
+        }
+        if (attribute === 'order') {
+          sqlAttributes.order[0][1] = queryAttributes[attribute];
+          continue;
+        }
+        if (typeof attribute === 'string') {
+          sqlAttributes.where[Op.like] = queryAttributes[attribute];
+        }
+        if (typeof attribute === 'number') {
+          sqlAttributes.where[Op.contains] = queryAttributes[attribute];
+        }
+      }
+
+      const businessTransactions = await BusinessTransaction.findAll(
+        sqlAttributes,
+      );
+
+      // Respond to Client Request
+      return res.json({ businessTransactions, error: null, success: true });
+    } catch (error) {
+      return Errors.General.serveResponse(error, res);
+    }
   },
   async fetchBusinessTransaction(req, res) {
     // Validate Input
@@ -221,6 +277,7 @@ module.exports = {
         customerID,
         productID,
       } = validationResult.value;
+      // Fetch Transaction from our Database
       const businessTransaction = await BusinessTransaction.findOne({
         where: {
           id: transactionID,
@@ -234,6 +291,7 @@ module.exports = {
         throw { error: 'Transaction does not exist for the given information' };
       }
 
+      // Respond to Client Request
       return res.json({ businessTransaction, error: null, success: true });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
