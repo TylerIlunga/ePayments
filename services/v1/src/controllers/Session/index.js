@@ -4,6 +4,7 @@
  */
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
+const Cookies = require('universal-cookie');
 const generalConfig = require('../../config');
 const { User } = require('../../dal/config');
 const { Errors, Generators, Tokens, Validation } = require('../../utils');
@@ -139,8 +140,8 @@ module.exports = {
         }
         // Create session token (JWT)
         const sessionToken = Tokens.signToken({ id: user.id });
-        console.log(sessionToken);
-        res.cookie('ut', sessionToken, {
+        const cookies = new Cookies();
+        cookies.set('ut', sessionToken, {
           expires: new Date(Date.now() + generalConfig.JWT.expirationInSecs),
           // Disable Document.cookie API
           httpOnly: true,
