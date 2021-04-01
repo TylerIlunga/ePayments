@@ -2,7 +2,13 @@
  * Controller module for BusinessProduct endpoints.
  * @module src/controllers/BusinessProduct/index.js
  */
-const { getSqlizeModule, BusinessProduct, User } = require('../../dal/config');
+const {
+  getSqlizeModule,
+  BusinessProduct,
+  BusinessTransaction,
+  User,
+} = require('../../dal/config');
+
 const { Errors, Strings, Validation } = require('../../utils');
 const {
   createBusinessProductSchema,
@@ -33,7 +39,7 @@ module.exports = {
     }
     try {
       const {
-        userID,
+        businessID,
         sku,
         label,
         description,
@@ -41,7 +47,7 @@ module.exports = {
         inventoryCount,
       } = validationResult.value;
       // Verify User
-      const businessUser = await User.findOne({ where: { id: userID } });
+      const businessUser = await User.findOne({ where: { id: businessID } });
       if (businessUser === null) {
         throw { error: 'Account not found for the given user ID.' };
       }
@@ -56,7 +62,7 @@ module.exports = {
         label,
         description,
         price,
-        user_id: userID,
+        user_id: businessID,
         inventory_count: inventoryCount,
       });
       console.log('new business product created! ID: ', newBusinessProduct.id);
@@ -83,16 +89,16 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      const { userID, queryAttributes } = validationResult.value;
+      const { businessID, queryAttributes } = validationResult.value;
       // Verify User
-      const businessUser = await User.findOne({ where: { id: userID } });
+      const businessUser = await User.findOne({ where: { id: businessID } });
       if (businessUser === null) {
         throw { error: 'Account not found for the given user ID.' };
       }
       // List Products
       // NOTE: String attributes should contain the proper query syntax (ex: "%GUM" or "GUM%")
       const sqlAttributes = {
-        where: { user_id: userID },
+        where: { user_id: businessID },
         order: [['created_at', 'ASC']],
       };
 
@@ -144,20 +150,33 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      const { userID, businessProductID, sku } = validationResult.value;
+      const { businessID, businessProductID, sku } = validationResult.value;
       // Verify User
-      const businessUser = await User.findOne({ where: { id: userID } });
+      const businessUser = await User.findOne({ where: { id: businessID } });
       if (businessUser === null) {
         throw { error: 'Account not found for the given user ID.' };
       }
       // Fetch Business Proudct
       const businessProduct = await BusinessProduct.findOne({
-        where: { sku, id: businessProductID, user_id: userID },
+        where: { sku, id: businessProductID, user_id: businessID },
       });
       if (businessProduct === null) {
         throw { error: 'Product does not exist for the given information.' };
       }
-      return res.json({ error: null, success: true, product: businessProduct });
+
+      // Fetch five recent transactions for that product
+      const transactions = await BusinessTransaction.findAll({
+        where: { product_id: businessProductID },
+        limit: 5,
+        order: [['created_at', 'DESC']],
+      });
+
+      return res.json({
+        error: null,
+        success: true,
+        product: businessProduct,
+        transactions,
+      });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
     }
@@ -181,14 +200,14 @@ module.exports = {
     }
     try {
       const {
-        userID,
+        businessID,
         businessProductID,
         sku,
         updates,
       } = validationResult.value;
       // Locate Business Product
       const businessProduct = await BusinessProduct.findOne({
-        where: { sku, id: businessProductID, user_id: userID },
+        where: { sku, id: businessProductID, user_id: businessID },
       });
       if (businessProduct === null) {
         throw { error: 'Product does not exist for the given information.' };
@@ -228,10 +247,10 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      const { userID, businessProductID, sku } = validationResult.value;
+      const { businessID, businessProductID, sku } = validationResult.value;
       // Delete Business Product
       await BusinessProduct.destroy({
-        where: { sku, id: businessProductID, user_id: userID },
+        where: { sku, id: businessProductID, user_id: businessID },
       });
       return res.json({ error: null, success: true });
     } catch (error) {
