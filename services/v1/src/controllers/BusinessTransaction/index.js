@@ -1,8 +1,10 @@
 /**
- * BusinessProduct Controller module.
- * @module src/controllers/BusinessProduct/index.js
+ * BusinessTransaction Controller module.
+ * @module src/controllers/BusinessTransaction/index.js
  */
 const uuid = require('uuid');
+const generalConfig = require('../../config');
+const EmailSender = require('../../email');
 const {
   getSqlizeModule,
   BusinessProfile,
@@ -59,17 +61,19 @@ module.exports = {
       if (businessProfile == null) {
         throw { error: 'Business profile does not exist for the given ID' };
       }
+
       // Validate Customer Account
-      // const customerAccount = await User.findOne({ where: { id: customerID } });
-      // if (customerAccount == null) {
-      //   throw { error: 'Customer account does not exist for the given ID' };
-      // }
-      // const customerProfile = await CustomerProfile.findOne({
-      //   where: { user_id: customerAccount.id },
-      // });
-      // if (customerProfile == null) {
-      //   throw { error: 'Customer profile does not exist for the given ID' };
-      // }
+      const customerAccount = await User.findOne({ where: { id: customerID } });
+      if (customerAccount == null) {
+        throw { error: 'Customer account does not exist for the given ID' };
+      }
+      const customerProfile = await CustomerProfile.findOne({
+        where: { user_id: customerAccount.id },
+      });
+      if (customerProfile == null) {
+        throw { error: 'Customer profile does not exist for the given ID' };
+      }
+
       // Validate Product
       const businessProduct = await BusinessProduct.findOne({
         where: { sku, id: productID, user_id: businessAccount.id },
@@ -77,6 +81,7 @@ module.exports = {
       if (businessProduct == null) {
         throw { error: 'Product does not exist for the given info.' };
       }
+
       // Evaluate PaymentAccount Information for both Accounts
       const businessPaymentAccount = await PaymentAccount.findOne({
         where: { user_id: businessAccount.id },
@@ -84,21 +89,21 @@ module.exports = {
       if (businessPaymentAccount == null) {
         throw { error: 'Business payment account does not exist.' };
       }
-      // const customerPaymentAccount = await PaymentAccount.findOne({
-      //   where: { user_id: customerAccount.id },
-      // });
-      // if (customerPaymentAccount == null) {
-      //   throw { error: 'Customer payment account does not exist.' };
-      // }
-      // // Account for expired access tokens (refresh with refresh token and then fetch/store new accessToken data)
+      const customerPaymentAccount = await PaymentAccount.findOne({
+        where: { user_id: customerAccount.id },
+      });
+      if (customerPaymentAccount == null) {
+        throw { error: 'Customer payment account does not exist.' };
+      }
+
+      // Account for expired access tokens (refresh with refresh token and then fetch/persist new accessToken data)
       const coinbaseAPIHelper = new CoinbaseAPIHelper();
       const currentDateTime = new Date();
       const businessAccessTokenExpiryDate = new Date(
         Number(businessPaymentAccount.coinbase_access_token_expiry),
       );
-      console.log(
-        'businessAccessTokenExpiryDate - currentDateTime:',
-        businessAccessTokenExpiryDate - currentDateTime,
+      const customerAccessTokenExpiryDate = new Date(
+        Number(customerPaymentAccount.coinbase_access_token_expiry),
       );
       if (businessAccessTokenExpiryDate - currentDateTime <= 0) {
         // Refresh Token + Persist Token
@@ -107,16 +112,13 @@ module.exports = {
           businessPaymentAccount.coinbase_refresh_token,
         );
       }
-      // const customerAccessTokenExpiryDate = new Date(
-      //   Number(customerPaymentAccount.coinbase_access_token_expiry),
-      // );
-      // if (customerAccessTokenExpiryDate - currentDateTime <= 0) {
-      //   // Refresh Token + Persist Token
-      //   await coinbaseAPIHelper.refreshAccessToken(
-      //     customerPaymentAccount,
-      //     customerPaymentAccount.coinbase_refresh_token,
-      //   );
-      // }
+      if (customerAccessTokenExpiryDate - currentDateTime <= 0) {
+        // Refresh Token + Persist Token
+        await coinbaseAPIHelper.refreshAccessToken(
+          customerPaymentAccount,
+          customerPaymentAccount.coinbase_refresh_token,
+        );
+      }
 
       // Convert Product Price to current currency buy price
       const cbCurrentBTCBuyPrice = await coinbaseAPIHelper.getCurrentBuyPriceFor(
@@ -124,80 +126,112 @@ module.exports = {
         'BTC-USD',
       );
 
-      // businessProduct.price =
-      //   businessProduct.price / cbCurrentBTCBuyPrice.amount;
+      businessProduct.price =
+        businessProduct.price / cbCurrentBTCBuyPrice.amount;
+      if (
+        businessProduct.price <= generalConfig.COINBASE.currentTransferMinimum
+      ) {
+        throw {
+          error: `BTC Price (${businessProduct.price}) of product must be at least 0.0001 BTC (Coinbase Standard)`,
+        };
+      }
 
-      businessProduct.price = 1 / cbCurrentBTCBuyPrice.amount;
+      // Transfer Product's value from Customer's Coinbase Wallet to Business Wallet (via API map to current currency's wallet)
+      const cbTransactionResult = await coinbaseAPIHelper.transferFunds({
+        currency,
+        latitude,
+        longitude,
+        twoFactorAuthToken: validationResult.value.twoFactorAuthToken,
+        price: String(businessProduct.price),
+        from: customerPaymentAccount,
+        to: businessPaymentAccount,
+      });
+      console.log(
+        'Successfully transfered funds from customer BTC address to business BTC address',
+      );
 
-      // if (businessProduct.price <= 0.0001) {
-      //   throw {
-      //     error: `BTC Price (${businessProduct.price}) of product must be at least 0.0001 BTC (Coinbase Standard)`,
-      //   };
-      // }
+      // Persist BusinessTransaction data
+      const newBusinessTransaction = await BusinessTransaction.create({
+        id: uuid.v4(),
+        business_id: businessID,
+        customer_id: customerID,
+        product_id: productID,
+        coinbase_transaction_id: cbTransactionResult.id,
+        amount: businessProduct.price,
+        token_amount: `${cbTransactionResult.amount.amount}`,
+        currency: currency,
+        latitude: latitude,
+        longitude: longitude,
+      });
 
-      // // Transfer Product's value from Customer's Coinbase Wallet to Business Wallet (via API map to current currency's wallet)
-      // const cbTransactionResult = await coinbaseAPIHelper.transferFunds({
-      //   currency,
-      //   latitude,
-      //   longitude,
-      //   twoFactorAuthToken: validationResult.value.twoFactorAuthToken,
-      //   price: String(businessProduct.price),
-      //   from: customerPaymentAccount,
-      //   to: businessPaymentAccount,
-      // });
+      console.log('Persisted new transaction data:', newBusinessTransaction.id);
 
-      // console.log(
-      //   'Successfully transfered funds from customer BTC address to business BTC address',
-      // );
+      // Async Response to Customer
+      res.json({
+        error: false,
+        success: true,
+        transactionID: newBusinessTransaction.id,
+      });
 
-      // // Persist BusinessTransaction data
-      // const newBusinessTransaction = await BusinessTransaction.create({
-      //   id: uuid.v4(),
-      //   business_id: businessID,
-      //   customer_id: customerID,
-      //   product_id: productID,
-      //   coinbase_transaction_id: cbTransactionResult.id,
-      //   amount: businessProduct.price,
-      //   token_amount: `${cbTransactionResult.amount.amount}`,
-      //   currency: currency,
-      //   latitude: latitude,
-      //   longitude: longitude,
-      // });
-
-      // console.log('Persisted new transaction data:', newBusinessTransaction.id);
-
-      // // Async Response to Customer
-      // res.json({
-      //   error: false,
-      //   success: true,
-      //   transactionID: newBusinessTransaction.id,
-      // });
-
-      // TODO: Handle this portion now...
-      // (BACKGROUND) Convert Crypto value to Fiat Value for Business if they have auto_convert_to_fiat enabled
+      // Convert Crypto value to Fiat Value for Business if
+      // they have auto_convert_to_fiat enabled for their payment account.
+      // NOTE: Would probably handle this with a dedicated Conversion service in a distributed system...
       if (!businessPaymentAccount.auto_convert_to_fiat) {
         return;
       }
       coinbaseAPIHelper
         .convertToFiat({
           paymentAccount: businessPaymentAccount,
-          // amount: String(businessProduct.price),
-          amount: '0.00001696',
-          currency: 'BTC',
-          // currency: cbTransactionResult.amount.currency,
+          amount: String(businessProduct.price),
+          currency: cbTransactionResult.amount.currency,
         })
-        .then((cbConversionResult) => {
+        .then(async (cbConversionResult) => {
           console.log('cbConversionResult:', cbConversionResult);
           console.log(
             'coinbaseAPIHelper.convertToFiat(): coinbase ID',
             cbConversionResult.id,
           );
-          // TODO: Send out an notification email to the business regarding the result of the conversino
+          // Notification email to the business regarding the result of the conversion
+          // NOTE: Would probably handle this with a dedicated Email Service in a distributed system...
+          EmailSender.sendTokenConversionStatusEmail({
+            email: businessProfile.public_email,
+            status: 'success',
+            conversionData: cbConversionResult,
+          })
+            .then((eRes) => {
+              console.log(
+                'Successfully sent out Token Conversion Status (Success) Email',
+                eRes,
+              );
+            })
+            .catch((eResError) => {
+              console.log(
+                'Error sending out Token Conversion Status (Success) Email',
+                eResError,
+              );
+            });
         })
-        .catch((error) => {
+        .catch(async (error) => {
           console.log('coinbaseAPIHelper.convertToFiat() error:', error);
           Errors.General.logError(error);
-          // TODO: Send out an notification email to the business regarding the result of the conversino
+          // Notification email to the business regarding the result of the conversion
+          EmailSender.sendTokenConversionStatusEmail({
+            email: businessProfile.public_email,
+            status: 'failure',
+            conversionData: null,
+          })
+            .then((eRes) => {
+              console.log(
+                'Successfully sent out Token Conversion Status (Failure) Email',
+                eRes,
+              );
+            })
+            .catch((eResError) => {
+              console.log(
+                'Error sending out Token Conversion Status (Failure) Email',
+                eResError,
+              );
+            });
         });
     } catch (error) {
       return Errors.General.serveResponse(error, res);

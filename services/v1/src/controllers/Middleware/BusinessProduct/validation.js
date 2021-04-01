@@ -6,7 +6,7 @@ const Joi = require('joi');
 
 module.exports = {
   createBusinessProductSchema: Joi.object({
-    userID: Joi.number().required(),
+    businessID: Joi.number().required(),
     sku: Joi.string().length(16).required(),
     label: Joi.string().required(),
     description: Joi.string().required(),
@@ -14,7 +14,7 @@ module.exports = {
     inventoryCount: Joi.number().required(),
   }),
   listBusinessProductsSchema: Joi.object({
-    userID: Joi.number().required(),
+    businessID: Joi.number().required(),
     queryAttributes: Joi.object()
       .keys({
         sku: Joi.string().length(16),
@@ -31,12 +31,12 @@ module.exports = {
       .required(),
   }),
   fetchBusinessProductSchema: Joi.object({
-    userID: Joi.number().required(),
+    businessID: Joi.number().required(),
     businessProductID: Joi.number().required(),
     sku: Joi.string().length(16).required(),
   }),
   updateBusinessProductSchema: Joi.object({
-    userID: Joi.number().required(),
+    businessID: Joi.number().required(),
     businessProductID: Joi.number().required(),
     sku: Joi.string().length(16).required(),
     updates: Joi.object()
@@ -49,7 +49,7 @@ module.exports = {
       .required(),
   }),
   deleteBusinessProductSchema: Joi.object({
-    userID: Joi.number().required(),
+    businessID: Joi.number().required(),
     businessProductID: Joi.number().required(),
     sku: Joi.string().length(16).required(),
   }),

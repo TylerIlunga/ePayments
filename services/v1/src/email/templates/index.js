@@ -15,4 +15,10 @@ module.exports = {
       html: require('./ResetPassword')({ user }),
     };
   },
+  tokenConversionStatus(emailMetaData) {
+    return {
+      subject: 'Transaction Update: Token Conversion Status',
+      html: require('./TokenConversionStatus')(emailMetaData),
+    };
+  },
 };

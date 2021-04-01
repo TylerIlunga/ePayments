@@ -41,6 +41,7 @@ module.exports = {
       'wallet:withdrawals:read', // **
       'wallet:withdrawals:create', //**
     ],
+    currentTransferMinimum: 0.0001,
     currentTransactionSendLimitAmount: 1,
     currentTransactionSendLimitCurrency: 'USD',
     currentTransactionSendLimitPeriod: 'day',
