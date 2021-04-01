@@ -74,7 +74,6 @@ module.exports = {
    * @return {Array} list of JSON objects
    */
   async listBusinessProducts(req, res) {
-    // TODO: Handle Pagination (just add pageNumber(offset), pageSize(limit) with bounds)
     // Validate Input
     const validationResult = Validation.validateRequestBody(
       listBusinessProductsSchema,
@@ -91,22 +90,37 @@ module.exports = {
         throw { error: 'Account not found for the given user ID.' };
       }
       // List Products
-      // NOTE: String attributes should contain the proper query (ex: "%GUM" or "GUM%")
-      const whereAttributes = {};
-      Object.keys(queryAttributes).forEach((attribute) => {
-        let whereAttribute = {};
-        console.log('typeof attribute', typeof attribute);
+      // NOTE: String attributes should contain the proper query syntax (ex: "%GUM" or "GUM%")
+      const sqlAttributes = {
+        where: { user_id: userID },
+        order: [['created_at', 'ASC']],
+      };
+
+      const attributes = Object.keys(queryAttributes);
+      for (let i = 0; i < attributes.length; i++) {
+        const attribute = attributes[i];
+        if (attribute === 'offset' || attribute === 'limit') {
+          sqlAttributes[attribute] = queryAttributes[attribute];
+          continue;
+        }
+        if (attribute === 'order') {
+          sqlAttributes.order[0][1] = queryAttributes[attribute];
+          continue;
+        }
         if (typeof attribute === 'string') {
+          let whereAttribute = {};
           whereAttribute[Op.like] = queryAttributes[attribute];
+          sqlAttributes.where[Strings.camelToSnake(attribute)] = whereAttribute;
         }
         if (typeof attribute === 'number') {
+          let whereAttribute = {};
           whereAttribute[Op.contains] = queryAttributes[attribute];
+          sqlAttributes.where[Strings.camelToSnake(attribute)] = whereAttribute;
         }
-        whereAttributes[Strings.camelToSnake(attribute)] = whereAttribute;
-      });
-      const products = await BusinessProduct.findAll({
-        where: whereAttributes,
-      });
+      }
+
+      const products = await BusinessProduct.findAll(sqlAttributes);
+
       return res.json({ error: null, success: true, products });
     } catch (error) {
       return Errors.General.serveResponse(error, res);

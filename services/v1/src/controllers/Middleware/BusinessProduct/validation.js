@@ -24,6 +24,9 @@ module.exports = {
         inventoryCount: Joi.number(),
         viewCount: Joi.number(),
         purchasedCount: Joi.number(),
+        order: Joi.string().valid('ASC', 'DESC'),
+        offset: Joi.number(),
+        limit: Joi.number(),
       })
       .required(),
   }),
