@@ -70,7 +70,7 @@ module.exports = (sequelize) => {
     });
     User.hasMany(models.BusinessTransaction, {
       onDelete,
-      foreignKey,
+      foreignKey: 'customer_id',
       as: 'customer',
     });
     User.hasMany(models.BusinessTransaction, {

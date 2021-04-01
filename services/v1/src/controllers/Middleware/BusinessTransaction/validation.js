@@ -4,14 +4,15 @@
  */
 const Joi = require('joi');
 
-const updateDeleteRequirements = {
-  transactionID: Joi.number().required(),
+const fetchRequirements = {
+  transactionID: Joi.string().required(),
+  coinbaseTransactionID: Joi.string().required(),
   customerID: Joi.number().required(),
   businessID: Joi.number().required(),
   productID: Joi.number().required(),
 };
-const listFetchRequirements = {
-  ...updateDeleteRequirements,
+const listRequirements = {
+  ...fetchRequirements,
   pageNumber: Joi.number().required(),
   pageSize: Joi.number().required(),
 };
@@ -21,14 +22,13 @@ module.exports = {
     businessID: Joi.number().required(),
     customerID: Joi.number().required(),
     productID: Joi.number().required(),
-    twoFactorAuthToken: Joi.string(), // Not required in case they don't have it set up
+    // Not required in case they don't have it set up on Coinbase
+    twoFactorAuthToken: Joi.string(),
     sku: Joi.string().required(),
     currency: Joi.string().required(),
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),
   }),
-  listBusinessTransactionsSchema: Joi.object(listFetchRequirements),
-  fetchBusinessTransactionSchema: Joi.object(listFetchRequirements),
-  updateBusinessTransactionSchema: Joi.object(updateDeleteRequirements),
-  deleteBusinessTransactionSchema: Joi.object(updateDeleteRequirements),
+  listBusinessTransactionsSchema: Joi.object(listRequirements),
+  fetchBusinessTransactionSchema: Joi.object(fetchRequirements),
 };

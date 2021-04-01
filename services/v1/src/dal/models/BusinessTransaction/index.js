@@ -3,7 +3,6 @@
  * @module src/models/BusinessTransaction/index.js
  */
 const Sequelize = require('sequelize');
-const uuid = require('uuid');
 
 const options = {
   freezeTableName: true,
@@ -16,7 +15,6 @@ module.exports = (sequelize) => {
     {
       id: {
         type: Sequelize.UUID,
-        default: uuid.v4(),
         primaryKey: true,
       },
       business_id: {
@@ -40,6 +38,10 @@ module.exports = (sequelize) => {
         type: Sequelize.FLOAT,
       },
       token_amount: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      currency: {
         allowNull: false,
         type: Sequelize.STRING,
       },

@@ -2,6 +2,7 @@
  * BusinessProduct Controller module.
  * @module src/controllers/BusinessProduct/index.js
  */
+const uuid = require('uuid');
 const {
   BusinessProfile,
   BusinessProduct,
@@ -15,8 +16,6 @@ const {
   createBusinessTransactionSchema,
   listBusinessTransactionsSchema,
   fetchBusinessTransactionSchema,
-  updateBusinessTransactionSchema,
-  deleteBusinessTransactionSchema,
 } = require('../middleware/BusinessTransaction/validation');
 module.exports = {
   /**
@@ -150,12 +149,14 @@ module.exports = {
 
       // // Persist BusinessTransaction data
       // const newBusinessTransaction = await BusinessTransaction.create({
+      //   id: uuid.v4(),
       //   business_id: businessID,
       //   customer_id: customerID,
       //   product_id: productID,
       //   coinbase_transaction_id: cbTransactionResult.id,
       //   amount: businessProduct.price,
-      //   token_amount: `${cbTransactionResult.amount.amount} ${cbTransactionResult.amount.currency}`,
+      //   token_amount: `${cbTransactionResult.amount.amount}`,
+      //   currency: currency,
       //   latitude: latitude,
       //   longitude: longitude,
       // });
@@ -204,14 +205,38 @@ module.exports = {
     res.send('list');
   },
   async fetchBusinessTransaction(req, res) {
-    res.send('fetch');
-  },
-  async updateBusinessTransaction(req, res) {
-    // Possible only an internal call via SQL (sensitive data)
-    res.send('update');
-  },
-  async deleteBusinessTransaction(req, res) {
-    // Possible only an internal call via SQL (sensitive data)
-    res.send('delete');
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      fetchBusinessTransactionSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const {
+        transactionID,
+        coinbaseTransactionID,
+        businessID,
+        customerID,
+        productID,
+      } = validationResult.value;
+      const businessTransaction = await BusinessTransaction.findOne({
+        where: {
+          id: transactionID,
+          coinbase_transaction_id: coinbaseTransactionID,
+          business_id: businessID,
+          customer_id: customerID,
+          product_id: productID,
+        },
+      });
+      if (businessTransaction === null) {
+        throw { error: 'Transaction does not exist for the given information' };
+      }
+
+      return res.json({ businessTransaction, error: null, success: true });
+    } catch (error) {
+      return Errors.General.serveResponse(error, res);
+    }
   },
 };

@@ -95,13 +95,5 @@ Router.get(
   '/api/v1/transactions/fetch',
   BusinessTransactionController.fetchBusinessTransaction,
 );
-Router.put(
-  '/api/v1/transactions/update',
-  BusinessTransactionController.updateBusinessTransaction,
-);
-Router.delete(
-  '/api/v1/transactions/delete',
-  BusinessTransactionController.deleteBusinessTransaction,
-);
 
 module.exports = Router;
