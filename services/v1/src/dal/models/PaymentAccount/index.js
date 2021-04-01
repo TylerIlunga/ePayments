@@ -43,7 +43,7 @@ module.exports = (sequelize) => {
       },
       auto_convert_to_fiat: {
         type: Sequelize.BOOLEAN,
-        default: false,
+        defaultValue: true,
       },
       created_at: {
         type: Sequelize.BIGINT,

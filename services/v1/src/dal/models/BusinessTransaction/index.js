@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      user_id: {
+      customer_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
@@ -38,6 +38,10 @@ module.exports = (sequelize) => {
       amount: {
         allowNull: false,
         type: Sequelize.FLOAT,
+      },
+      token_amount: {
+        allowNull: false,
+        type: Sequelize.STRING,
       },
       latitude: {
         type: Sequelize.STRING,

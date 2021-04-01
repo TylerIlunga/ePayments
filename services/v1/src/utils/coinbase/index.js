@@ -125,7 +125,7 @@ class CoinbaseAPIHelper {
           resolve();
         })
         .catch((error) => {
-          reject(error);
+          rreject(error.response.data);
         });
     });
   }
@@ -155,7 +155,7 @@ class CoinbaseAPIHelper {
         })
         .catch((error) => {
           console.log('createNewWalletAddress() error:', error);
-          reject(error);
+          reject(error.response.data);
         });
     });
   }
@@ -191,7 +191,7 @@ class CoinbaseAPIHelper {
         })
         .catch((error) => {
           console.log('getAccountData() error:', error);
-          reject(error);
+          reject(error.response.data);
         });
     });
   }
@@ -212,7 +212,7 @@ class CoinbaseAPIHelper {
         })
         .catch((error) => {
           console.log('getCurrentBuyPriceFor() error:', error);
-          reject(error);
+          reject(error.response.data);
         });
     });
   }
@@ -244,7 +244,7 @@ class CoinbaseAPIHelper {
       })
         .then((res) => {
           console.log('transferFunds res.data:', res.data);
-          resolve(res.data);
+          resolve(res.data.data);
         })
         .catch((error) => {
           console.log('transferFunds() error:', error);
@@ -256,9 +256,29 @@ class CoinbaseAPIHelper {
     });
   }
 
-  convertToFiat(account, transactionID) {
+  convertToFiat(conversionData) {
     return new Promise((resolve, reject) => {
-      // Use CB Withdrawl API methods...
+      this.request({
+        method: 'POST',
+        baseURL: this.api_url,
+        path: `/accounts/${conversionData.paymentAccount.coinbase_account_id}/sells`,
+        headers: this.getHeaders({
+          Authorization: `Bearer ${conversionData.paymentAccount.coinbase_access_token}`,
+          'Content-Type': 'application/json',
+        }),
+        body: {
+          amount: conversionData.amount,
+          currency: conversionData.currency,
+        },
+      })
+        .then((res) => {
+          console.log('convertToFiat() res.data:', res.data);
+          resolve(res.data.data);
+        })
+        .catch((error) => {
+          console.log('convertToFiat() error:', error);
+          reject(error.response.data);
+        });
     });
   }
 }

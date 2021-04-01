@@ -35,6 +35,7 @@ module.exports = {
       'wallet:transactions:send', // **
       'wallet:transactions:request', //**
       'wallet:transactions:transfer', //**
+      'wallet:sells:create',
       'wallet:user:read',
       'wallet:user:email',
       'wallet:withdrawals:read', // **
