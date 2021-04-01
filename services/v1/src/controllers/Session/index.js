@@ -141,8 +141,11 @@ module.exports = {
         const sessionToken = Tokens.signToken({ id: user.id });
         console.log(sessionToken);
         res.cookie('ut', sessionToken, {
-          maxAge: Date.now() + generalConfig.JWT.expirationInSecs,
+          expires: new Date(Date.now() + generalConfig.JWT.expirationInSecs),
+          // Disable Document.cookie API
           httpOnly: true,
+          // Sent only to the server using HTTPS protocol unless it's directed to localhost
+          secure: true,
         });
         // Return user data not profile.
         return res.json({ user: removeSensitiveUserData(user), error: null });
