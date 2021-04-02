@@ -114,9 +114,9 @@ module.exports = {
             new Date().getTime() + generalConfig.JWT.expirationInSecs,
           ),
           // Disable Document.cookie API
-          httpOnly: true,
+          httpOnly: process.env.NODE_ENV === 'production',
           // Sent only to the server using HTTPS protocol
-          // secure: true,
+          secure: process.env.NODE_ENV === 'production',
         });
         // Return user data not profile.
         return res.json({ user: removeSensitiveUserData(user), error: null });

@@ -16,7 +16,7 @@
     "aws-sdk": "^2.850.0",
     "axios": "^0.21.1",
     "bcrypt-nodejs": "0.0.3",
-    "cookie-parser": "^1.4.4",
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -28,7 +28,6 @@
     "pq": "0.0.3",
     "retry-axios": "^2.4.0",
     "sequelize": "^6.5.0",
-    "universal-cookie": "^4.0.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
