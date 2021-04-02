@@ -10,7 +10,7 @@ class AuthView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'activateAccount',
+      view: 'forgotPassword',
       signUpLogInForm: {
         email: '',
         password: '',
@@ -21,6 +21,7 @@ class AuthView extends React.Component {
         email: '',
         activationToken: '',
       },
+      forgotPasswordForm: { email: '' },
     };
 
     this.SessionService = new SessionService();
@@ -29,9 +30,11 @@ class AuthView extends React.Component {
     this.renderSignUpView = this.renderSignUpView.bind(this);
     this.updateSignUpLogInForm = this.updateSignUpLogInForm.bind(this);
     this.updateActivateAccountForm = this.updateActivateAccountForm.bind(this);
+    this.updateForgotPasswordForm = this.updateForgotPasswordForm.bind(this);
     this.signNewUserUp = this.signNewUserUp.bind(this);
     this.logUserIn = this.logUserIn.bind(this);
     this.activateUsersAccount = this.activateUsersAccount.bind(this);
+    this.sendResetPasswordToken = this.sendResetPasswordToken.bind(this);
   }
 
   displayToastMessage(type, message) {
@@ -68,6 +71,19 @@ class AuthView extends React.Component {
     );
   }
 
+  updateForgotPasswordForm(evt, field) {
+    this.setState(
+      {
+        forgotPasswordForm: {
+          ...this.state.forgotPasswordForm,
+          [field]: evt.target.value,
+        },
+      },
+      () =>
+        console.log('new forgotPasswordForm:', this.state.forgotPasswordForm),
+    );
+  }
+
   validInput(inputType) {
     if (inputType === 'signUp') {
       const {
@@ -89,16 +105,24 @@ class AuthView extends React.Component {
         };
       }
     }
+
     if (inputType === 'logIn') {
       const { email, password } = this.state.signUpLogInForm;
       if (!(email && password)) {
         return { error: 'Please enter a value for each field.' };
       }
     }
+
     if (inputType === 'activateAccount') {
       const { email, activationToken } = this.state.activateAccountForm;
       if (!(email && activationToken)) {
         return { error: 'Please enter a value for each field.' };
+      }
+    }
+
+    if (inputType === 'forgotPassword') {
+      if (!this.state.forgotPasswordForm.email) {
+        return { error: 'Please enter a value for the email field.' };
       }
     }
 
@@ -214,6 +238,42 @@ class AuthView extends React.Component {
       });
   }
 
+  sendResetPasswordToken(evt) {
+    evt.preventDefault();
+
+    this.displayToastMessage('info', 'Loading...');
+
+    const inputValidationResult = this.validInput('forgotPassword');
+    if (inputValidationResult.error) {
+      return this.displayToastMessage('error', inputValidationResult.error);
+    }
+
+    this.UserService.forgotPassword(this.state.forgotPasswordForm)
+      .then((res) => {
+        console.log(
+          'sendResetPasswordToken(), this.UserService.forgotPassword() res',
+          res,
+        );
+        if (res.error) {
+          throw res.error;
+        }
+
+        this.displayToastMessage(
+          'success',
+          'Success: Please check your email for your reset token.',
+        );
+
+        this.setState({ view: 'resetPassword' });
+      })
+      .catch((error) => {
+        console.log('forgot password error:', error);
+        if (typeof error !== 'string') {
+          error = 'Failed: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
+  }
+
   renderSignUpView() {
     return (
       <div className='MainAuthViewContainer'>
@@ -309,7 +369,7 @@ class AuthView extends React.Component {
           <div className='LogInViewOptionsLinkContainer'>
             <a
               className='LogInViewOptionsLink'
-              href='#logIn'
+              href='#signUp'
               onClick={(evt) => this.setState({ view: 'signUp' })}
             >
               Sign Up
@@ -318,7 +378,7 @@ class AuthView extends React.Component {
           <div className='LogInViewOptionsLinkContainer'>
             <a
               className='LogInViewOptionsLink'
-              href='#logIn'
+              href='#forgotPassword'
               onClick={(evt) => this.setState({ view: 'forgotPassword' })}
             >
               Forgot Password
@@ -371,18 +431,60 @@ class AuthView extends React.Component {
     );
   }
 
-  renderResetPasswordView() {
+  renderForgotPasswordView() {
     return (
       <div className='MainAuthViewContainer'>
-        <div>ResetPassword</div>
+        <div className='ForgotPasswordViewHeader'>
+          <h1>Forgot Password</h1>
+        </div>
+        <div className='ForgotPasswordViewFormContainer'>
+          <form className='ForgotPasswordViewForm'>
+            <label className='ForgotPasswordViewFormEmailLabel'>
+              Email Address:
+            </label>
+            <input
+              className='ForgotPasswordViewFormEmailInput'
+              type='text'
+              value={this.state.forgotPasswordForm.email}
+              onChange={(evt) => this.updateForgotPasswordForm(evt, 'email')}
+              placeholder={'w@xyz.com'}
+            />
+            <input
+              className='ForgotPasswordViewFormSubmitButton'
+              type='button'
+              value='Submit'
+              onClick={this.sendResetPasswordToken}
+            />
+          </form>
+        </div>
+        <div className='ForgotPasswordViewOptionsContainer'>
+          <div className='ForgotPasswordViewOptionsLinkContainer'>
+            <a
+              className='ForgotPasswordViewOptionsLink'
+              href='#signUp'
+              onClick={(evt) => this.setState({ view: 'signUp' })}
+            >
+              Sign Up
+            </a>
+          </div>
+          <div className='ForgotPasswordViewOptionsLinkContainer'>
+            <a
+              className='ForgotPasswordViewOptionsLink'
+              href='#logIn'
+              onClick={(evt) => this.setState({ view: 'logIn' })}
+            >
+              Log In
+            </a>
+          </div>
+        </div>
       </div>
     );
   }
 
-  renderForgotPasswordView() {
+  renderResetPasswordView() {
     return (
       <div className='MainAuthViewContainer'>
-        <div>ForgotPassword</div>
+        <div>ResetPassword</div>
       </div>
     );
   }
@@ -393,10 +495,10 @@ class AuthView extends React.Component {
         return this.renderLogInView();
       case 'activateAccount':
         return this.renderActivateAccountView();
-      case 'resetPassword':
-        return this.renderResetPasswordView();
       case 'forgotPassword':
         return this.renderForgotPasswordView();
+      case 'resetPassword':
+        return this.renderResetPasswordView();
       default:
         return this.renderSignUpView();
     }
