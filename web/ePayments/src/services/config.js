@@ -1,5 +1,9 @@
 const config = {
   networkRequest(url, reqOptions = {}, resType = 'json') {
+    reqOptions = {
+      ...reqOptions,
+      credentials: 'include',
+    };
     return fetch(url, reqOptions)
       .then((res) => {
         if (!res.ok) {

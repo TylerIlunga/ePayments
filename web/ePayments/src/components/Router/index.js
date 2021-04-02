@@ -36,9 +36,14 @@ import PageNotFoundView from '../PageNotFoundView';
 
 const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
   const [cookies] = cookieOpts;
+  console.log('history.location.pathname:', history.location.pathname);
   if (!(cookies && cookies.ut !== undefined && cookies.ut !== null)) {
     return <AuthView {...history} {...props} />;
   }
+  //   if (history.location.pathname === '/') {
+  //     // TODO: Make sure to check in "ComponentDidMount" that valid user data exists in our global (user) redux store
+  //     return <TransactionsView />;
+  //   }
   return <Component {...history} {...props} />;
 };
 

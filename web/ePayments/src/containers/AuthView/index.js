@@ -1,6 +1,7 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
+import { setUser } from '../../redux/actions/user';
 import SessionService from '../../services/SessionService';
 import UserService from '../../services/UserService';
 import './index.css';
@@ -9,7 +10,7 @@ class AuthView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'signUp',
+      view: 'logIn',
       signUpLogInForm: {
         email: '',
         password: '',
@@ -24,6 +25,7 @@ class AuthView extends React.Component {
     this.renderSignUpView = this.renderSignUpView.bind(this);
     this.updateSignUpLogInForm = this.updateSignUpLogInForm.bind(this);
     this.signNewUserUp = this.signNewUserUp.bind(this);
+    this.logUserIn = this.logUserIn.bind(this);
   }
 
   displayToastMessage(type, message) {
@@ -47,11 +49,14 @@ class AuthView extends React.Component {
     );
   }
 
-  validInput(inputFieldInState) {
-    if (inputFieldInState === 'signUpLogInForm') {
-      const { email, password, confirmPassword, passwordPattern } = this.state[
-        inputFieldInState
-      ];
+  validInput(inputType) {
+    if (inputType === 'signUp') {
+      const {
+        email,
+        password,
+        confirmPassword,
+        passwordPattern,
+      } = this.state.signUpLogInForm;
       if (!(email && password && confirmPassword)) {
         return { error: 'Please enter a value for each field.' };
       }
@@ -65,13 +70,22 @@ class AuthView extends React.Component {
         };
       }
     }
+    if (inputType === 'logIn') {
+      const { email, password } = this.state.signUpLogInForm;
+      if (!(email && password)) {
+        return { error: 'Please enter a value for each field.' };
+      }
+    }
 
     return { error: null };
   }
 
   signNewUserUp(evt) {
     evt.preventDefault();
-    const inputValidationResult = this.validInput('signUpLogInForm');
+
+    this.displayToastMessage('info', 'Loading...');
+
+    const inputValidationResult = this.validInput('signUp');
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
@@ -82,12 +96,60 @@ class AuthView extends React.Component {
           throw res.error;
         }
         // Segue to Activate Account View
+        this.displayToastMessage(
+          'success',
+          'Success: Check your email and activate your account.',
+        );
+        this.setState({ view: 'activateAccount' });
       })
       .catch((error) => {
-        // Toast with notification
         console.log('sign up error:', error);
         if (typeof error !== 'string') {
           error = 'Sign Up Failed: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
+  }
+
+  logUserIn(evt) {
+    evt.preventDefault();
+
+    this.displayToastMessage('info', 'Loading...');
+
+    const inputValidationResult = this.validInput('logIn');
+    if (inputValidationResult.error) {
+      return this.displayToastMessage('error', inputValidationResult.error);
+    }
+    this.SessionService.logIn(this.state.signUpLogInForm)
+      .then((res) => {
+        console.log('logUserIn(), this.SessionService.logUserIn() res', res);
+        if (res.error) {
+          throw res.error;
+        }
+        if (res.user === null || res.user === undefined) {
+          throw 'Invalid request';
+        }
+
+        // Update Redux State with User Data
+        this.props.dispatchSetUser(res.user);
+
+        if (!res.user.active) {
+          // Segue to Activate Account View
+          this.displayToastMessage(
+            'success',
+            'Success: Check your email for your activation token.',
+          );
+          return this.setState({ view: 'activateAccount' });
+        }
+
+        // Segue to Home (Transaction view)
+        this.displayToastMessage('success', 'Success!');
+        this.props.history.push('/h/transactions');
+      })
+      .catch((error) => {
+        console.log('log In error:', error);
+        if (typeof error !== 'string') {
+          error = 'Log In Failed: Please try again';
         }
         this.displayToastMessage('error', error);
       });
@@ -137,6 +199,17 @@ class AuthView extends React.Component {
             />
           </form>
         </div>
+        <div className='SignUpViewOptionsContainer'>
+          <div className='SignUpViewOptionsLinkContainer'>
+            <a
+              className='SignUpViewOptionsLink'
+              href='#logIn'
+              onClick={(evt) => this.setState({ view: 'logIn' })}
+            >
+              Log In
+            </a>
+          </div>
+        </div>
       </div>
     );
   }
@@ -144,7 +217,55 @@ class AuthView extends React.Component {
   renderLogInView() {
     return (
       <div className='MainAuthViewContainer'>
-        <div>LogIn</div>
+        <div className='LogInViewHeader'>
+          <h1>Log In</h1>
+        </div>
+        <div className='LogInViewFormContainer'>
+          <form className='LogInViewForm'>
+            <label className='LogInViewFormEmailLabel'>Email Address:</label>
+            <input
+              className='LogInViewFormEmailInput'
+              type='text'
+              value={this.state.signUpLogInForm.email}
+              onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
+              placeholder={'w@xyz.com'}
+            />
+            <label className='LogInViewFormPasswodLabel'>Password:</label>
+            <input
+              className='LogInViewFormPasswordInput'
+              type='password'
+              value={this.state.signUpLogInForm.password}
+              onChange={(evt) => this.updateSignUpLogInForm(evt, 'password')}
+              placeholder={'************'}
+            />
+            <input
+              className='LogInViewFormCreateButton'
+              type='button'
+              value='Log In'
+              onClick={this.logUserIn}
+            />
+          </form>
+        </div>
+        <div className='LogInViewOptionsContainer'>
+          <div className='LogInViewOptionsLinkContainer'>
+            <a
+              className='LogInViewOptionsLink'
+              href='#logIn'
+              onClick={(evt) => this.setState({ view: 'signUp' })}
+            >
+              Sign Up
+            </a>
+          </div>
+          <div className='LogInViewOptionsLinkContainer'>
+            <a
+              className='LogInViewOptionsLink'
+              href='#logIn'
+              onClick={(evt) => this.setState({ view: 'forgotPassword' })}
+            >
+              Forgot Password
+            </a>
+          </div>
+        </div>
       </div>
     );
   }
@@ -191,7 +312,10 @@ class AuthView extends React.Component {
 
 const mapStateToProps = (state) => ({
   toast: state.toast,
+  user: state.user,
 });
-const mapDispatchToProps = (dispatch) => ({});
+const mapDispatchToProps = (dispatch) => ({
+  dispatchSetUser: (userData) => dispatch(setUser(userData)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(AuthView);

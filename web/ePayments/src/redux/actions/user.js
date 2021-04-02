@@ -1,4 +1,11 @@
-import { CLEAR_USER, UPDATE_USER } from '../constants';
+import { CLEAR_USER, SET_USER, UPDATE_USER } from '../constants';
+
+export const setUser = (userData) => {
+  return {
+    user: userData,
+    type: SET_USER,
+  };
+};
 
 export const updateUser = ({ key, value }) => {
   return {

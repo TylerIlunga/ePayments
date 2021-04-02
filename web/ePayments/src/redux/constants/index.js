@@ -19,5 +19,6 @@ export const UPDATE_TRANSACTION = 'UPDATE_TRANSACTION';
 export const CLEAR_TRANSACTION = 'CLEAR_TRANSACTION';
 
 // User
+export const SET_USER = 'SET_USER';
 export const UPDATE_USER = 'UPDATE_USER';
 export const CLEAR_USER = 'CLEAR_USER';
