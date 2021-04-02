@@ -27,6 +27,7 @@ Router.post('/api/v1/user/forgotPassword', UserController.forgotPassword);
 Router.post('/api/v1/user/resetPassword', UserController.resetPassword);
 
 /** API Endpoints related to handling user profiles */
+Router.post('/api/v1/profile/fetch', ProfileController.fetchProfile);
 Router.post(
   '/api/v1/profile/customer/create',
   ProfileController.customerCreation,

@@ -5,6 +5,9 @@
 const Joi = require('joi');
 
 module.exports = {
+  fetchProfileSchema: Joi.object({
+    userID: Joi.number().required(),
+  }),
   customerCreationSchema: Joi.object({
     profileImage: Joi.string().required(),
     country: Joi.string().required(),

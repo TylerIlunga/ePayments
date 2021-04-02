@@ -4,6 +4,7 @@
  */
 const { BusinessProfile, CustomerProfile } = require('../../dal/config');
 const {
+  fetchProfileSchema,
   customerCreationSchema,
   businessCreationSchema,
   customerUpdateSchema,
@@ -17,6 +18,36 @@ const {
 } = require('../../utils');
 
 module.exports = {
+  async fetchProfile(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      fetchProfileSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const { userID } = validationResult.value;
+      // Customer Profile?
+      const customerProfile = await CustomerProfile.findOne({
+        where: { user_id: userID },
+      });
+      if (customerProfile !== null) {
+        return res.json({ error: null, profile: customerProfile });
+      }
+      // Business Profile?
+      const businessProfile = await BusinessProfile.findOne({
+        where: { user_id: userID },
+      });
+      if (businessProfile !== null) {
+        return res.json({ error: null, profile: businessProfile });
+      }
+      return res.json({ error: null, profile: null });
+    } catch (error) {
+      return Errors.General.serveResponse(error, res);
+    }
+  },
   async customerCreation(req, res) {
     // Validate Input
     const validationResult = Validation.validateRequestBody(
