@@ -7,7 +7,7 @@ import toastReducer from './toast';
 import transactionReducer from './transaction';
 import userReducer from './user';
 
-export default (history) =>
+const rootReducer = (history) =>
   combineReducers({
     product: productReducer,
     profile: profileReducer,
@@ -17,3 +17,5 @@ export default (history) =>
     transaction: transactionReducer,
     user: userReducer,
   });
+
+export default rootReducer;

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { history } from '../../redux/store';
 import { withCookies, useCookies } from 'react-cookie';
 import { ConnectedRouter } from 'connected-react-router';
+import { Redirect } from 'react-router';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -36,8 +37,7 @@ import PageNotFoundView from '../PageNotFoundView';
 
 const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
   const [cookies] = cookieOpts;
-  console.log('handleProtectedRoutes() cookies', cookies);
-  if (!(cookies && (cookies.ut !== undefined || cookies.ut !== null))) {
+  if (!(cookies && cookies.ut !== undefined && cookies.ut !== null)) {
     return <AuthView {...history} {...props} />;
   }
   return <Component {...history} {...props} />;
