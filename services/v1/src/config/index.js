@@ -73,4 +73,7 @@ module.exports = {
       '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',
     supportEmail: process.env.SUPPORT_EMAIL_ADDRESS || 'support@mizudev.com',
   },
+  VALIDATION: {
+    genericPasswordPattern: new RegExp('^[a-zA-Z0-9]{10,30}$'),
+  },
 };

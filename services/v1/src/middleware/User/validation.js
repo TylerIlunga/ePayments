@@ -3,6 +3,7 @@
  * @module src/middleware/User/validation.js
  */
 const Joi = require('joi');
+const { VALIDATION } = require('../../config');
 
 module.exports = {
   activateAccountSchema: Joi.object({
@@ -29,10 +30,10 @@ module.exports = {
       .required(),
     resetPasswordToken: Joi.string().required(),
     oldPassword: Joi.string()
-      .pattern(new RegExp('config.Validation.genericPasswordPattern'))
+      .pattern(new RegExp(VALIDATION.genericPasswordPattern))
       .required(),
     newPassword: Joi.string()
-      .pattern(new RegExp('config.Validation.genericPasswordPattern'))
+      .pattern(new RegExp(VALIDATION.genericPasswordPattern))
       .required(),
   }),
 };

@@ -4,6 +4,7 @@
  */
 const Joi = require('joi');
 const { Errors, Tokens } = require('../../utils');
+const { VALIDATION } = require('../../config');
 
 module.exports = {
   tokenHasExpired(authorization, cb) {
@@ -19,6 +20,6 @@ module.exports = {
       minDomainSegments: 2,
       tlds: { allow: ['com', 'net', 'org', 'edu'] },
     }),
-    password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{10,30}$')),
+    password: Joi.string().pattern(VALIDATION.genericPasswordPattern),
   }).with('email', 'password'),
 };
