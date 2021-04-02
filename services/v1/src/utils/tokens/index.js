@@ -21,11 +21,13 @@ module.exports = {
     return { token };
   },
   signToken(data) {
+    console.log('Tokens.signToken()');
     return jwt.sign({ data }, JWT.secret, {
       expiresIn: JWT.expiration,
     });
   },
   verifyToken(token, cb) {
+    console.log('verifyToken()');
     jwt.verify(token, JWT.secret, null, (error, decoded) => {
       if (error) {
         Errors.General.logError(error);

@@ -141,8 +141,11 @@ module.exports = {
         // Create session token (JWT)
         const sessionToken = Tokens.signToken({ userID: user.id });
         const cookies = new Cookies();
+        console.log('sessionToken:', sessionToken);
         cookies.set('ut', sessionToken, {
-          expires: new Date(Date.now() + generalConfig.JWT.expirationInSecs),
+          expires: new Date(
+            new Date().getTime() + generalConfig.JWT.expirationInSecs,
+          ),
           // Disable Document.cookie API
           httpOnly: true,
           // Sent only to the server using HTTPS protocol unless it's directed to localhost

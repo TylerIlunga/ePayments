@@ -11,7 +11,7 @@ const BusinessProductController = require('../controllers/BusinessProduct');
 const PaymentAccountController = require('../controllers/PaymentAccount');
 const BusinessTransactionController = require('../controllers/BusinessTransaction');
 
-// TODO: Protected / Authenticated Middleware for certain routes (apply evaluateSession)
+// TODO: Protected / Authenticated Middleware for certain routes (apply evaluateSession to all endpoints)
 
 /** Service Health Check */
 Router.get('/healthcheck', (req, res) => res.sendStatus(200));
@@ -94,6 +94,7 @@ Router.get(
 );
 Router.get(
   '/api/v1/transactions/fetch',
+  evaluateSession,
   BusinessTransactionController.fetchBusinessTransaction,
 );
 
