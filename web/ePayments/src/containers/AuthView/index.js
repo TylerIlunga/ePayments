@@ -10,12 +10,16 @@ class AuthView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'logIn',
+      view: 'activateAccount',
       signUpLogInForm: {
         email: '',
         password: '',
         confirmPassword: '',
         passwordPattern: /^[a-zA-Z0-9]{10,30}$/,
+      },
+      activateAccountForm: {
+        email: '',
+        activationToken: '',
       },
     };
 
@@ -24,8 +28,10 @@ class AuthView extends React.Component {
 
     this.renderSignUpView = this.renderSignUpView.bind(this);
     this.updateSignUpLogInForm = this.updateSignUpLogInForm.bind(this);
+    this.updateActivateAccountForm = this.updateActivateAccountForm.bind(this);
     this.signNewUserUp = this.signNewUserUp.bind(this);
     this.logUserIn = this.logUserIn.bind(this);
+    this.activateUsersAccount = this.activateUsersAccount.bind(this);
   }
 
   displayToastMessage(type, message) {
@@ -46,6 +52,19 @@ class AuthView extends React.Component {
         },
       },
       () => console.log('new signUpLogInForm:', this.state.signUpLogInForm),
+    );
+  }
+
+  updateActivateAccountForm(evt, field) {
+    this.setState(
+      {
+        activateAccountForm: {
+          ...this.state.activateAccountForm,
+          [field]: evt.target.value,
+        },
+      },
+      () =>
+        console.log('new activateAccountForm:', this.state.activateAccountForm),
     );
   }
 
@@ -73,6 +92,12 @@ class AuthView extends React.Component {
     if (inputType === 'logIn') {
       const { email, password } = this.state.signUpLogInForm;
       if (!(email && password)) {
+        return { error: 'Please enter a value for each field.' };
+      }
+    }
+    if (inputType === 'activateAccount') {
+      const { email, activationToken } = this.state.activateAccountForm;
+      if (!(email && activationToken)) {
         return { error: 'Please enter a value for each field.' };
       }
     }
@@ -120,6 +145,7 @@ class AuthView extends React.Component {
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
+
     this.SessionService.logIn(this.state.signUpLogInForm)
       .then((res) => {
         console.log('logUserIn(), this.SessionService.logUserIn() res', res);
@@ -150,6 +176,39 @@ class AuthView extends React.Component {
         console.log('log In error:', error);
         if (typeof error !== 'string') {
           error = 'Log In Failed: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
+  }
+
+  activateUsersAccount(evt) {
+    evt.preventDefault();
+
+    this.displayToastMessage('info', 'Loading...');
+
+    const inputValidationResult = this.validInput('activateAccount');
+    if (inputValidationResult.error) {
+      return this.displayToastMessage('error', inputValidationResult.error);
+    }
+
+    this.UserService.activateAccount(this.state.activateAccountForm)
+      .then((res) => {
+        console.log(
+          'activateUsersAccount(), this.UserService.activateAccount() res',
+          res,
+        );
+        if (res.error) {
+          throw res.error;
+        }
+
+        this.displayToastMessage('success', 'Success: Please log in');
+
+        this.setState({ view: 'logIn' });
+      })
+      .catch((error) => {
+        console.log('activate account error:', error);
+        if (typeof error !== 'string') {
+          error = 'Activation Failed: Please try again';
         }
         this.displayToastMessage('error', error);
       });
@@ -239,7 +298,7 @@ class AuthView extends React.Component {
               placeholder={'************'}
             />
             <input
-              className='LogInViewFormCreateButton'
+              className='LogInViewFormLogInButton'
               type='button'
               value='Log In'
               onClick={this.logUserIn}
@@ -273,7 +332,41 @@ class AuthView extends React.Component {
   renderActivateAccountView() {
     return (
       <div className='MainAuthViewContainer'>
-        <div>ActivateAccount</div>
+        <div className='ActivateAccountViewHeader'>
+          <h1>Activate Account</h1>
+        </div>
+        <div className='ActivateAccountViewFormContainer'>
+          <form className='ActivateAccountViewForm'>
+            <label className='ActivateAccountViewFormEmailLabel'>
+              Email Address:
+            </label>
+            <input
+              className='ActivateAccountViewFormEmailInput'
+              type='text'
+              value={this.state.activateAccountForm.email}
+              onChange={(evt) => this.updateActivateAccountForm(evt, 'email')}
+              placeholder={'w@xyz.com'}
+            />
+            <label className='ActivateAccountViewFormPasswodLabel'>
+              Activation Token:
+            </label>
+            <input
+              className='ActivateAccountViewFormPasswordInput'
+              type='text'
+              value={this.state.activateAccountForm.activationToken}
+              onChange={(evt) =>
+                this.updateActivateAccountForm(evt, 'activationToken')
+              }
+              placeholder={'38239ds32msaDSj239asnma...'}
+            />
+            <input
+              className='ActivateAccountViewFormActivateButton'
+              type='button'
+              value='Activate'
+              onClick={this.activateUsersAccount}
+            />
+          </form>
+        </div>
       </div>
     );
   }
