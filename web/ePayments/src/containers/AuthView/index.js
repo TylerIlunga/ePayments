@@ -247,7 +247,9 @@ class AuthView extends React.Component {
 
         // Segue to Home (Transaction view)
         this.displayToastMessage('success', 'Success: Redirecting...');
-        this.props.history.push('/h/transactions');
+        this.props.history.replace('/h/transactions', {
+          session: true,
+        });
       })
       .catch((error) => {
         console.log('log In error:', error);

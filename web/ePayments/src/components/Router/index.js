@@ -35,9 +35,20 @@ import SettingsView from '../../containers/SettingsView';
 import PageNotFoundView from '../PageNotFoundView';
 
 const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
+  // TODO: Use props.allCookies instead of cookieOpts?
   const [cookies] = cookieOpts;
-  console.log('cookies:', cookies);
-  if (!(cookies && cookies.ut !== undefined && cookies.ut !== null)) {
+  const sessionExists =
+    props.router.location !== undefined ||
+    props.router.location.state !== undefined ||
+    props.router.location.state.session !== undefined ||
+    !props.router.location.state.session;
+  // TODO: Make sure to set state.session to false for logging out...
+  if (
+    !(
+      sessionExists ||
+      (cookies && cookies.ut !== undefined && cookies.ut !== null)
+    )
+  ) {
     return <AuthView {...history} {...props} />;
   }
   //   if (history.location.pathname === '/') {
@@ -119,7 +130,9 @@ const Router = (props) => {
   );
 };
 
-const mapStateToProps = (state) => ({});
+const mapStateToProps = (state) => ({
+  router: state.router,
+});
 const mapDispatchToProps = (dispatch) => ({});
 
 export default withCookies(
