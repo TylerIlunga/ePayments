@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { history } from '../../redux/store';
 import { withCookies, useCookies } from 'react-cookie';
 import { ConnectedRouter } from 'connected-react-router';
-import { Redirect } from 'react-router';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
