@@ -10,7 +10,7 @@ class AuthView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'forgotPassword',
+      view: 'logIn',
       signUpLogInForm: {
         email: '',
         password: '',
@@ -22,6 +22,14 @@ class AuthView extends React.Component {
         activationToken: '',
       },
       forgotPasswordForm: { email: '' },
+      resetPasswordForm: {
+        email: '',
+        resetPasswordToken: '',
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+        passwordPattern: /^[a-zA-Z0-9]{10,30}$/,
+      },
     };
 
     this.SessionService = new SessionService();
@@ -31,10 +39,12 @@ class AuthView extends React.Component {
     this.updateSignUpLogInForm = this.updateSignUpLogInForm.bind(this);
     this.updateActivateAccountForm = this.updateActivateAccountForm.bind(this);
     this.updateForgotPasswordForm = this.updateForgotPasswordForm.bind(this);
+    this.updateResetPasswordForm = this.updateResetPasswordForm.bind(this);
     this.signNewUserUp = this.signNewUserUp.bind(this);
     this.logUserIn = this.logUserIn.bind(this);
     this.activateUsersAccount = this.activateUsersAccount.bind(this);
     this.sendResetPasswordToken = this.sendResetPasswordToken.bind(this);
+    this.resetUsersPassword = this.resetUsersPassword.bind(this);
   }
 
   displayToastMessage(type, message) {
@@ -84,6 +94,18 @@ class AuthView extends React.Component {
     );
   }
 
+  updateResetPasswordForm(evt, field) {
+    this.setState(
+      {
+        resetPasswordForm: {
+          ...this.state.resetPasswordForm,
+          [field]: evt.target.value,
+        },
+      },
+      () => console.log('new resetPasswordForm:', this.state.resetPasswordForm),
+    );
+  }
+
   validInput(inputType) {
     if (inputType === 'signUp') {
       const {
@@ -123,6 +145,37 @@ class AuthView extends React.Component {
     if (inputType === 'forgotPassword') {
       if (!this.state.forgotPasswordForm.email) {
         return { error: 'Please enter a value for the email field.' };
+      }
+    }
+
+    if (inputType === 'resetPassword') {
+      const {
+        email,
+        resetPasswordToken,
+        oldPassword,
+        newPassword,
+        confirmPassword,
+        passwordPattern,
+      } = this.state.resetPasswordForm;
+      if (
+        !(
+          email &&
+          resetPasswordToken &&
+          oldPassword &&
+          newPassword &&
+          confirmPassword
+        )
+      ) {
+        return { error: 'Please enter a value for each field.' };
+      }
+      if (newPassword !== confirmPassword) {
+        return { error: 'Password do not match.' };
+      }
+      if (!newPassword.match(passwordPattern)) {
+        return {
+          error:
+            'Password must 10-30 characters long containing letters or digits.',
+        };
       }
     }
 
@@ -193,7 +246,7 @@ class AuthView extends React.Component {
         }
 
         // Segue to Home (Transaction view)
-        this.displayToastMessage('success', 'Success!');
+        this.displayToastMessage('success', 'Success: Redirecting...');
         this.props.history.push('/h/transactions');
       })
       .catch((error) => {
@@ -274,6 +327,39 @@ class AuthView extends React.Component {
       });
   }
 
+  resetUsersPassword(evt) {
+    evt.preventDefault();
+
+    this.displayToastMessage('info', 'Loading...');
+
+    const inputValidationResult = this.validInput('resetPassword');
+    if (inputValidationResult.error) {
+      return this.displayToastMessage('error', inputValidationResult.error);
+    }
+
+    this.UserService.resetPassword(this.state.resetPasswordForm)
+      .then((res) => {
+        console.log(
+          'resetUsersPassword(), this.UserService.resetPassword() res',
+          res,
+        );
+        if (res.error) {
+          throw res.error;
+        }
+
+        this.displayToastMessage('success', 'Success: Please log in.');
+
+        this.setState({ view: 'logIn' });
+      })
+      .catch((error) => {
+        console.log('reset password error:', error);
+        if (typeof error !== 'string') {
+          error = 'Failed resetting password: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
+  }
+
   renderSignUpView() {
     return (
       <div className='MainAuthViewContainer'>
@@ -290,7 +376,7 @@ class AuthView extends React.Component {
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
               placeholder={'w@xyz.com'}
             />
-            <label className='SignUpViewFormPasswodLabel'>Password:</label>
+            <label className='SignUpViewFormPasswordLabel'>Password:</label>
             <input
               className='SignUpViewFormPasswordInput'
               type='password'
@@ -298,7 +384,7 @@ class AuthView extends React.Component {
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'password')}
               placeholder={'************'}
             />
-            <label className='SignUpViewFormPasswodLabel'>
+            <label className='SignUpViewFormPasswordLabel'>
               Confirm Password:
             </label>
             <input
@@ -349,7 +435,7 @@ class AuthView extends React.Component {
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
               placeholder={'w@xyz.com'}
             />
-            <label className='LogInViewFormPasswodLabel'>Password:</label>
+            <label className='LogInViewFormPasswordLabel'>Password:</label>
             <input
               className='LogInViewFormPasswordInput'
               type='password'
@@ -407,7 +493,7 @@ class AuthView extends React.Component {
               onChange={(evt) => this.updateActivateAccountForm(evt, 'email')}
               placeholder={'w@xyz.com'}
             />
-            <label className='ActivateAccountViewFormPasswodLabel'>
+            <label className='ActivateAccountViewFormPasswordLabel'>
               Activation Token:
             </label>
             <input
@@ -484,7 +570,97 @@ class AuthView extends React.Component {
   renderResetPasswordView() {
     return (
       <div className='MainAuthViewContainer'>
-        <div>ResetPassword</div>
+        <div className='ResetPasswordViewHeader'>
+          <h1>Reset Password</h1>
+        </div>
+        <div className='ResetPasswordViewFormContainer'>
+          <form className='ResetPasswordViewForm'>
+            <label className='ResetPasswordViewFormEmailLabel'>
+              Email Address:
+            </label>
+            <input
+              className='ResetPasswordViewFormEmailInput'
+              type='text'
+              value={this.state.resetPasswordForm.email}
+              onChange={(evt) => this.updateResetPasswordForm(evt, 'email')}
+              placeholder={'w@xyz.com'}
+            />
+            <label className='ResetPasswordViewFormEmailLabel'>
+              Reset Token:
+            </label>
+            <input
+              className='ResetPasswordViewFormResetTokenInput'
+              type='text'
+              value={this.state.resetPasswordForm.resetPasswordToken}
+              onChange={(evt) =>
+                this.updateResetPasswordForm(evt, 'resetPasswordToken')
+              }
+              placeholder={'38239ds32msaDSj239asnma...'}
+            />
+            <label className='ResetPasswordViewFormOldPasswordLabel'>
+              Old Password:
+            </label>
+            <input
+              className='ResetPasswordViewFormOldPasswordInput'
+              type='password'
+              value={this.state.resetPasswordForm.oldPassword}
+              onChange={(evt) =>
+                this.updateResetPasswordForm(evt, 'oldPassword')
+              }
+              placeholder={'************'}
+            />
+            <label className='ResetPasswordViewFormNewPasswordLabel'>
+              New Password:
+            </label>
+            <input
+              className='ResetPasswordViewFormNewPasswordInput'
+              type='password'
+              value={this.state.resetPasswordForm.newPassword}
+              onChange={(evt) =>
+                this.updateResetPasswordForm(evt, 'newPassword')
+              }
+              placeholder={'************'}
+            />
+            <label className='ResetPasswordViewFormConfirmPasswordLabel'>
+              Confirm Password:
+            </label>
+            <input
+              className='ResetPasswordViewFormConfirmPasswordInput'
+              type='password'
+              value={this.state.resetPasswordForm.confirmPassword}
+              onChange={(evt) =>
+                this.updateResetPasswordForm(evt, 'confirmPassword')
+              }
+              placeholder={'************'}
+            />
+            <input
+              className='ResetPasswordViewFormSubmitButton'
+              type='button'
+              value='Submit'
+              onClick={this.resetUsersPassword}
+            />
+          </form>
+        </div>
+        <div className='ResetPasswordViewOptionsContainer'>
+          <div className='ResetPasswordViewOptionsLinkContainer'>
+            <a
+              className='ResetPasswordViewOptionsLink'
+              href='#signUp'
+              onClick={(evt) => this.setState({ view: 'signUp' })}
+            >
+              Sign Up
+            </a>
+          </div>
+          <div className='ResetPasswordViewOptionsLinkContainer'>
+            <a
+              className='ResetPasswordViewOptionsLink'
+              href='#logIn'
+              onClick={(evt) => this.setState({ view: 'logIn' })}
+            >
+              Log In
+            </a>
+          </div>
+        </div>
       </div>
     );
   }

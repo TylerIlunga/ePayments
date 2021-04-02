@@ -36,7 +36,7 @@ import PageNotFoundView from '../PageNotFoundView';
 
 const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
   const [cookies] = cookieOpts;
-  console.log('history.location.pathname:', history.location.pathname);
+  console.log('cookies:', cookies);
   if (!(cookies && cookies.ut !== undefined && cookies.ut !== null)) {
     return <AuthView {...history} {...props} />;
   }
@@ -48,7 +48,7 @@ const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
 };
 
 const Router = (props) => {
-  const cookieOpts = useCookies([]);
+  const cookieOpts = useCookies(['ut']);
   return (
     <ConnectedRouter history={history}>
       <div className='main'>
