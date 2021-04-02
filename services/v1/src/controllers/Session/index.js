@@ -4,7 +4,6 @@
  */
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
-const Cookies = require('universal-cookie');
 const generalConfig = require('../../config');
 const { User } = require('../../dal/config');
 const { Errors, Generators, Tokens, Validation } = require('../../utils');
@@ -110,16 +109,14 @@ module.exports = {
         }
         // Create session token (JWT)
         const sessionToken = Tokens.signToken({ userID: user.id });
-        const cookies = new Cookies();
-        console.log('sessionToken:', sessionToken);
-        cookies.set('ut', sessionToken, {
+        res.cookie('ut', sessionToken, {
           expires: new Date(
             new Date().getTime() + generalConfig.JWT.expirationInSecs,
           ),
           // Disable Document.cookie API
           httpOnly: true,
-          // Sent only to the server using HTTPS protocol unless it's directed to localhost
-          secure: true,
+          // Sent only to the server using HTTPS protocol
+          // secure: true,
         });
         // Return user data not profile.
         return res.json({ user: removeSensitiveUserData(user), error: null });
@@ -137,10 +134,7 @@ module.exports = {
    * @return {number} HTTP Status Code
    */
   async logOut(req, res) {
-    const cookies = new Cookies();
-
-    cookies.remove('ut');
-
+    res.clearCookie('ut');
     res.sendStatus(200);
   },
 };
