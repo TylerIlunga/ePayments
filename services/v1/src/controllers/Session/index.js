@@ -28,36 +28,6 @@ const removeSensitiveUserData = (user) => {
 
 module.exports = {
   /**
-   * Determines whether or not a user's session is still active based on their JWT.
-   *
-   * @param {object} req - Express.js Request
-   * @param {object} res - Express.js Response
-   *
-   * @return {object} JSON object
-   */
-  async reviewSession(req, res) {
-    tokenHasExpired(req.headers.authorization, async (rsp) => {
-      if (rsp.error) {
-        return res.json({ error: rsp.error });
-      }
-      const user = await User.findOne({ where: { id: rsp.data.id } });
-      if (user === null) {
-        return res.json({
-          error: 'Account does not exist for the given email.',
-        });
-      }
-      if (!user.active) {
-        return res.json({
-          error: 'Please check your email and activate your account.',
-        });
-      }
-      return res.json({
-        error: null,
-        user: removeSensitiveUserData(user),
-      });
-    });
-  },
-  /**
    * Creates a new account for a new user.
    *
    * @param {object} req - Express.js Request
@@ -167,7 +137,10 @@ module.exports = {
    * @return {number} HTTP Status Code
    */
   async logOut(req, res) {
-    res.clearCookie('ut');
+    const cookies = new Cookies();
+
+    cookies.remove('ut');
+
     res.sendStatus(200);
   },
 };
