@@ -72,7 +72,7 @@ const Router = (props) => {
             exact
           />
           <Route
-            path='/create/profile*'
+            path='/profile/create*'
             component={(h) =>
               handleProtectedRoutes(h, props, cookieOpts, CreateProfileView)
             }

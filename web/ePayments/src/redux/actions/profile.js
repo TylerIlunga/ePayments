@@ -1,4 +1,11 @@
-import { CLEAR_PROFILE, UPDATE_PROFILE } from '../constants';
+import { CLEAR_PROFILE, UPDATE_PROFILE, SET_PROFILE } from '../constants';
+
+export const setProfile = (profile) => {
+  return {
+    profile,
+    type: SET_PROFILE,
+  };
+};
 
 export const updateProfile = ({ key, value }) => {
   return {

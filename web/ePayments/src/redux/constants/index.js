@@ -7,6 +7,7 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const CLEAR_PRODUCT = 'CLEAR_PRODUCT';
 
 // Profile
+export const SET_PROFILE = 'SET_PROFILE';
 export const UPDATE_PROFILE = 'UPDATE_PROFILE';
 export const CLEAR_PROFILE = 'CLEAR_PROFILE';
 
