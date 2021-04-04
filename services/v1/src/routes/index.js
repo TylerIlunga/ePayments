@@ -44,7 +44,7 @@ Router.post(
   '/api/v1/products/business/create',
   BusinessProductController.createBusinessProduct,
 );
-Router.get(
+Router.post(
   '/api/v1/products/business/list',
   BusinessProductController.listBusinessProducts,
 );
@@ -88,7 +88,7 @@ Router.post(
   '/api/v1/transactions/create',
   BusinessTransactionController.createBusinessTransaction,
 );
-Router.get(
+Router.post(
   '/api/v1/transactions/list',
   BusinessTransactionController.listBusinessTransactions,
 );

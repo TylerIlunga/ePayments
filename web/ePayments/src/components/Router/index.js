@@ -43,14 +43,14 @@ const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
     props.router.location.state.session !== undefined ||
     !props.router.location.state.session;
   // TODO: Make sure to set state.session to false for logging out...
-  if (
-    !(
-      sessionExists ||
-      (cookies && cookies.ut !== undefined && cookies.ut !== null)
-    )
-  ) {
-    return <AuthView {...history} {...props} />;
-  }
+  //   if (
+  //     !(
+  //       sessionExists ||
+  //       (cookies && cookies.ut !== undefined && cookies.ut !== null)
+  //     )
+  //   ) {
+  //     return <AuthView {...history} {...props} />;
+  //   }
   //   if (history.location.pathname === '/') {
   //     // TODO: Make sure to check in "ComponentDidMount" that valid user data exists in our global (user) redux store
   //     return <TransactionsView />;
