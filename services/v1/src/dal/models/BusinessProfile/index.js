@@ -17,7 +17,6 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      profile_image_url: Sequelize.STRING,
       address: Sequelize.STRING,
       phone_number: Sequelize.STRING,
       public_email: Sequelize.STRING,

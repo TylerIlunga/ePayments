@@ -17,7 +17,6 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      profile_image_url: Sequelize.STRING,
       country: Sequelize.STRING,
       username: Sequelize.STRING,
       created_at: {

@@ -3,7 +3,6 @@
  * @module src/utils/index.js
  */
 module.exports = {
-  AWS: require('./aws'),
   CoinbaseAPIHelper: require('./coinbase'),
   Errors: require('./errors'),
   Network: require('./network'),

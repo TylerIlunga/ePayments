@@ -10,10 +10,6 @@ module.exports = {
       process.env.AWS_SECRET_ACCESS_KEY ||
       'EvzJGxOVCKvQOdvwH+qVCHTbvoN4vaXFf66SOYcq',
     region: process.env.AWS_REGION || 'us-west-1',
-    S3: {
-      bucket: process.env.AWS_BUCKET || 'epay-bucket-dev',
-      bucketPIFolder: process.env.AWS_BUCKET_PI_FOLDER || 'profileImages',
-    },
   },
   // TODO: Setup CB Notification Webhooks on Coinbase Dev App
   COINBASE: {

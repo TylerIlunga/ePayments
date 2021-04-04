@@ -10,12 +10,7 @@ const {
   customerUpdateSchema,
   businessUpdateSchema,
 } = require('../../middleware/Profile/validation');
-const {
-  AWS: { S3Utils },
-  Errors,
-  Strings,
-  Validation,
-} = require('../../utils');
+const { Errors, Strings, Validation } = require('../../utils');
 
 module.exports = {
   async fetchProfile(req, res) {
@@ -58,31 +53,18 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      const {
-        profileImage,
-        country,
-        username,
-        userID,
-      } = validationResult.value;
-      // Store image in the cloud (AWS)
-      const s3ImgUrl = await S3Utils.profileImageUpload(
-        null,
-        'customers',
-        userID,
-        profileImage,
-      );
+      const { country, username, userID } = validationResult.value;
       // Persist a new customer profile
       const newCustomerProfile = await CustomerProfile.create({
         country,
         username,
         user_id: userID,
-        profile_image_url: s3ImgUrl,
       });
       console.log('new customer profile created! ID:', newCustomerProfile.id);
       res.json({
         error: null,
         success: true,
-        customerProfileID: newCustomerProfile.id,
+        profile: newCustomerProfile,
       });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
@@ -99,32 +81,23 @@ module.exports = {
     }
     try {
       const {
-        profileImage,
         address,
         phoneNumber,
         publicEmail,
         userID,
       } = validationResult.value;
-      // Store image in the cloud (AWS)
-      const s3ImgUrl = await S3Utils.profileImageUpload(
-        null,
-        'businesses',
-        userID,
-        profileImage,
-      );
       // Persist a new business profile
       const newBusinessProfile = await BusinessProfile.create({
         address,
         phone_number: phoneNumber,
         public_email: publicEmail,
         user_id: userID,
-        profile_image_url: s3ImgUrl,
       });
       console.log('new business profile created! ID:', newBusinessProfile.id);
       res.json({
         error: null,
         success: true,
-        businessProfileID: newBusinessProfile.id,
+        profile: newBusinessProfile,
       });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
