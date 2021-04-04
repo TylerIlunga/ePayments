@@ -1,9 +1,10 @@
 import React from 'react';
-import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { setUser } from '../../redux/actions/user';
+import ProfileService from '../../services/ProfileService';
 import SessionService from '../../services/SessionService';
 import UserService from '../../services/UserService';
+import toastUtils from '../../utils/Toasts';
 import './index.css';
 
 class AuthView extends React.Component {
@@ -33,7 +34,9 @@ class AuthView extends React.Component {
     };
 
     this.SessionService = new SessionService();
+    this.ProfileService = new ProfileService();
     this.UserService = new UserService();
+    this.displayToastMessage = toastUtils.displayToastMessage;
 
     this.renderSignUpView = this.renderSignUpView.bind(this);
     this.updateSignUpLogInForm = this.updateSignUpLogInForm.bind(this);
@@ -45,15 +48,6 @@ class AuthView extends React.Component {
     this.activateUsersAccount = this.activateUsersAccount.bind(this);
     this.sendResetPasswordToken = this.sendResetPasswordToken.bind(this);
     this.resetUsersPassword = this.resetUsersPassword.bind(this);
-  }
-
-  displayToastMessage(type, message) {
-    // Types: (https://github.com/fkhadra/react-toastify#toast)
-    console.log('displayToastMessage', type, message);
-    toast[type](message, {
-      autoClose: 4000,
-      position: toast.POSITION.BOTTOM_LEFT,
-    });
   }
 
   updateSignUpLogInForm(evt, field) {
@@ -185,12 +179,13 @@ class AuthView extends React.Component {
   signNewUserUp(evt) {
     evt.preventDefault();
 
-    this.displayToastMessage('info', 'Loading...');
-
     const inputValidationResult = this.validInput('signUp');
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
+
+    this.displayToastMessage('info', 'Loading...');
+
     this.SessionService.signUp(this.state.signUpLogInForm)
       .then((res) => {
         console.log('signNewUserUp(), this.SessionService.signUp() res', res);
@@ -216,15 +211,15 @@ class AuthView extends React.Component {
   logUserIn(evt) {
     evt.preventDefault();
 
-    this.displayToastMessage('info', 'Loading...');
-
     const inputValidationResult = this.validInput('logIn');
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
 
+    this.displayToastMessage('info', 'Loading...');
+
     this.SessionService.logIn(this.state.signUpLogInForm)
-      .then((res) => {
+      .then(async (res) => {
         console.log('logUserIn(), this.SessionService.logUserIn() res', res);
         if (res.error) {
           throw res.error;
@@ -245,8 +240,20 @@ class AuthView extends React.Component {
           return this.setState({ view: 'activateAccount' });
         }
 
-        // Segue to Home (Transaction view)
+        const pRes = await this.ProfileService.fetchProfile(res.user.id);
+        console.log('this.ProfileService.fetchProfile() pRes:', pRes);
+        if (pRes.error) {
+          throw pRes.error;
+        }
+
         this.displayToastMessage('success', 'Success: Redirecting...');
+
+        if (pRes.profile === null) {
+          // Segue to CreateProfileView
+          return this.props.history.replace('/profile/create');
+        }
+
+        // Segue to TransactionView (Home)
         this.props.history.replace('/h/transactions', {
           session: true,
         });
@@ -263,12 +270,12 @@ class AuthView extends React.Component {
   activateUsersAccount(evt) {
     evt.preventDefault();
 
-    this.displayToastMessage('info', 'Loading...');
-
     const inputValidationResult = this.validInput('activateAccount');
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
+
+    this.displayToastMessage('info', 'Loading...');
 
     this.UserService.activateAccount(this.state.activateAccountForm)
       .then((res) => {
@@ -296,12 +303,12 @@ class AuthView extends React.Component {
   sendResetPasswordToken(evt) {
     evt.preventDefault();
 
-    this.displayToastMessage('info', 'Loading...');
-
     const inputValidationResult = this.validInput('forgotPassword');
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
+
+    this.displayToastMessage('info', 'Loading...');
 
     this.UserService.forgotPassword(this.state.forgotPasswordForm)
       .then((res) => {
@@ -332,12 +339,12 @@ class AuthView extends React.Component {
   resetUsersPassword(evt) {
     evt.preventDefault();
 
-    this.displayToastMessage('info', 'Loading...');
-
     const inputValidationResult = this.validInput('resetPassword');
     if (inputValidationResult.error) {
       return this.displayToastMessage('error', inputValidationResult.error);
     }
+
+    this.displayToastMessage('info', 'Loading...');
 
     this.UserService.resetPassword(this.state.resetPasswordForm)
       .then((res) => {

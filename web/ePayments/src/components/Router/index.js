@@ -13,8 +13,8 @@ import AuthView from '../../containers/AuthView';
 // CreateProfileView
 import CreateProfileView from '../../containers/CreateProfileView';
 
-// ConnectCoinbaseAccountView
-import ConnectCoinbaseAccountView from '../../containers/ConnectCoinbaseAccountView';
+// ConnectPaymentAccountView
+import ConnectPaymentAccountView from '../../containers/ConnectPaymentAccountView';
 
 // TransactionsView
 import TransactionsView from '../../containers/TransactionsView';
@@ -79,13 +79,13 @@ const Router = (props) => {
             exact
           />
           <Route
-            path='/connect/coinbase*'
+            path='/payments/connect*'
             component={(h) =>
               handleProtectedRoutes(
                 h,
                 props,
                 cookieOpts,
-                ConnectCoinbaseAccountView,
+                ConnectPaymentAccountView,
               )
             }
             exact
