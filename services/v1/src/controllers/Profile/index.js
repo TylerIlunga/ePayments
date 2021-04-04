@@ -3,6 +3,7 @@
  * @module src/controllers/Profile/validation.js
  */
 const { BusinessProfile, CustomerProfile } = require('../../dal/config');
+const User = require('../../dal/models/User');
 const {
   fetchProfileSchema,
   customerCreationSchema,
@@ -94,6 +95,14 @@ module.exports = {
         user_id: userID,
       });
       console.log('new business profile created! ID:', newBusinessProfile.id);
+
+      // Update User Account
+      const businessUser = await User.findOne({ where: { id: userID } });
+
+      businessUser.type = 'business';
+
+      businessUser.save();
+
       res.json({
         error: null,
         success: true,

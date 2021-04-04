@@ -1,9 +1,15 @@
-import { CLEAR_PAYMENT_ACCOUNT, UPDATE_PAYMENT_ACCOUNT } from '../constants';
+import {
+  CLEAR_PAYMENT_ACCOUNT,
+  UPDATE_PAYMENT_ACCOUNT,
+  SET_PAYMENT_ACCOUNT,
+} from '../constants';
 
 const initialState = {};
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case SET_PAYMENT_ACCOUNT:
+      return action.paymentAccount;
     case UPDATE_PAYMENT_ACCOUNT:
       return {
         ...state,

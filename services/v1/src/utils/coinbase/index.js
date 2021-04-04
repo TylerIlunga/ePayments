@@ -65,9 +65,9 @@ class CoinbaseAPIHelper {
         sendLimitPeriod: coinbaseConfig.currentTransactionSendLimitPeriod,
       },
     };
-    return res.redirect(
-      `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&state=${state}&scope=${opts.queryParams.scopes}&meta[send_limit_amount]=${opts.queryParams.sendLimitAmount}&meta[send_limit_currency]=${opts.queryParams.sendLimitCurrency}&meta[send_limit_period]=${opts.queryParams.sendLimitPeriod}`,
-    );
+    return res.json({
+      authURL: `${opts.baseURL}/${opts.path}?response_type=${opts.queryParams.responseType}&client_id=${opts.queryParams.clientID}&redirect_uri=${opts.queryParams.redirectURI}&state=${state}&scope=${opts.queryParams.scopes}&meta[send_limit_amount]=${opts.queryParams.sendLimitAmount}&meta[send_limit_currency]=${opts.queryParams.sendLimitCurrency}&meta[send_limit_period]=${opts.queryParams.sendLimitPeriod}`,
+    });
   }
 
   getAccessToken(oauthCallbackCode) {

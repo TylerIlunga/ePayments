@@ -2,7 +2,7 @@
  * Controller module for PaymentAccount endpoints.
  * @module src/controllers/PaymentAccount/index.js
  */
-const generalConfig = require('../../config');
+const { broadcastChannel } = require('./config');
 const dbModels = require('../../dal/config');
 const {
   Validation,
@@ -139,7 +139,20 @@ module.exports = {
             coinbase_refresh_token: accessTokenData.refresh_token,
           });
           console.log('New Payment Account created!', newPaymentAccount.id);
-          return res.json({ error: null, success: true });
+          return res.send(
+            broadcastChannel({
+              error: null,
+              success: true,
+              paymentAccount: {
+                id: newPaymentAccount.id,
+                user_id: newPaymentAccount.user_id,
+                profile_id: newPaymentAccount.profile_id,
+                coinbase_account_id: newPaymentAccount.coinbase_account_id,
+                coinbase_bitcoin_address:
+                  newPaymentAccount.coinbase_bitcoin_address,
+              },
+            }),
+          );
         })
         .catch((error) => {
           console.log('coinbaseAPI.getAccessToken() error:', error);
