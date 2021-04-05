@@ -5,7 +5,19 @@ import './index.css';
 class ProductsView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+
+    let selectedProduct = null;
+    if (
+      props.location !== undefined &&
+      props.location.state !== undefined &&
+      props.location.state !== null &&
+      props.location.state.selectedProduct !== undefined &&
+      props.location.state.selectedProduct !== null
+    ) {
+      selectedProduct = props.location.state.selectedProduct;
+    }
+
+    this.state = { selectedProduct, products: [] };
   }
 
   render() {

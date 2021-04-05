@@ -24,6 +24,7 @@ class TransactionsView extends React.Component {
       loadingTableData: true,
       transactions: [],
       tableOffset: 0,
+      tablePage: 1,
       tableColumns: [
         { title: 'ID', field: 'id' },
         { title: 'Date', field: 'created_at' },
@@ -63,6 +64,9 @@ class TransactionsView extends React.Component {
     this.renderMenuColumn = this.renderMenuColumn.bind(this);
     this.renderTableHeader = this.renderTableHeader.bind(this);
     this.renderTransactionTable = this.renderTransactionTable.bind(this);
+    this.handleOnChangeRowsPerPage = this.handleOnChangeRowsPerPage.bind(this);
+    this.handleOnChangePage = this.handleOnChangePage.bind(this);
+    this.handleOnRowClick = this.handleOnRowClick.bind(this);
     this.renderTransactions = this.renderTransactions.bind(this);
   }
 
@@ -70,7 +74,7 @@ class TransactionsView extends React.Component {
     // Fetch Transactions
     const queryData = {
       queryAttributes: {
-        limit: 5,
+        limit: 10,
         order: 'DESC',
       },
     };
@@ -116,6 +120,67 @@ class TransactionsView extends React.Component {
     return <p className='TransactionsHeaderLabel'>Loading...</p>;
   }
 
+  handleOnChangeRowsPerPage(pageSize) {
+    this.setState({ loadingTableData: true }, () => {
+      const queryData = {
+        queryAttributes: {
+          offset: this.state.tableOffset,
+          limit: pageSize,
+          order: 'DESC',
+        },
+      };
+
+      // queryData[`${this.user.props.type}ID`] = this.props.user.id;
+      queryData[`businessID`] = 7;
+
+      this.BusinessTransactionService.listTransactions(queryData)
+        .then((res) => {
+          console.log(
+            'this.BusinessTransactionService.listTransactions() res:',
+            res,
+          );
+          if (res.error) {
+            throw res.error;
+          }
+          this.setState({
+            transactions: res.businessTransactions,
+            loadingTableData: false,
+          });
+        })
+        .catch((error) => {
+          console.log(
+            'this.BusinessTransactionService.listTransactions error:',
+            error,
+          );
+          if (typeof error !== 'string') {
+            error = 'Loading failure: Please refresh and try again';
+          }
+          this.displayToastMessage('error', error);
+          this.setState({ loadingTableData: false });
+        });
+    });
+  }
+
+  handleOnChangePage(tablePage, pageSize) {
+    // TODO: Might need to change this up in case we decide to load more data..
+    let tableOffset = this.state.tableOffset;
+    if (tablePage !== tableOffset && tablePage > this.state.tablePage) {
+      tableOffset += pageSize;
+    }
+    if (tablePage !== tableOffset && tablePage < this.state.tablePage) {
+      tableOffset -= pageSize;
+    }
+    this.setState({ tablePage, tableOffset });
+  }
+
+  handleOnRowClick(evt, rowData, toggleDetailPanel) {
+    console.log('evt, rowData:', evt, rowData);
+    // TODO: Segue to ProductView with the state set to "ProductDetails"
+    this.props.history.push('/h/products', {
+      selectedProduct: rowData,
+    });
+  }
+
   renderTransactionTable() {
     // TODO: Handle Table Pagination!
     return (
@@ -126,6 +191,9 @@ class TransactionsView extends React.Component {
         columns={this.state.tableColumns}
         options={this.state.tableOptions}
         icons={this.state.tableIcons}
+        onChangeRowsPerPage={this.handleOnChangeRowsPerPage}
+        onChangePage={this.handleOnChangePage}
+        onRowClick={this.handleOnRowClick}
       />
     );
   }
