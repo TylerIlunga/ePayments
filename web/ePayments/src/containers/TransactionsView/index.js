@@ -182,7 +182,6 @@ class TransactionsView extends React.Component {
   }
 
   renderTransactionTable() {
-    // TODO: Handle Table Pagination!
     return (
       <MaterialTable
         title='Transactions'
