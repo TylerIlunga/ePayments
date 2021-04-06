@@ -8,6 +8,7 @@ import toastUtils from '../../utils/Toasts';
 import stringUtils from '../../utils/Strings';
 import './index.css';
 
+// TODO: Add CreateProduct feature
 class ProductsView extends React.Component {
   constructor(props) {
     super(props);
