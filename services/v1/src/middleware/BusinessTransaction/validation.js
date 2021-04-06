@@ -4,6 +4,9 @@
  */
 const Joi = require('joi');
 
+// TODO: Handling "quantity" and "category" field for all schemas
+// TODO: Will have to compute the total (req.body.quantity * businessProductt.price) for
+// creating a new business transaction.
 module.exports = {
   createBusinessTransactionSchema: Joi.object({
     businessID: Joi.number().required(),

@@ -173,6 +173,8 @@ module.exports = {
         transactionID: newBusinessTransaction.id,
       });
 
+      // TODO: Update BusinessProduct details (lower inventory count, increase purchased count)
+
       // Convert Crypto value to Fiat Value for Business if
       // they have auto_convert_to_fiat enabled for their payment account.
       // NOTE: Would probably handle this with a dedicated Conversion service in a distributed system...
@@ -277,10 +279,20 @@ module.exports = {
           continue;
         }
         if (typeof attribute === 'string') {
-          sqlAttributes.where[Op.like] = queryAttributes[attribute];
+          if (attribute.includes('ID')) {
+            const table = attribute.split('ID')[0];
+            sqlAttributes.where[`${table}_id`] = queryAttributes[attribute];
+          } else {
+            sqlAttributes.where[Op.like] = queryAttributes[attribute];
+          }
         }
         if (typeof attribute === 'number') {
-          sqlAttributes.where[Op.contains] = queryAttributes[attribute];
+          if (attribute.includes('ID')) {
+            const table = attribute.split('ID')[0];
+            sqlAttributes.where[`${table}_id`] = queryAttributes[attribute];
+          } else {
+            sqlAttributes.where[Op.contains] = queryAttributes[attribute];
+          }
         }
       }
 

@@ -14,7 +14,9 @@ module.exports = {
   snakeToCamel(text) {
     return text
       .split('_')
-      .map((w) => capitalize(w))
+      .map((w, i) => {
+        return i === 0 ? w : capitalize(w);
+      })
       .join('');
   },
 };

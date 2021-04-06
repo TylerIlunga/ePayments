@@ -10,6 +10,7 @@ const options = {
 };
 
 module.exports = (sequelize) => {
+  // TODO: Drop tables to Create new one + make changes in controllers/middleware
   let BusinessTransaction = sequelize.define(
     'businesstransactions',
     {
@@ -32,6 +33,14 @@ module.exports = (sequelize) => {
       coinbase_transaction_id: {
         allowNull: false,
         type: Sequelize.STRING,
+      },
+      product_category: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      quantity: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
       amount: {
         allowNull: false,

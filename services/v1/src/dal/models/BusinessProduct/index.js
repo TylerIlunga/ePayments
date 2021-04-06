@@ -10,6 +10,7 @@ const options = {
 };
 
 module.exports = (sequelize) => {
+  // TODO: Drop tables to Create new one + add allowNull attributes + make changes in controllers/middleware
   let BusinessProduct = sequelize.define(
     'businessproducts',
     {
@@ -19,13 +20,10 @@ module.exports = (sequelize) => {
       },
       sku: Sequelize.STRING,
       label: Sequelize.STRING,
+      category: Sequelize.STRING,
       description: Sequelize.STRING,
       price: Sequelize.DECIMAL(10, 2),
       inventory_count: Sequelize.STRING,
-      view_count: {
-        type: Sequelize.INTEGER,
-        default: 0,
-      },
       purchased_count: {
         type: Sequelize.INTEGER,
         default: 0,

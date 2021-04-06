@@ -4,6 +4,7 @@
  */
 const Joi = require('joi');
 
+// NOTE: Handling "category" field for all schemas
 module.exports = {
   createBusinessProductSchema: Joi.object({
     businessID: Joi.number().required(),
@@ -22,7 +23,6 @@ module.exports = {
         description: Joi.string(),
         price: Joi.number(),
         inventoryCount: Joi.number(),
-        viewCount: Joi.number(),
         purchasedCount: Joi.number(),
         order: Joi.string().valid('ASC', 'DESC'),
         offset: Joi.number(),
