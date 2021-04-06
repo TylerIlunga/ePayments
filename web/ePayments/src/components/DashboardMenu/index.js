@@ -1,6 +1,7 @@
 import React from 'react';
 import ReceiptRoundedIcon from '@material-ui/icons/ReceiptRounded';
 import StoreRoundedIcon from '@material-ui/icons/StoreRounded';
+import CameraAltRoundedIcon from '@material-ui/icons/CameraAltRounded';
 import AssessmentRoundedIcon from '@material-ui/icons/AssessmentRounded';
 import SettingsApplicationsRoundedIcon from '@material-ui/icons/SettingsApplicationsRounded';
 import './index.css';
@@ -9,15 +10,23 @@ const DashboardMenu = (props) => {
   const menuOptions = [
     { logo: <ReceiptRoundedIcon />, label: 'Transactions' },
     { logo: <StoreRoundedIcon />, label: 'Products' },
+    { logo: <CameraAltRoundedIcon />, label: 'Checkout' },
     { logo: <AssessmentRoundedIcon />, label: 'Analytics' },
     { logo: <SettingsApplicationsRoundedIcon />, label: 'Settings' },
   ];
 
-  // TODO: Display alert or modal if a user of type "customer" tries to
-  // click on the "Products" tab
-
   const segueTo = (evt, view) => {
     evt.preventDefault();
+    if (
+      props.user !== undefined &&
+      props.user.type === 'customer' &&
+      view === 'products'
+    ) {
+      return props.displayToastMessage(
+        'error',
+        'Only business accounts can create products.',
+      );
+    }
     props.history.push(`/h/${view}`);
   };
 

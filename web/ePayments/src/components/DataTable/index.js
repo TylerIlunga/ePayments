@@ -13,7 +13,37 @@ import Remove from '@material-ui/icons/Remove';
 import Clear from '@material-ui/icons/Clear';
 
 const DataTable = (props) => {
-  return;
+  let tableIcons = {
+    Check: () => <Check />,
+    Clear: () => <Clear />,
+    Export: () => <SaveAlt />,
+    Filter: () => <FilterList />,
+    FirstPage: () => <FirstPage />,
+    LastPage: () => <LastPage />,
+    NextPage: () => <ChevronRight />,
+    PreviousPage: () => <ChevronLeft />,
+    ResetSearch: () => <Clear />,
+    Search: () => <Search />,
+    ThirdStateCheck: () => <Remove />,
+    ViewColumn: () => <ViewColumn />,
+    DetailPanel: () => <ChevronRight />,
+  };
+  if (props.icons !== undefined) {
+    tableIcons = props.icons;
+  }
+  return (
+    <MaterialTable
+      title={props.title}
+      isLoading={props.isLoading}
+      data={props.data}
+      columns={props.columns}
+      options={props.options}
+      icons={tableIcons}
+      onChangeRowsPerPage={props.onChangeRowsPerPage}
+      onChangePage={props.onChangePage}
+      onRowClick={props.onRowClick}
+    />
+  );
 };
 
 export default DataTable;

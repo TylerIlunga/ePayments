@@ -26,6 +26,28 @@ class BusinessProductService {
         });
     });
   }
+
+  updateProduct(newProductData) {
+    return new Promise((resolve, reject) => {
+      const { businessID, businessProductID, sku, updates } = newProductData;
+      this.networkRequest(`${this.url}/update`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessID, businessProductID, sku, updates }),
+      })
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('listProducts() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('listProducts() error:', error);
+          reject(error);
+        });
+    });
+  }
 }
 
 export default BusinessProductService;

@@ -1,18 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import MaterialTable from 'material-table';
-import Search from '@material-ui/icons/Search';
-import ViewColumn from '@material-ui/icons/ViewColumn';
-import SaveAlt from '@material-ui/icons/SaveAlt';
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import FirstPage from '@material-ui/icons/FirstPage';
-import LastPage from '@material-ui/icons/LastPage';
-import Check from '@material-ui/icons/Check';
-import FilterList from '@material-ui/icons/FilterList';
-import Remove from '@material-ui/icons/Remove';
-import Clear from '@material-ui/icons/Clear';
 import DashboardMenu from '../../components/DashboardMenu';
+import DataTable from '../../components/DataTable';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
@@ -41,21 +30,6 @@ class TransactionsView extends React.Component {
         filtering: false,
         exportButton: true,
         exportFileName: 'ePayment-transactions',
-      },
-      tableIcons: {
-        Check: () => <Check />,
-        Clear: () => <Clear />,
-        Export: () => <SaveAlt />,
-        Filter: () => <FilterList />,
-        FirstPage: () => <FirstPage />,
-        LastPage: () => <LastPage />,
-        NextPage: () => <ChevronRight />,
-        PreviousPage: () => <ChevronLeft />,
-        ResetSearch: () => <Clear />,
-        Search: () => <Search />,
-        ThirdStateCheck: () => <Remove />,
-        ViewColumn: () => <ViewColumn />,
-        DetailPanel: () => <ChevronRight />,
       },
     };
 
@@ -110,7 +84,14 @@ class TransactionsView extends React.Component {
   }
 
   renderMenuColumn() {
-    return <DashboardMenu colSize='col-2' user={this.props.user} />;
+    return (
+      <DashboardMenu
+        colSize='col-2'
+        user={this.props.user}
+        history={this.props.history}
+        displayToastMessage={this.displayToastMessage}
+      />
+    );
   }
 
   renderTableHeader() {
@@ -183,13 +164,12 @@ class TransactionsView extends React.Component {
 
   renderTransactionTable() {
     return (
-      <MaterialTable
+      <DataTable
         title='Transactions'
         isLoading={this.state.loadingTableData}
         data={this.state.transactions}
         columns={this.state.tableColumns}
         options={this.state.tableOptions}
-        icons={this.state.tableIcons}
         onChangeRowsPerPage={this.handleOnChangeRowsPerPage}
         onChangePage={this.handleOnChangePage}
         onRowClick={this.handleOnRowClick}
