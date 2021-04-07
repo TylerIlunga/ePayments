@@ -152,7 +152,12 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      const { businessID, businessProductID, sku } = validationResult.value;
+      const {
+        businessID,
+        businessProductID,
+        sku,
+        withTransactions,
+      } = validationResult.value;
       // Verify User
       const businessUser = await User.findOne({ where: { id: businessID } });
       if (businessUser === null) {
@@ -165,12 +170,18 @@ module.exports = {
       if (businessProduct === null) {
         throw { error: 'Product does not exist for the given information.' };
       }
-      // Fetch five recent transactions for that product
-      const transactions = await BusinessTransaction.findAll({
-        where: { product_id: businessProductID },
-        limit: 5,
-        order: [['created_at', 'DESC']],
-      });
+
+      let transactions = [];
+
+      if (withTransactions) {
+        // If required fetch five recent transactions for that product
+        transactions = await BusinessTransaction.findAll({
+          where: { product_id: businessProductID },
+          limit: 5,
+          order: [['created_at', 'DESC']],
+        });
+      }
+
       // Respond
       return res.json({
         error: null,

@@ -49,9 +49,25 @@ module.exports = {
         productCategory,
         quantity,
         currency,
-        latitude,
-        longitude,
       } = validationResult.value;
+
+      const nbt = await BusinessTransaction.create({
+        id: uuid.v4(),
+        business_id: businessID,
+        customer_id: customerID,
+        product_id: productID,
+        coinbase_transaction_id: 'cbTransactionResult.id',
+        product_category: productCategory,
+        quantity: quantity,
+        amount: 1.5 * quantity,
+        token_amount: '${cbTransactionResult.amount.amount}',
+        currency: currency,
+        latitude: 0.0,
+        longitude: 0.0,
+      });
+
+      return res.json({ success: true });
+
       // Validate Business Account
       const businessAccount = await User.findOne({ where: { id: businessID } });
       if (businessAccount == null) {
@@ -142,8 +158,6 @@ module.exports = {
       // Transfer Product's value from Customer's Coinbase Wallet to Business Wallet (via API map to current currency's wallet)
       const cbTransactionResult = await coinbaseAPIHelper.transferFunds({
         currency,
-        latitude,
-        longitude,
         twoFactorAuthToken: validationResult.value.twoFactorAuthToken,
         tokenPrice: String(businessProductTokenPrice),
         from: customerPaymentAccount,
@@ -154,7 +168,7 @@ module.exports = {
       );
 
       // Persist BusinessTransaction data
-      const newBusinessTransaction = await BusinessTransaction.create({
+      const businessTransactionData = {
         id: uuid.v4(),
         business_id: businessID,
         customer_id: customerID,
@@ -165,10 +179,18 @@ module.exports = {
         amount: businessProduct.price * quantity,
         token_amount: `${cbTransactionResult.amount.amount}`,
         currency: currency,
-        latitude: latitude,
-        longitude: longitude,
-      });
+      };
+      if (
+        validationResult.value.latitude !== undefined &&
+        validationResult.value.longitude !== undefined
+      ) {
+        businessTransactionData.latitude = validationResult.value.latitude;
+        businessTransactionData.longitude = validationResult.value.longitude;
+      }
 
+      const newBusinessTransaction = await BusinessTransaction.create(
+        businessTransactionData,
+      );
       console.log('Persisted new transaction data:', newBusinessTransaction.id);
 
       // Async Response to Customer

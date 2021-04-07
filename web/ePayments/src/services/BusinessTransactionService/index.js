@@ -26,6 +26,27 @@ class BusinessTransactionService {
         });
     });
   }
+
+  createNewTransaction(transactionData) {
+    return new Promise((resolve, reject) => {
+      this.networkRequest(`${this.url}/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transactionData),
+      })
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('createNewTransaction() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('createNewTransaction() error:', error);
+          reject(error);
+        });
+    });
+  }
 }
 
 export default BusinessTransactionService;

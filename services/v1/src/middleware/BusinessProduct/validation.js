@@ -36,6 +36,7 @@ module.exports = {
     businessID: Joi.number().required(),
     businessProductID: Joi.number().required(),
     sku: Joi.string().length(16).required(),
+    withTransactions: Joi.boolean().required(),
   }),
   updateBusinessProductSchema: Joi.object({
     businessID: Joi.number().required(),

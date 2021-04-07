@@ -125,7 +125,7 @@ class CoinbaseAPIHelper {
           resolve();
         })
         .catch((error) => {
-          rreject(error.response.data);
+          reject(error.response.data);
         });
     });
   }
@@ -223,19 +223,23 @@ class CoinbaseAPIHelper {
         Authorization: `Bearer ${transactionData.from.coinbase_access_token}`,
         'Content-Type': 'application/json',
       });
-      if (
-        transactionData.twoFactorAuthToken !== null &&
-        transactionData.twoFactorAuthToken !== undefined
-      ) {
-        reqHeaders['CB-2FA-TOKEN'] = transactionData.twoFactorAuthToken;
-      }
+      // NOTE: (NOT IN V1) [Requires two seperate requests]
+      // Reference: https://developers.coinbase.com/docs/wallet/coinbase-connect/two-factor-authentication
+      // if (
+      //   transactionData.twoFactorAuthToken !== null &&
+      //   transactionData.twoFactorAuthToken !== undefined
+      // ) {
+      //   reqHeaders['CB-2FA-TOKEN'] = transactionData.twoFactorAuthToken;
+      // }
       this.request({
         method: 'POST',
         baseURL: this.api_url,
         path: `/accounts/${transactionData.from.coinbase_account_id}/transactions`,
         headers: reqHeaders,
         body: {
-          type: 'send',
+          // NOTE: For external accounts, but in v1 it's internal (Coinbase)
+          // type: 'send',
+          type: 'transfer',
           // TODO: UNCOMMENT THIS to: transactionData.to.coinbase_bitcoin_address,
           to: 'bc1qegu60t0n6npt7vam36mur60zpyudz62pd3f4za',
           // TODO: UNCOMMENT THIS to: transactionData.tokenPrice,

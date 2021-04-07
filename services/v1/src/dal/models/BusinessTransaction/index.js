@@ -10,6 +10,7 @@ const options = {
 };
 
 module.exports = (sequelize) => {
+  // NOTE: Drop tables to change longitude,latitude change
   let BusinessTransaction = sequelize.define(
     'businesstransactions',
     {
@@ -55,11 +56,11 @@ module.exports = (sequelize) => {
       },
       latitude: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       longitude: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.BIGINT,

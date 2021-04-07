@@ -48,7 +48,7 @@ Router.post(
   '/api/v1/products/business/list',
   BusinessProductController.listBusinessProducts,
 );
-Router.get(
+Router.post(
   '/api/v1/products/business/fetch',
   BusinessProductController.fetchBusinessProduct,
 );

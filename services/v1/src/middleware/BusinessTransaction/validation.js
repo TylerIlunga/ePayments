@@ -10,14 +10,14 @@ module.exports = {
     businessID: Joi.number().required(),
     customerID: Joi.number().required(),
     productID: Joi.number().required(),
-    // Not required in case they don't have it set up on Coinbase
-    twoFactorAuthToken: Joi.string(),
+    // (NOT IN V1) Not required in case they don't have it set up on Coinbase
+    // twoFactorAuthToken: Joi.string(),
     sku: Joi.string().required(),
     productCategory: Joi.string().required(),
     quantity: Joi.number().required(),
     currency: Joi.string().required(),
-    latitude: Joi.number().required(),
-    longitude: Joi.number().required(),
+    latitude: Joi.number(),
+    longitude: Joi.number(),
   }),
   listBusinessTransactionsSchema: Joi.object({
     customerID: Joi.number(),

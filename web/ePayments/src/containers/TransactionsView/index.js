@@ -52,6 +52,7 @@ class TransactionsView extends React.Component {
     this.fetchTransactions({
       // [`${this.user.props.type}ID`]: this.props.user.id,
       businessID: 7,
+      // customerID: 10,
       queryAttributes: {
         limit: 10,
         order: 'DESC',
@@ -144,10 +145,7 @@ class TransactionsView extends React.Component {
 
   handleOnRowClick(evt, rowData, toggleDetailPanel) {
     console.log('evt, rowData:', evt, rowData);
-    // TODO: Segue to ProductView with the state set to "ProductDetails"
-    this.props.history.push('/h/products', {
-      selectedProduct: rowData,
-    });
+    // TODO: Display "TransactionDetails" view which will be read only (review what we've done for ProductDetails)
   }
 
   renderTransactionTable() {

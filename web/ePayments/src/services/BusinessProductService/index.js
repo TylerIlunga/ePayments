@@ -6,6 +6,27 @@ class BusinessProductService {
     this.networkRequest = config.networkRequest;
   }
 
+  fetchProduct(queryData) {
+    return new Promise((resolve, reject) => {
+      this.networkRequest(`${this.url}/fetch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(queryData),
+      })
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('fetchProduct() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('fetchProduct() error:', error);
+          reject(error);
+        });
+    });
+  }
+
   listProducts(queryData) {
     return new Promise((resolve, reject) => {
       this.networkRequest(`${this.url}/list`, {
