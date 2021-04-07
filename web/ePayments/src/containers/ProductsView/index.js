@@ -106,7 +106,7 @@ class ProductsView extends React.Component {
 
   componentDidMount() {
     this.fetchProducts({
-      // businessID: this.props.user.id,
+      // TODO: (UNCOMMENT) businessID: this.props.user.id,
       businessID: 7,
       queryAttributes: {
         limit: 5,
@@ -198,7 +198,7 @@ class ProductsView extends React.Component {
       newState = { loadingProducts: true };
       cb = () => {
         this.fetchProducts({
-          // businessID: this.props.user.id,
+          // TODO: (UNCOMMENT) businessID: this.props.user.id,
           businessID: 7,
           queryAttributes: {
             offset: this.state.productsTableOffset,
@@ -211,10 +211,10 @@ class ProductsView extends React.Component {
       newState = { loadingProductTransactions: true };
       cb = () => {
         this.fetchProductTransactions({
-          // businessID: this.props.user.id,
+          // TODO: (UNCOMMENT) businessID: this.props.user.id,
           businessID: 7,
           queryAttributes: {
-            // businessID: this.props.user.id,
+            // TODO: (UNCOMMENT) businessID: this.props.user.id,
             businessID: 7,
             productID: this.state.selectedProduct.id,
             offset: this.state.transactionsTableOffset,
@@ -250,7 +250,7 @@ class ProductsView extends React.Component {
       () => {
         if (this.state.products.length < productsTableOffset + pageSize) {
           this.fetchProducts({
-            // businessID: this.props.user.id,
+            // TODO: (UNCOMMENT) businessID: this.props.user.id,
             businessID: 7,
             queryAttributes: {
               offset: productsTableOffset,
@@ -288,10 +288,10 @@ class ProductsView extends React.Component {
           transactionsTableOffset + pageSize
         ) {
           this.fetchProductTransactions({
-            // businessID: this.props.user.id,
+            // TODO: (UNCOMMENT) businessID: this.props.user.id,
             businessID: 7,
             queryAttributes: {
-              // businessID: this.props.user.id,
+              // TODO: (UNCOMMENT) businessID: this.props.user.id,
               businessID: 7,
               productID: this.state.selectedProduct.id,
               offset: transactionsTableOffset,
@@ -472,10 +472,10 @@ class ProductsView extends React.Component {
           className='ProductViewDetailsShowTransactionButton'
           onClick={(evt) =>
             this.fetchProductTransactions({
-              // businessID: this.props.user.id,
+              // TODO: (UNCOMMENT) businessID: this.props.user.id,
               businessID: 7,
               queryAttributes: {
-                // businessID: this.props.user.id,
+                // TODO: (UNCOMMENT) businessID: this.props.user.id,
                 businessID: 7,
                 productID: this.state.selectedProduct.id,
                 limit: 5,

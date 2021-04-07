@@ -48,9 +48,8 @@ class TransactionsView extends React.Component {
   }
 
   componentDidMount() {
-    // Fetch Transactions
     this.fetchTransactions({
-      // [`${this.user.props.type}ID`]: this.props.user.id,
+      // TODO: (UNCOMMENT)  [`${this.user.props.type}ID`]: this.props.user.id,
       businessID: 7,
       // customerID: 10,
       queryAttributes: {
@@ -109,8 +108,9 @@ class TransactionsView extends React.Component {
   handleOnChangeRowsPerPage(pageSize) {
     this.setState({ loadingTableData: true }, () => {
       this.fetchTransactions({
-        // [`${this.user.props.type}ID`]: this.props.user.id,
+        // TODO: (UNCOMMENT) [`${this.user.props.type}ID`]: this.props.user.id,
         businessID: 7,
+        // customerID: 10,
         queryAttributes: {
           offset: this.state.tableOffset,
           limit: pageSize,
@@ -131,8 +131,9 @@ class TransactionsView extends React.Component {
     this.setState({ tablePage, tableOffset }, () => {
       if (this.state.transactions.length < tableOffset + pageSize) {
         this.fetchTransactions({
-          // businessID: this.props.user.id,
+          // TODO: (UNCOMMENT) [`${this.user.props.type}ID`]: this.props.user.id,
           businessID: 7,
+          // customerID: 10,
           queryAttributes: {
             offset: tableOffset,
             limit: pageSize,

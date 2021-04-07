@@ -59,11 +59,6 @@ class ConnectPaymentAccountView extends React.Component {
 
   startCoinbaseOAuth(evt) {
     evt.preventDefault();
-    // this.PaymentAccountService.fetchCoinbaseOauthLink({
-    //   userID: this.props.user.id,
-    //   email: this.props.user.email,
-    //   profileID: this.props.profile.id
-    // })
     this.PaymentAccountService.fetchCoinbaseOauthLink({
       userID: this.props.user.id,
       email: this.props.user.email,

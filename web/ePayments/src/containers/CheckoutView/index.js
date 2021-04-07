@@ -70,7 +70,7 @@ class CheckoutView extends React.Component {
       this.fetchUsersLocation().then((locationData) => {
         const createNewTransactionData = {
           businessID: this.state.scannedProduct.user_id,
-          // customerID: this.props.user.id,
+          // TODO: (UNCOMMENT) customerID: this.props.user.id,
           customerID: 10,
           productID: this.state.scannedProduct.id,
           sku: this.state.scannedProduct.sku,
