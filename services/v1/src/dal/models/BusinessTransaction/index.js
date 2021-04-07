@@ -10,7 +10,6 @@ const options = {
 };
 
 module.exports = (sequelize) => {
-  // TODO: Drop tables to Create new one + make changes in controllers/middleware
   let BusinessTransaction = sequelize.define(
     'businesstransactions',
     {

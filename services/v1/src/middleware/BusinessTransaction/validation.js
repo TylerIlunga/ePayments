@@ -4,8 +4,6 @@
  */
 const Joi = require('joi');
 
-// TODO: Handling "quantity" and "category" field for all schemas
-// TODO: Will have to compute the total (req.body.quantity * businessProductt.price) for
 // creating a new business transaction.
 module.exports = {
   createBusinessTransactionSchema: Joi.object({
@@ -15,6 +13,8 @@ module.exports = {
     // Not required in case they don't have it set up on Coinbase
     twoFactorAuthToken: Joi.string(),
     sku: Joi.string().required(),
+    productCategory: Joi.string().required(),
+    quantity: Joi.number().required(),
     currency: Joi.string().required(),
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),
@@ -30,6 +30,8 @@ module.exports = {
         productID: Joi.number(),
         amount: Joi.number(),
         token_amount: Joi.number(),
+        productCategory: Joi.string(),
+        quantity: Joi.number(),
         currency: Joi.string(),
         latitude: Joi.number(),
         longitude: Joi.number(),

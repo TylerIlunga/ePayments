@@ -18,9 +18,11 @@ class TransactionsView extends React.Component {
         { title: 'ID', field: 'id' },
         { title: 'Date', field: 'created_at' },
         { title: 'Product', field: 'product_id' },
+        { title: 'Category', field: 'product_category' },
+        { title: 'Quantity', field: 'quantity' },
         { title: 'Currency', field: 'currency' },
         { title: 'Token Amount', field: 'token_amount' },
-        { title: 'Fiat Amount', field: 'amount' },
+        { title: 'Fiat Price', field: 'amount' },
         { title: 'Latitude', field: 'latitude' },
         { title: 'Longitude', field: 'longitude' },
       ],
@@ -35,6 +37,7 @@ class TransactionsView extends React.Component {
 
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessTransactionService = new BusinessTransactionService();
+    this.fetchTransactions = this.fetchTransactions.bind(this);
     this.renderMenuColumn = this.renderMenuColumn.bind(this);
     this.renderTableHeader = this.renderTableHeader.bind(this);
     this.renderTransactionTable = this.renderTransactionTable.bind(this);
@@ -46,16 +49,17 @@ class TransactionsView extends React.Component {
 
   componentDidMount() {
     // Fetch Transactions
-    const queryData = {
+    this.fetchTransactions({
+      // [`${this.user.props.type}ID`]: this.props.user.id,
+      businessID: 7,
       queryAttributes: {
         limit: 10,
         order: 'DESC',
       },
-    };
+    });
+  }
 
-    // queryData[`${this.user.props.type}ID`] = this.props.user.id;
-    queryData[`businessID`] = 7;
-
+  fetchTransactions(queryData) {
     this.BusinessTransactionService.listTransactions(queryData)
       .then((res) => {
         console.log(
@@ -103,47 +107,19 @@ class TransactionsView extends React.Component {
 
   handleOnChangeRowsPerPage(pageSize) {
     this.setState({ loadingTableData: true }, () => {
-      const queryData = {
+      this.fetchTransactions({
+        // [`${this.user.props.type}ID`]: this.props.user.id,
+        businessID: 7,
         queryAttributes: {
           offset: this.state.tableOffset,
           limit: pageSize,
           order: 'DESC',
         },
-      };
-
-      // queryData[`${this.user.props.type}ID`] = this.props.user.id;
-      queryData[`businessID`] = 7;
-
-      this.BusinessTransactionService.listTransactions(queryData)
-        .then((res) => {
-          console.log(
-            'this.BusinessTransactionService.listTransactions() res:',
-            res,
-          );
-          if (res.error) {
-            throw res.error;
-          }
-          this.setState({
-            transactions: res.businessTransactions,
-            loadingTableData: false,
-          });
-        })
-        .catch((error) => {
-          console.log(
-            'this.BusinessTransactionService.listTransactions error:',
-            error,
-          );
-          if (typeof error !== 'string') {
-            error = 'Loading failure: Please refresh and try again';
-          }
-          this.displayToastMessage('error', error);
-          this.setState({ loadingTableData: false });
-        });
+      });
     });
   }
 
   handleOnChangePage(tablePage, pageSize) {
-    // TODO: Might need to change this up in case we decide to load more data..
     let tableOffset = this.state.tableOffset;
     if (tablePage !== tableOffset && tablePage > this.state.tablePage) {
       tableOffset += pageSize;
@@ -151,7 +127,19 @@ class TransactionsView extends React.Component {
     if (tablePage !== tableOffset && tablePage < this.state.tablePage) {
       tableOffset -= pageSize;
     }
-    this.setState({ tablePage, tableOffset });
+    this.setState({ tablePage, tableOffset }, () => {
+      if (this.state.transactions.length < tableOffset + pageSize) {
+        this.fetchTransactions({
+          // businessID: this.props.user.id,
+          businessID: 7,
+          queryAttributes: {
+            offset: tableOffset,
+            limit: pageSize,
+            order: 'DESC',
+          },
+        });
+      }
+    });
   }
 
   handleOnRowClick(evt, rowData, toggleDetailPanel) {

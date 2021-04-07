@@ -44,6 +44,7 @@ module.exports = {
         label,
         description,
         price,
+        category,
         inventoryCount,
       } = validationResult.value;
       // Verify User
@@ -62,6 +63,7 @@ module.exports = {
         label,
         description,
         price,
+        category,
         user_id: businessID,
         inventory_count: inventoryCount,
       });
@@ -163,14 +165,13 @@ module.exports = {
       if (businessProduct === null) {
         throw { error: 'Product does not exist for the given information.' };
       }
-
       // Fetch five recent transactions for that product
       const transactions = await BusinessTransaction.findAll({
         where: { product_id: businessProductID },
         limit: 5,
         order: [['created_at', 'DESC']],
       });
-
+      // Respond
       return res.json({
         error: null,
         success: true,

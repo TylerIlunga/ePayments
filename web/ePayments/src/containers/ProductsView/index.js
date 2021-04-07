@@ -38,6 +38,7 @@ class ProductsView extends React.Component {
         { title: 'ID', field: 'id' },
         { title: 'SKU', field: 'sku' },
         { title: 'Date', field: 'created_at' },
+        { title: 'Category', field: 'category' },
         { title: 'Label', field: 'label' },
         { title: 'Price', field: 'price' },
         { title: 'Inventory', field: 'inventory_count' },
@@ -57,9 +58,11 @@ class ProductsView extends React.Component {
         { title: 'ID', field: 'id' },
         { title: 'Date', field: 'created_at' },
         { title: 'Product', field: 'product_id' },
+        { title: 'Category', field: 'product_category' },
+        { title: 'Quantity', field: 'quantity' },
         { title: 'Currency', field: 'currency' },
         { title: 'Token Amount', field: 'token_amount' },
-        { title: 'Fiat Amount', field: 'amount' },
+        { title: 'Fiat Price', field: 'amount' },
         { title: 'Latitude', field: 'latitude' },
         { title: 'Longitude', field: 'longitude' },
       ],
@@ -80,7 +83,12 @@ class ProductsView extends React.Component {
     this.renderViewHeader = this.renderViewHeader.bind(this);
     this.renderProductsTable = this.renderProductsTable.bind(this);
     this.handleOnChangeRowsPerPage = this.handleOnChangeRowsPerPage.bind(this);
-    this.handleOnChangePage = this.handleOnChangePage.bind(this);
+    this.handleOnChangeProductsTablePage = this.handleOnChangeProductsTablePage.bind(
+      this,
+    );
+    this.handleOnChangeTransactionsTablePage = this.handleOnChangeTransactionsTablePage.bind(
+      this,
+    );
     this.handleOnRowClick = this.handleOnRowClick.bind(this);
     this.renderProductView = this.renderProductView.bind(this);
     this.exitProductDetailsView = this.exitProductDetailsView.bind(this);
@@ -220,27 +228,42 @@ class ProductsView extends React.Component {
     this.setState(newState, cb);
   }
 
-  handleOnChangePage(table, tablePage, pageSize) {
-    // TODO: Might need to change this up in case we decide to load more data..
-    if (table === 'products') {
-      let productsTableOffset = this.state.productsTableOffset;
-      if (
-        tablePage !== productsTableOffset &&
-        tablePage > this.state.productsTablePage
-      ) {
-        productsTableOffset += pageSize;
-      }
-      if (
-        tablePage !== productsTableOffset &&
-        tablePage < this.state.productsTablePage
-      ) {
-        productsTableOffset -= pageSize;
-      }
-      return this.setState({
+  handleOnChangeProductsTablePage(tablePage, pageSize) {
+    let productsTableOffset = this.state.productsTableOffset;
+    if (
+      tablePage !== productsTableOffset &&
+      tablePage > this.state.productsTablePage
+    ) {
+      productsTableOffset += pageSize;
+    }
+    if (
+      tablePage !== productsTableOffset &&
+      tablePage < this.state.productsTablePage
+    ) {
+      productsTableOffset -= pageSize;
+    }
+    return this.setState(
+      {
         productsTableOffset,
         productsTablePage: tablePage,
-      });
-    }
+      },
+      () => {
+        if (this.state.products.length < productsTableOffset + pageSize) {
+          this.fetchProducts({
+            // businessID: this.props.user.id,
+            businessID: 7,
+            queryAttributes: {
+              offset: productsTableOffset,
+              limit: pageSize,
+              order: 'DESC',
+            },
+          });
+        }
+      },
+    );
+  }
+
+  handleOnChangeTransactionsTablePage(tablePage, pageSize) {
     let transactionsTableOffset = this.state.transactionsTableOffset;
     if (
       tablePage !== transactionsTableOffset &&
@@ -254,10 +277,31 @@ class ProductsView extends React.Component {
     ) {
       transactionsTableOffset -= pageSize;
     }
-    this.setState({
-      transactionsTableOffset,
-      transactionsTablePage: tablePage,
-    });
+    this.setState(
+      {
+        transactionsTableOffset,
+        transactionsTablePage: tablePage,
+      },
+      () => {
+        if (
+          this.state.transactions.length <
+          transactionsTableOffset + pageSize
+        ) {
+          this.fetchProductTransactions({
+            // businessID: this.props.user.id,
+            businessID: 7,
+            queryAttributes: {
+              // businessID: this.props.user.id,
+              businessID: 7,
+              productID: this.state.selectedProduct.id,
+              offset: transactionsTableOffset,
+              limit: pageSize,
+              order: 'DESC',
+            },
+          });
+        }
+      },
+    );
   }
 
   handleOnRowClick(table, evt, rowData, toggleDetailPanel) {
@@ -277,7 +321,9 @@ class ProductsView extends React.Component {
         onChangeRowsPerPage={(ps) =>
           this.handleOnChangeRowsPerPage('products', ps)
         }
-        onChangePage={(tp, ps) => this.handleOnChangePage('products', tp, ps)}
+        onChangePage={(tp, ps) =>
+          this['handleOnChangeProductsTablePage'](tp, ps)
+        }
         onRowClick={(e, rd, tdp) =>
           this.handleOnRowClick('products', e, rd, tdp)
         }
@@ -370,6 +416,12 @@ class ProductsView extends React.Component {
       <form className='MainProductViewDetails'>
         <label>ID: {productID}</label>
         <label>SKU: {sku}</label>
+        <label>Category: </label>
+        <input
+          type='text'
+          value={this.state.selectedProduct.category}
+          onChange={(evt) => this.updateSelectedProductField(evt, 'category')}
+        />
         <label>Label: </label>
         <input
           type='text'
@@ -447,7 +499,7 @@ class ProductsView extends React.Component {
           this.handleOnChangeRowsPerPage('transactions', ps)
         }
         onChangePage={(tp, ps) =>
-          this.handleOnChangePage('transactions', tp, ps)
+          this['handleOnChangeTransactionsTablePage'](tp, ps)
         }
         onRowClick={(e, rd, tdp) =>
           this.handleOnRowClick('transactions', e, rd, tdp)

@@ -46,6 +46,8 @@ module.exports = {
         customerID,
         productID,
         sku,
+        productCategory,
+        quantity,
         currency,
         latitude,
         longitude,
@@ -126,13 +128,14 @@ module.exports = {
         'BTC-USD',
       );
 
-      businessProduct.price =
-        businessProduct.price / cbCurrentBTCBuyPrice.amount;
+      const businessProductTokenPrice =
+        (businessProduct.price * quantity) / cbCurrentBTCBuyPrice.amount;
       if (
-        businessProduct.price <= generalConfig.COINBASE.currentTransferMinimum
+        businessProductTokenPrice <=
+        generalConfig.COINBASE.currentTransferMinimum
       ) {
         throw {
-          error: `BTC Price (${businessProduct.price}) of product must be at least 0.0001 BTC (Coinbase Standard)`,
+          error: `BTC Price (${businessProductTokenPrice}) of product must be at least 0.0001 BTC (Coinbase Standard)`,
         };
       }
 
@@ -142,7 +145,7 @@ module.exports = {
         latitude,
         longitude,
         twoFactorAuthToken: validationResult.value.twoFactorAuthToken,
-        price: String(businessProduct.price),
+        tokenPrice: String(businessProductTokenPrice),
         from: customerPaymentAccount,
         to: businessPaymentAccount,
       });
@@ -157,7 +160,9 @@ module.exports = {
         customer_id: customerID,
         product_id: productID,
         coinbase_transaction_id: cbTransactionResult.id,
-        amount: businessProduct.price,
+        product_category: productCategory,
+        quantity: quantity,
+        amount: businessProduct.price * quantity,
         token_amount: `${cbTransactionResult.amount.amount}`,
         currency: currency,
         latitude: latitude,
@@ -173,7 +178,10 @@ module.exports = {
         transactionID: newBusinessTransaction.id,
       });
 
-      // TODO: Update BusinessProduct details (lower inventory count, increase purchased count)
+      // Update BusinessProduct details (lower inventory count, increase purchased count)
+      businessProduct.inventory_count -= 1;
+      businessProduct.purchased_count += 1;
+      businessProduct.save();
 
       // Convert Crypto value to Fiat Value for Business if
       // they have auto_convert_to_fiat enabled for their payment account.
@@ -184,7 +192,7 @@ module.exports = {
       coinbaseAPIHelper
         .convertToFiat({
           paymentAccount: businessPaymentAccount,
-          amount: String(businessProduct.price),
+          amount: String(businessProductTokenPrice),
           currency: cbTransactionResult.amount.currency,
         })
         .then(async (cbConversionResult) => {

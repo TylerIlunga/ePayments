@@ -238,6 +238,7 @@ class CoinbaseAPIHelper {
           type: 'send',
           // TODO: UNCOMMENT THIS to: transactionData.to.coinbase_bitcoin_address,
           to: 'bc1qegu60t0n6npt7vam36mur60zpyudz62pd3f4za',
+          // TODO: UNCOMMENT THIS to: transactionData.tokenPrice,
           amount: '0.00010003',
           currency: transactionData.currency,
         },

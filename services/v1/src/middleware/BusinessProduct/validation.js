@@ -12,6 +12,7 @@ module.exports = {
     label: Joi.string().required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
+    category: Joi.string().required(),
     inventoryCount: Joi.number().required(),
   }),
   listBusinessProductsSchema: Joi.object({
@@ -22,6 +23,7 @@ module.exports = {
         label: Joi.string(),
         description: Joi.string(),
         price: Joi.number(),
+        category: Joi.string(),
         inventoryCount: Joi.number(),
         purchasedCount: Joi.number(),
         order: Joi.string().valid('ASC', 'DESC'),
@@ -44,6 +46,7 @@ module.exports = {
         label: Joi.string(),
         description: Joi.string(),
         price: Joi.number(),
+        category: Joi.string(),
         inventoryCount: Joi.number(),
       })
       .required(),
