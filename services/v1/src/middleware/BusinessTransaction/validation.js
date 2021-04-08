@@ -22,6 +22,10 @@ module.exports = {
   listBusinessTransactionsSchema: Joi.object({
     customerID: Joi.number(),
     businessID: Joi.number(),
+    betweenDates: Joi.object({
+      start: Joi.number().required(),
+      end: Joi.number().required(),
+    }),
     queryAttributes: Joi.object()
       .keys({
         coinbaseTransactionID: Joi.string(),

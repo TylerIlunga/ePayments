@@ -31,6 +31,10 @@ module.exports = {
         limit: Joi.number(),
       })
       .required(),
+    betweenDates: Joi.object({
+      start: Joi.number().required(),
+      end: Joi.number().required(),
+    }),
   }),
   fetchBusinessProductSchema: Joi.object({
     businessID: Joi.number().required(),

@@ -51,22 +51,22 @@ module.exports = {
         currency,
       } = validationResult.value;
 
-      const nbt = await BusinessTransaction.create({
-        id: uuid.v4(),
-        business_id: businessID,
-        customer_id: customerID,
-        product_id: productID,
-        coinbase_transaction_id: 'cbTransactionResult.id',
-        product_category: productCategory,
-        quantity: quantity,
-        amount: 1.5 * quantity,
-        token_amount: '${cbTransactionResult.amount.amount}',
-        currency: currency,
-        latitude: 0.0,
-        longitude: 0.0,
-      });
+      // const nbt = await BusinessTransaction.create({
+      //   id: uuid.v4(),
+      //   business_id: businessID,
+      //   customer_id: customerID,
+      //   product_id: productID,
+      //   coinbase_transaction_id: 'cbTransactionResult.id',
+      //   product_category: productCategory,
+      //   quantity: quantity,
+      //   amount: 1.5 * quantity,
+      //   token_amount: '${cbTransactionResult.amount.amount}',
+      //   currency: currency,
+      //   latitude: 0.0,
+      //   longitude: 0.0,
+      // });
 
-      return res.json({ success: true });
+      // return res.json({ success: true });
 
       // Validate Business Account
       const businessAccount = await User.findOne({ where: { id: businessID } });
@@ -291,10 +291,19 @@ module.exports = {
         where: {},
         order: [['created_at', 'ASC']],
       };
+      // Given a BusinessID or a CustomerID?
       if (validationResult.value.businessID === undefined) {
         sqlAttributes.where.customer_id = validationResult.value.customerID;
       } else {
         sqlAttributes.where.business_id = validationResult.value.businessID;
+      }
+
+      // Given a range of dates?
+      if (validationResult.value.betweenDates !== undefined) {
+        const { betweenDates } = validationResult.value;
+        sqlAttributes.where.created_at = {
+          [Op.between]: [betweenDates.start, betweenDates.end],
+        };
       }
 
       const attributes = Object.keys(queryAttributes);

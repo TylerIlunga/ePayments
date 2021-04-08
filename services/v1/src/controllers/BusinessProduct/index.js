@@ -104,6 +104,14 @@ module.exports = {
         order: [['created_at', 'ASC']],
       };
 
+      // Given a range of dates?
+      if (validationResult.value.betweenDates !== undefined) {
+        const { betweenDates } = validationResult.value;
+        sqlAttributes.where.created_at = {
+          [Op.between]: [betweenDates.start, betweenDates.end],
+        };
+      }
+
       const attributes = Object.keys(queryAttributes);
       for (let i = 0; i < attributes.length; i++) {
         const attribute = attributes[i];
