@@ -11,6 +11,7 @@ class AnalyticsView extends React.Component {
     super(props);
     this.state = {
       loading: true,
+      transactions: [],
       reportTypes: [
         'Total Revenue',
         'Total Sales',
@@ -20,11 +21,12 @@ class AnalyticsView extends React.Component {
       ],
       periodTypes: ['Today', 'This Week', 'This Month'],
       selectedReport: 'Total Revenue',
-      selectedPeriod: 'Today',
+      selectedPeriod: 'This Week',
       currentReportData: null,
     };
 
     this.reportDataStartState = {
+      totalValueLabel: null,
       barChart: {
         data: {
           labels: [],
@@ -55,9 +57,23 @@ class AnalyticsView extends React.Component {
       this,
     );
     this.handleChangeReport = this.handleChangeReport.bind(this);
+    this.generateCurrentReportData = this.generateCurrentReportData.bind(this);
     this.generateTotalRevenueReportData = this.generateTotalRevenueReportData.bind(
       this,
     );
+    this.generateTotalSalesReportData = this.generateTotalSalesReportData.bind(
+      this,
+    );
+    this.generateTotalRevenueTopFiveProductsReportData = this.generateTotalRevenueTopFiveProductsReportData.bind(
+      this,
+    );
+    this.generateTotalSalesTopFiveProductsReportData = this.generateTotalSalesTopFiveProductsReportData.bind(
+      this,
+    );
+    this.generateNewVsReturningCustomersReportData = this.generateNewVsReturningCustomersReportData.bind(
+      this,
+    );
+    this.generateChartJSData = this.generateChartJSData.bind(this);
     this.renderAnalyticsViewCharts = this.renderAnalyticsViewCharts.bind(this);
   }
 
@@ -65,35 +81,35 @@ class AnalyticsView extends React.Component {
     this.toggleSelectElements(true);
 
     const currentDate = Date.now();
-    // const dateAWeekAgoFromNow = this.getDateDaysAgoFromNow(currentDate, 7);
-    const dateOneDayAgoFromNow = this.getDateDaysAgoFromNow(currentDate, 1);
+    const dateAWeekAgoFromNow = this.getDateDaysAgoFromNow(currentDate, 7);
+    console.log(
+      'currentDate:, dateAWeekAgoFromNow.getTime()',
+      currentDate,
+      dateAWeekAgoFromNow.getTime(),
+    );
     this.fetchTransactions({
       // businessID: this.props.user.id
       businessID: 7,
       betweenDates: {
-        // start: currentDate,
-        // end: dateOneDayAgoFromNow.getTime(),
-        start: '1617761380978',
-        end: '1617761413176',
+        start: dateAWeekAgoFromNow.getTime(),
+        end: currentDate,
       },
-      queryAttributes: {
-        order: 'ASC',
-      },
+      queryAttributes: {},
     })
       .then((transactions) => {
         if (transactions.length === 0) {
           this.toggleSelectElements(false);
           return this.setState({ loading: false });
         }
-        const currentReportData = this.generateTotalRevenueReportData(
-          transactions,
-        );
 
-        this.toggleSelectElements(false);
+        this.setState({ transactions }, () => {
+          const currentReportData = this.generateTotalRevenueReportData(
+            transactions,
+          );
 
-        this.setState({
-          currentReportData,
-          loading: false,
+          this.toggleSelectElements(false);
+
+          this.setState({ currentReportData, loading: false });
         });
       })
       .catch((error) => {
@@ -132,14 +148,13 @@ class AnalyticsView extends React.Component {
   }
 
   generateTotalRevenueReportData(transactions) {
-    const currentReportData = this.reportDataStartState;
     let dailyRevenue = {};
     let aggregatedRevenue = 0;
 
     transactions.forEach((transaction) => {
       const currentDate = new Date(
         Number(transaction.created_at),
-      ).toDateString();
+      ).toUTCString();
 
       aggregatedRevenue += transaction.amount;
 
@@ -152,9 +167,93 @@ class AnalyticsView extends React.Component {
 
     console.log('dailyRevenue', dailyRevenue);
 
-    const dataLabels = Object.keys(dailyRevenue);
-    const dataValues = Object.values(dailyRevenue);
-    const chartLabel = 'Revenue';
+    return this.generateChartJSData({
+      chartLabel: 'Revenue',
+      totalValueLabel: `$${aggregatedRevenue}`,
+      generalReportData: dailyRevenue,
+    });
+  }
+
+  generateTotalSalesReportData(transactions) {
+    let dailySales = {};
+    let aggregatedSales = transactions.length;
+
+    transactions.forEach((transaction) => {
+      const currentDate = new Date(
+        Number(transaction.created_at),
+      ).toUTCString();
+
+      aggregatedSales += 1;
+
+      if (dailySales[currentDate] !== undefined) {
+        dailySales[currentDate] += 1;
+      } else {
+        dailySales[currentDate] = 1;
+      }
+    });
+
+    console.log('dailySales', dailySales);
+
+    return this.generateChartJSData({
+      chartLabel: 'Sales',
+      totalValueLabel: `${aggregatedSales} products`,
+      generalReportData: dailySales,
+    });
+  }
+
+  generateTotalRevenueTopFiveProductsReportData(transactions) {
+    // TODO
+    return null;
+  }
+
+  generateTotalSalesTopFiveProductsReportData(transactions) {
+    // TODO
+    return null;
+  }
+
+  generateNewVsReturningCustomersReportData(transactions) {
+    // TODO
+    return null;
+  }
+
+  generateRandomHexColor() {
+    const availableSymbols = [
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+    ];
+    let hexColor = '#';
+    let index = 0;
+
+    while (index++ <= 5) {
+      const randomIndex = Math.floor(Math.random() * availableSymbols.length);
+      hexColor += availableSymbols[randomIndex];
+    }
+
+    console.log('hexColor:', hexColor);
+    return hexColor;
+  }
+
+  generateChartJSData(customReportData) {
+    const currentReportData = JSON.parse(
+      JSON.stringify(this.reportDataStartState),
+    );
+    const dataLabels = Object.keys(customReportData.generalReportData);
+    const dataValues = Object.values(customReportData.generalReportData);
+    const chartLabel = customReportData.chartLabel;
     const chartTitleOptions = {
       display: true,
       fontSize: 20,
@@ -170,8 +269,8 @@ class AnalyticsView extends React.Component {
 
     currentReportData.barChart.data.datasets.push({
       label: chartLabel,
-      backgroundColor: 'rgba(75,192,192,1)',
-      borderColor: 'rgba(0,0,0,1)',
+      backgroundColor: this.generateRandomHexColor(),
+      borderColor: this.generateRandomHexColor(),
       borderWidth: 2,
       data: dataValues,
     });
@@ -179,31 +278,26 @@ class AnalyticsView extends React.Component {
       label: chartLabel,
       fill: false,
       lineTension: 0.5,
-      backgroundColor: 'rgba(75,192,192,1)',
-      borderColor: 'rgba(0,0,0,1)',
+      backgroundColor: this.generateRandomHexColor(),
+      borderColor: this.generateRandomHexColor(),
       borderWidth: 2,
       data: dataValues,
     });
-    // currentReportData.pieChart.data.datasets.push({
-    //   label: chartLabel,
-    //   // TODO: Generate hex colors based on the amount of data we have
-    //   backgroundColor: [
-    //     '#B21F00',
-    //     '#C9DE00',
-    //     '#2FDE00',
-    //     '#00A6B4',
-    //     '#6800B4'
-    //   ],
-    //   // TODO: Generate hex colors based on the amount of data we have
-    //   hoverBackgroundColor: [
-    //   '#501800',
-    //   '#4B5000',
-    //   '#175000',
-    //   '#003350',
-    //   '#35014F'
-    //   ],
-    //   data: dataValues
-    // })
+
+    const pieChartBackgroundColors = [];
+    const pieChartHoverBackgroundColors = [];
+
+    dataValues.forEach((v) => {
+      pieChartBackgroundColors.push(this.generateRandomHexColor());
+      pieChartHoverBackgroundColors.push(this.generateRandomHexColor());
+    });
+
+    currentReportData.pieChart.data.datasets.push({
+      label: chartLabel,
+      backgroundColor: pieChartBackgroundColors,
+      hoverBackgroundColor: pieChartHoverBackgroundColors,
+      data: dataValues,
+    });
 
     currentReportData.barChart.options.title = chartTitleOptions;
     currentReportData.lineChart.options.title = chartTitleOptions;
@@ -213,7 +307,11 @@ class AnalyticsView extends React.Component {
     currentReportData.lineChart.options.legend = chartLegendOptions;
     currentReportData.pieChart.options.legend = chartLegendOptions;
 
-    console.log('currentReportData:', currentReportData);
+    if (customReportData.totalValueLabel !== undefined) {
+      currentReportData.totalValueLabel = customReportData.totalValueLabel;
+    }
+
+    console.log('generateChartJSData() currentReportData:', currentReportData);
 
     return currentReportData;
   }
@@ -239,13 +337,107 @@ class AnalyticsView extends React.Component {
   }
 
   handleChangeReport(evt, type) {
-    // Fetch data based on selected report/period type
-    // Disbale MainAnalyticsViewOptionsSelect elements while loading data
     console.log(
       'handleChangeReport() evt.target.value, type:',
       evt.target.value,
       type,
     );
+
+    const prevEventTargetValue = evt.target.value;
+
+    this.toggleSelectElements(true);
+
+    this.setState({ loading: true }, () => {
+      if (type === 'report') {
+        const selectedReport = prevEventTargetValue;
+        const currentReportData = this.generateCurrentReportData(
+          selectedReport,
+          this.state.transactions,
+        );
+
+        this.toggleSelectElements(false);
+
+        return this.setState({
+          currentReportData,
+          selectedReport,
+          loading: false,
+        });
+      }
+      if (type === 'period') {
+        const selectedPeriod = prevEventTargetValue;
+        const currentDate = Date.now();
+        let daysAgo = 1;
+        if (selectedPeriod === 'This Week') {
+          daysAgo = 7;
+        }
+        if (selectedPeriod === 'This Month') {
+          daysAgo = 30;
+        }
+
+        const dateDaysAgoFromNow = this.getDateDaysAgoFromNow(
+          currentDate,
+          daysAgo,
+        );
+        this.fetchTransactions({
+          // businessID: this.props.user.id
+          businessID: 7,
+          betweenDates: {
+            start: dateDaysAgoFromNow.getTime(),
+            end: currentDate,
+          },
+          queryAttributes: {},
+        })
+          .then((transactions) => {
+            if (transactions.length === 0) {
+              this.toggleSelectElements(false);
+              return this.setState({
+                currentReportData: null,
+                selectedPeriod,
+                loading: false,
+              });
+            }
+
+            const currentReportData = this.generateCurrentReportData(
+              this.state.selectedReport,
+              transactions,
+            );
+
+            this.toggleSelectElements(false);
+
+            this.setState({
+              currentReportData,
+              selectedPeriod,
+              transactions,
+              loading: false,
+            });
+          })
+          .catch((error) => {
+            this.displayToastMessage('error', error);
+          });
+      }
+    });
+  }
+
+  generateCurrentReportData(reportType, transactions) {
+    console.log(
+      'generateCurrentReportData() reportType, transactions',
+      reportType,
+      transactions,
+    );
+    switch (reportType) {
+      case 'Total Revenue':
+        return this.generateTotalRevenueReportData(transactions);
+      case 'Total Sales':
+        return this.generateTotalSalesReportData(transactions);
+      case 'Total Revenue: Top 5 Products':
+        return this.generateTotalRevenueTopFiveProductsReportData(transactions);
+      case 'Total Sales: Top 5 Products':
+        return this.generateTotalSalesTopFiveProductsReportData(transactions);
+      case 'New vs Returning Customers':
+        return this.generateNewVsReturningCustomersReportData(transactions);
+      default:
+        return null;
+    }
   }
 
   renderAnalyticsViewOptions() {
@@ -285,6 +477,17 @@ class AnalyticsView extends React.Component {
     );
   }
 
+  renderTotalLabel() {
+    if (this.state.currentReportData.totalValueLabel !== null) {
+      return (
+        <div className='MainAnalyticsViewChartsTotalContainer col-12'>
+          <h1>Total</h1>
+          <p>{this.state.currentReportData.totalValueLabel}</p>
+        </div>
+      );
+    }
+  }
+
   renderAnalyticsViewCharts() {
     if (this.state.loading) {
       return (
@@ -303,6 +506,7 @@ class AnalyticsView extends React.Component {
     return (
       <div className='MainAnalyticsViewCharts'>
         <div className='MainAnalyticsViewChartsPieBarRow row'>
+          {this.renderTotalLabel()}
           <div className='MainAnalyticsViewChartsPieContainer col-6'>
             <Bar
               data={this.state.currentReportData.barChart.data}
@@ -311,16 +515,16 @@ class AnalyticsView extends React.Component {
           </div>
           <div className='MainAnalyticsViewChartsBarContainer col-6'>
             <Pie
-              data={this.state.currentReportData.barChart.data}
-              options={this.state.currentReportData.barChart.options}
+              data={this.state.currentReportData.pieChart.data}
+              options={this.state.currentReportData.pieChart.options}
             />
           </div>
         </div>
         <div className='MainAnalyticsViewChartsLineRow row'>
           <div className='MainAnalyticsViewChartsLineContainer col-12'>
             <Line
-              data={this.state.currentReportData.barChart.data}
-              options={this.state.currentReportData.barChart.options}
+              data={this.state.currentReportData.lineChart.data}
+              options={this.state.currentReportData.lineChart.options}
             />
           </div>
         </div>
