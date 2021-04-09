@@ -113,7 +113,9 @@ class AnalyticsView extends React.Component {
         });
       })
       .catch((error) => {
+        this.toggleSelectElements(false);
         this.displayToastMessage('error', error);
+        this.setState({ loading: false });
       });
   }
 
@@ -350,6 +352,14 @@ class AnalyticsView extends React.Component {
     this.setState({ loading: true }, () => {
       if (type === 'report') {
         const selectedReport = prevEventTargetValue;
+        if (this.state.transactions.length === 0) {
+          this.toggleSelectElements(false);
+          return this.setState({
+            currentReportData: null,
+            selectedReport,
+            loading: false,
+          });
+        }
         const currentReportData = this.generateCurrentReportData(
           selectedReport,
           this.state.transactions,
@@ -412,7 +422,9 @@ class AnalyticsView extends React.Component {
             });
           })
           .catch((error) => {
+            this.toggleSelectElements(false);
             this.displayToastMessage('error', error);
+            this.setState({ loading: false });
           });
       }
     });
