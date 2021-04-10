@@ -87,10 +87,11 @@ class ProfileService {
     });
   }
 
-  updateCustomerProfile(profileData) {
-    const { userID, profileID, updates } = profileData;
+  updateProfile(profileData) {
+    const { type, userID, profileID, updates } = profileData;
+    const url = type === 'customer' ? this.customerURL : this.businessURL;
     return new Promise((resolve, reject) => {
-      this.networkRequest(`${this.customerURL}/update`, {
+      this.networkRequest(`${url}/update`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userID, profileID, updates }),
@@ -99,33 +100,11 @@ class ProfileService {
           if (res.error) {
             throw res.error;
           }
-          console.log('updateCustomerProfile() res.data:', res.data);
+          console.log('updateProfile() res.data:', res.data);
           resolve(res.data);
         })
         .catch((error) => {
-          console.log('updateCustomerProfile() error:', error);
-          reject(error);
-        });
-    });
-  }
-
-  updateBusinessProfile(profileData) {
-    const { userID, profileID, updates } = profileData;
-    return new Promise((resolve, reject) => {
-      this.networkRequest(`${this.businessURL}/update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userID, profileID, updates }),
-      })
-        .then((res) => {
-          if (res.error) {
-            throw res.error;
-          }
-          console.log('updateBusinessProfile() res.data:', res.data);
-          resolve(res.data);
-        })
-        .catch((error) => {
-          console.log('updateBusinessProfile() error:', error);
+          console.log('updateProfile() error:', error);
           reject(error);
         });
     });
