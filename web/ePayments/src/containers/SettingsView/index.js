@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import config from '../../config';
 import DashboardMenu from '../../components/DashboardMenu';
 import { setProfile, updateProfile } from '../../redux/actions/profile';
 import { setUser, updateUser } from '../../redux/actions/user';
@@ -14,35 +15,32 @@ class SettingsView extends React.Component {
   constructor(props) {
     super(props);
 
+    // // Test Business User
+    // this.user = {
+    //   type: 'business',
+    //   email: 'w@xyz.com',
+    // };
+    // this.profile = {
+    //   id: 1,
+    //   user_id: 9,
+    //   address: '123 First Street',
+    //   phone_number: '2012109600',
+    //   public_email: 'w@xyz.com',
+    //   created_at: '1617549020305',
+    // };
+
     // Test Customer User
     this.user = {
-      type: 'business',
-      email: 'w@xyz.com',
+      type: 'customer',
+      email: 'x@y.com',
     };
     this.profile = {
       id: 1,
-      user_id: 9,
-      address: '123 First Street',
-      phone_number: '2012109600',
-      public_email: 'w@xyz.com',
-      created_at: '1617549020305',
+      user_id: 10,
+      country: 'US',
+      username: 'cguy',
+      created_at: '1617549020309',
     };
-
-    // // Test Customer User
-    // this.user = {
-    //   email: 'x@y.com',
-    // };
-    // this.profile = {
-    //   "id": 1,
-    //   "user_id": 10,
-    //   "country": "USA",
-    //   "username": "cguy",
-    //   "created_at": "1617549020309"
-    // };
-
-    // NOTE: For Testing...
-    this.props.dispatchSetUser(this.user);
-    this.props.dispatchSetProfile(this.profile);
 
     this.state = {
       activeOption: 'Profile',
@@ -262,7 +260,34 @@ class SettingsView extends React.Component {
   renderCustomerProfileView() {
     return (
       <div className='SettingsViewProfileViewContainer'>
-        Customer Profile View!!!!
+        {this.renderActiveOptionContentHeader()}
+        <form className='SettingsViewProfileViewInfoForm'>
+          <label>Type: {this.props.user.type}</label>
+          <label>Username: </label>
+          <input
+            className='SettingsViewProfileViewInput'
+            type='text'
+            value={this.state.updatedUserProfile.username}
+            onChange={(evt) =>
+              this.handleUpdatingUserProfileField(evt, 'username')
+            }
+          />
+          <label>Country: </label>
+          <select
+            className='SettingsViewProfileViewInput'
+            value={this.state.updatedUserProfile.country}
+            onChange={(evt) =>
+              this.handleUpdatingUserProfileField(evt, 'country')
+            }
+          >
+            {config.countries.map((countryData, i) => (
+              <option key={i} value={countryData.code}>
+                {`${countryData.name} (${countryData.code})`}
+              </option>
+            ))}
+          </select>
+          {this.renderUpdateProfileButtons()}
+        </form>
       </div>
     );
   }

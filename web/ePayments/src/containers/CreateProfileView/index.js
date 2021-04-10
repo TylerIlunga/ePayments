@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import config from '../../config';
 import { setProfile } from '../../redux/actions/profile';
 import ProfileService from '../../services/ProfileService';
 import toastUtils from '../../utils/Toasts';
@@ -162,15 +163,19 @@ class CreateProfileView extends React.Component {
       <div className='CreateProfileViewCustomerFormContainer'>
         <form className='CreateProfileViewForm'>
           <label>Country:</label>
-          <input
+          <select
             className='CreateProfileViewCustomerFormPhoneInput'
-            type='text'
             value={this.state.customerProfileForm.country}
             onChange={(evt) =>
               this.updateProfileForm(evt, 'customerProfileForm', 'country')
             }
-            placeholder={'USA'}
-          />
+          >
+            {config.countries.map((countryData, i) => (
+              <option key={i} value={countryData.code}>
+                {`${countryData.name} (${countryData.code})`}
+              </option>
+            ))}
+          </select>
           <label>Public Username:</label>
           <input
             className='CreateProfileViewCustomerFormAddressInput'
