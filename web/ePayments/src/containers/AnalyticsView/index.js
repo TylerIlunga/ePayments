@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Bar, Pie, Line } from 'react-chartjs-2';
-
+import DashboardMenu from '../../components/DashboardMenu';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
@@ -758,12 +758,32 @@ class AnalyticsView extends React.Component {
     );
   }
 
-  render() {
+  renderMenuColumn() {
     return (
-      <div className='MainAnalyticsViewContainer'>
+      <DashboardMenu
+        colSize='col-2'
+        user={this.props.user}
+        history={this.props.history}
+        displayToastMessage={this.displayToastMessage}
+      />
+    );
+  }
+
+  renderAnalyticsView() {
+    return (
+      <div className='AnalyticsViewContainer col-10'>
         {this.renderAnalyticsViewHeader()}
         {this.renderAnalyticsViewOptions()}
         {this.renderAnalyticsViewCharts()}
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div className='MainAnalyticsViewContainer row'>
+        {this.renderMenuColumn()}
+        {this.renderAnalyticsView()}
       </div>
     );
   }
