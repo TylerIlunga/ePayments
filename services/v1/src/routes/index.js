@@ -74,14 +74,6 @@ Router.get(
   '/api/v1/payment/accounts/create/oauthcallback/code',
   PaymentAccountController.createPaymentAccountOAuthCodeCallback,
 );
-Router.put(
-  '/api/v1/payment/accounts/update',
-  PaymentAccountController.updatePaymentAccount,
-);
-Router.delete(
-  '/api/v1/payment/accounts/delete',
-  PaymentAccountController.deletePaymentAccount,
-);
 
 /** API Endpoints related to handling business transactions */
 Router.post(
