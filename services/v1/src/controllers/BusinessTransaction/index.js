@@ -51,22 +51,23 @@ module.exports = {
         currency,
       } = validationResult.value;
 
-      // const nbt = await BusinessTransaction.create({
-      //   id: uuid.v4(),
-      //   business_id: businessID,
-      //   customer_id: customerID,
-      //   product_id: productID,
-      //   coinbase_transaction_id: 'cbTransactionResult.id',
-      //   product_category: productCategory,
-      //   quantity: quantity,
-      //   amount: 1.5 * quantity,
-      //   token_amount: '${cbTransactionResult.amount.amount}',
-      //   currency: currency,
-      //   latitude: 0.0,
-      //   longitude: 0.0,
-      // });
+      // TODO: FOR TESTING...REMOVE
+      const nbt = await BusinessTransaction.create({
+        id: uuid.v4(),
+        business_id: businessID,
+        customer_id: customerID,
+        product_id: productID,
+        coinbase_transaction_id: 'cbTransactionResult.id',
+        product_category: productCategory,
+        quantity: quantity,
+        amount: 1.5 * quantity,
+        token_amount: '${cbTransactionResult.amount.amount}',
+        currency: currency,
+        latitude: 0.0,
+        longitude: 0.0,
+      });
 
-      // return res.json({ success: true });
+      return res.json({ success: true });
 
       // Validate Business Account
       const businessAccount = await User.findOne({ where: { id: businessID } });

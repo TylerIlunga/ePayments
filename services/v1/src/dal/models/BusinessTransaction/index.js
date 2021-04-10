@@ -7,6 +7,12 @@ const Sequelize = require('sequelize');
 const options = {
   freezeTableName: true,
   timestamps: false,
+  // indexes: [
+  //   {
+  //     unique: true,
+  //     fields: ['customer_id', 'product_id'],
+  //   },
+  // ],
 };
 
 module.exports = (sequelize) => {
@@ -24,10 +30,12 @@ module.exports = (sequelize) => {
       },
       customer_id: {
         allowNull: false,
+        unique: true,
         type: Sequelize.INTEGER,
       },
       product_id: {
         allowNull: false,
+        unique: true,
         type: Sequelize.INTEGER,
       },
       coinbase_transaction_id: {
