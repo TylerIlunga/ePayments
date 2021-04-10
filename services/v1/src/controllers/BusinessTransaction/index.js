@@ -204,7 +204,7 @@ module.exports = {
       // Update BusinessProduct details (lower inventory count, increase purchased count)
       businessProduct.inventory_count -= 1;
       businessProduct.purchased_count += 1;
-      businessProduct.save();
+      await businessProduct.save();
 
       // Convert Crypto value to Fiat Value for Business if
       // they have auto_convert_to_fiat enabled for their payment account.

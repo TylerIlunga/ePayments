@@ -26,4 +26,10 @@ module.exports = {
     state: Joi.string().required(),
     code: Joi.string().required(),
   }),
+  toggleAutoConvertToFiatFeatureSchema: Joi.object({
+    id: Joi.number().required(),
+    userID: Joi.number().required(),
+    profileID: Joi.number().required(),
+    autoConvertToFiatStatus: Joi.boolean().required(),
+  }),
 };

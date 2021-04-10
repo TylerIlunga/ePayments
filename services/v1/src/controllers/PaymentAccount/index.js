@@ -14,13 +14,12 @@ const {
   fetchPaymentAccountSchema,
   createPaymentAccountSchema,
   createPaymentAccountOauthCallbackSchema,
-  updatePaymentAccountSchema,
-  deletePaymentAccountSchema,
+  toggleAutoConvertToFiatFeatureSchema,
 } = require('../../middleware/PaymentAccount/validation');
 
 module.exports = {
   /**
-   * (TODO): Fetches connected third-party (Stripe, Coinbase) payment account information
+   * Fetches connected third-party (Stripe, Coinbase) payment account information
    *
    * @param {object} req - Express.js Request
    * @param {object} res - Express.js Response
@@ -172,6 +171,45 @@ module.exports = {
       if (transaction !== null) {
         await transaction.rollback();
       }
+      return Errors.General.serveResponse(error, res);
+    }
+  },
+  /**
+   * Toggles the status of the "Auto Convert Tokens to Fiat Currency" feature for Businesses
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {object} JSON object
+   */
+  async toggleAutoConvertToFiatFeature(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      toggleAutoConvertToFiatFeatureSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const {
+        id,
+        userID,
+        profileID,
+        autoConvertToFiatStatus,
+      } = validationResult.value;
+      const paymentAccount = await dbConfig.PaymentAccount.findOne({
+        where: { id, user_id: userID, profile_id: profileID },
+      });
+      if (paymentAccount === null) {
+        throw { error: 'Payment account does not exist for the given data.' };
+      }
+
+      paymentAccount.auto_convert_to_fiat = autoConvertToFiatStatus;
+      await paymentAccount.save();
+
+      return res.json({ error: null, success: true });
+    } catch (error) {
       return Errors.General.serveResponse(error, res);
     }
   },

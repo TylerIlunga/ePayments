@@ -74,6 +74,10 @@ Router.get(
   '/api/v1/payment/accounts/create/oauthcallback/code',
   PaymentAccountController.createPaymentAccountOAuthCodeCallback,
 );
+Router.put(
+  '/api/v1/payment/accounts/conversion/toggle',
+  PaymentAccountController.toggleAutoConvertToFiatFeature,
+);
 
 /** API Endpoints related to handling business transactions */
 Router.post(

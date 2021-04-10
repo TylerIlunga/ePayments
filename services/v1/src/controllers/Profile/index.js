@@ -101,7 +101,7 @@ module.exports = {
 
       businessUser.type = 'business';
 
-      businessUser.save();
+      await businessUser.save();
 
       res.json({
         error: null,
