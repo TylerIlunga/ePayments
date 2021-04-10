@@ -63,6 +63,7 @@ class ConnectPaymentAccountView extends React.Component {
       userID: this.props.user.id,
       email: this.props.user.email,
       profileID: this.props.profile.id,
+      replaceAccount: false,
     })
       .then((res) => {
         console.log(

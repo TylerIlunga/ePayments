@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import config from '../../config';
 import DashboardMenu from '../../components/DashboardMenu';
-import { setProfile, updateProfile } from '../../redux/actions/profile';
-import { setUser, updateUser } from '../../redux/actions/user';
+import { updatePaymentAccount } from '../../redux/actions/paymentAccount';
+import { setProfile } from '../../redux/actions/profile';
+import PaymentAccountService from '../../services/PaymentAccountService';
 import ProfileService from '../../services/ProfileService';
 import SessionService from '../../services/SessionService';
 import UserService from '../../services/UserService';
@@ -41,6 +42,20 @@ class SettingsView extends React.Component {
       username: 'cguy',
       created_at: '1617549020309',
     };
+    this.paymentAccount = {
+      id: 6,
+      user_id: 9,
+      profile_id: 1,
+      coinbase_account_id: '18275233-09bb-5d7e-9836-2a440612bb24',
+      coinbase_bitcoin_address: '3DzkAuMw57LvveRZgPA9rdcCfRmMrJM1h1',
+      coinbase_access_token:
+        '8d26d498228dd8f9e91981916b6972004f8728b2baa38832e24cc9e1620f51f9',
+      coinbase_access_token_expiry: '1617560640508',
+      coinbase_refresh_token:
+        '75107907a45dc81ee400fef59bc41c61d9e0dd544e47484645aed32488fd5fe6',
+      auto_convert_to_fiat: true,
+      created_at: '1617553457903',
+    };
 
     this.state = {
       activeOption: 'Profile',
@@ -48,12 +63,19 @@ class SettingsView extends React.Component {
       updatingProfile: false,
       // updatedUserProfile: { ...this.props.profile },
       updatedUserProfile: { ...this.profile },
+      // updatedPaymentAccount: {
+      //   autoConvertToFiat: this.props.paymentAccount.auto_convert_to_fiat
+      // },
+      updatedPaymentAccount: {
+        autoConvertToFiat: this.paymentAccount.auto_convert_to_fiat,
+      },
     };
 
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.ProfileService = new ProfileService();
     this.SessionService = new SessionService();
     this.UserService = new UserService();
+    this.PaymentAccountService = new PaymentAccountService();
     this.renderSettingsView = this.renderSettingsView.bind(this);
     this.renderActiveOptionContent = this.renderActiveOptionContent.bind(this);
     this.renderCustomerProfileView = this.renderCustomerProfileView.bind(this);
@@ -66,12 +88,22 @@ class SettingsView extends React.Component {
     );
     this.updateUserProfile = this.updateUserProfile.bind(this);
     this.renderPaymentsView = this.renderPaymentsView.bind(this);
+    this.toggleAutoConvertToFiat = this.toggleAutoConvertToFiat.bind(this);
+    this.windowOAuthCBMessageHandler = this.windowOAuthCBMessageHandler.bind(
+      this,
+    );
+    this.startCoinbaseOAuth = this.startCoinbaseOAuth.bind(this);
     this.renderResetPasswordView = this.renderResetPasswordView.bind(this);
     this.renderLogOutView = this.renderLogOutView.bind(this);
   }
 
   componentDidMount() {
     this.toggleProfileInputEnableStatus(true);
+    window.addEventListener('message', this.windowOAuthCBMessageHandler);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('message', this.windowOAuthCBMessageHandler);
   }
 
   renderMenuColumn() {
@@ -117,6 +149,48 @@ class SettingsView extends React.Component {
           this.state.updatedUserProfile,
         ),
     );
+  }
+
+  toggleAutoConvertToFiat(evt) {
+    evt.preventDefault();
+
+    // this.PaymentAccountService.toggleAutoConvertToFiatFeature({
+    //   id: this.props.paymentAccount.id,
+    //   userID: this.props.paymentAccount.user_id,
+    //   profileID: this.props.paymentAccount.profile_id,
+    //   autoConvertToFiatStatus: evt.target.value
+    // })
+    const autoConvertToFiatStatus = evt.target.value;
+    this.PaymentAccountService.toggleAutoConvertToFiatFeature({
+      autoConvertToFiatStatus,
+      id: this.paymentAccount.id,
+      userID: this.paymentAccount.user_id,
+      profileID: this.paymentAccount.profile_id,
+    })
+      .then((res) => {
+        console.log(
+          'this.PaymentAccountService.toggleAutoConvertToFiatFeature res:',
+          res,
+        );
+        if (res.error) {
+          throw res.error;
+        }
+        this.displayToastMessage('success', 'Success: Updated Payment Account');
+        this.props.dispatchUpdatePaymentAccount({
+          key: 'auto_convert_to_fiat',
+          value: autoConvertToFiatStatus,
+        });
+      })
+      .catch((error) => {
+        console.log(
+          'this.PaymentAccountService.toggleAutoConvertToFiatFeature error:',
+          error,
+        );
+        if (typeof error !== 'string') {
+          error = 'Update failure: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
   }
 
   convertSnakeKeysToCamelCase(oldObject) {
@@ -166,7 +240,11 @@ class SettingsView extends React.Component {
           'success',
           'Success: Your profile has been updated.',
         );
+
+        this.props.dispatchSetProfile(this.state.updatedUserProfile);
+
         this.toggleProfileInputEnableStatus(false);
+
         this.toggleUpdatingProfileState(evt, false);
       })
       .catch((error) => {
@@ -293,15 +371,127 @@ class SettingsView extends React.Component {
   }
 
   renderProfileView() {
-    if (this.props.user.type === 'customer') {
+    // if (this.props.user.type === 'customer') {
+    //   return this.renderCustomerProfileView();
+    // }
+    if (this.user.type === 'customer') {
       return this.renderCustomerProfileView();
     }
     return this.renderBusinessProfileView();
   }
 
+  isJSON(object) {
+    try {
+      JSON.parse(object);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
+  windowOAuthCBMessageHandler(message) {
+    console.log('windowOAuthCBMessageHandler() message', message);
+    if (!this.isJSON(message.data)) {
+      return;
+    }
+    try {
+      const messageJson = JSON.parse(message.data);
+      console.log('messageJson:', messageJson);
+      if (!messageJson.success) {
+        throw '!messageJSON.success';
+      }
+      if (messageJson.paymentAccount) {
+        this.props.dispatchUpdatePaymentAccount(messageJson.paymentAccount);
+        this.displayToastMessage('success', 'Success');
+      }
+    } catch (error) {
+      console.log('windowOAuthCBMessageHandler() error:', error);
+      this.displayToastMessage('error', 'Failed to connect: Please try again');
+    }
+  }
+
+  startCoinbaseOAuth(evt) {
+    evt.preventDefault();
+
+    // TODO: LEFT OUT HERE
+
+    // this.PaymentAccountService.fetchCoinbaseOauthLink({
+    //   userID: this.props.user.id,
+    //   email: this.props.user.email,
+    //   profileID: this.props.profile.id,
+    //   replaceAccount: true,
+    // })
+    this.PaymentAccountService.fetchCoinbaseOauthLink({
+      userID: this.user.id,
+      email: this.user.email,
+      profileID: this.profile.id,
+      replaceAccount: true,
+    })
+      .then((res) => {
+        console.log(
+          'startCoinbaseOAuth(), this.PaymentAccountService.fetchCoinbaseOauthLink res',
+          res,
+        );
+        if (res.error) {
+          throw res.error;
+        }
+        // NOTE: popup window to handle OAUTH
+        window.open(
+          res.authURL,
+          'coinbase oauth',
+          'height=777,width=777,modal=yes,alwaysRaised=ye',
+        );
+      })
+      .catch((error) => {
+        console.log('startCoinbaseOAuth error:', error);
+        if (typeof error !== 'string') {
+          error = 'Failed to connect: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
+  }
+
   renderPaymentsView() {
+    // const paymentAccount = this.props.paymentAccount;
+    const paymentAccount = this.paymentAccount;
     return (
-      <div className='SettingsViewPaymentsViewContainer'>Payments View!!!!</div>
+      <div className='SettingsViewPaymentsViewContainer'>
+        {this.renderActiveOptionContentHeader()}
+        <div className='SettingsViewPaymentsViewInfoContainer'>
+          <p>
+            <span className='SettingsViewPaymentsViewInfoHeader'>
+              Coinbase Account ID:
+            </span>
+            {paymentAccount.coinbase_account_id}
+          </p>
+          <p>
+            <span className='SettingsViewPaymentsViewInfoHeader'>
+              Coinbase Bitcoin Address:
+            </span>
+            {paymentAccount.coinbase_bitcoin_address}
+          </p>
+          <form className='SettingsViewPaymentsViewInfoConvertForm'>
+            <label className='SettingsViewPaymentsViewInfoHeader'>
+              Auto-Convert Payments To Fiat:
+            </label>
+            <select
+              className='SettingsViewPaymentsViewInfoConvertFormInput'
+              // value={String(this.props.paymentAccount.auto_convert_to_fiat)}
+              value={String(this.paymentAccount.auto_convert_to_fiat)}
+              onChange={(evt) => this.toggleAutoConvertToFiat(evt)}
+            >
+              <option value='true'>Enabled</option>
+              <option value='false'>Disabled</option>
+            </select>
+          </form>
+          <button
+            className='SettingsViewPaymentsViewInfoButton'
+            onClick={this.startCoinbaseOAuth}
+          >
+            Update
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -366,15 +556,14 @@ class SettingsView extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
+  paymentAccount: state.paymentAccount,
   profile: state.profile,
   user: state.user,
 });
 const mapDispatchToProps = (dispatch) => ({
   dispatchSetProfile: (profile) => dispatch(setProfile(profile)),
-  dispatchSetUser: (user) => dispatch(setUser(user)),
-  dispatchUpdateProfile: (keyValueUpdate) =>
-    dispatch(updateProfile(keyValueUpdate)),
-  dispatchUpdateUser: (keyValueUpdate) => dispatch(updateUser(keyValueUpdate)),
+  dispatchUpdatePaymentAccount: (keyValueUpdate) =>
+    dispatch(updatePaymentAccount(keyValueUpdate)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingsView);
