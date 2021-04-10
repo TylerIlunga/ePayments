@@ -20,9 +20,17 @@ class AnalyticsView extends React.Component {
         'New vs Returning Customers',
       ],
       periodTypes: ['Today', 'This Week', 'This Month'],
+      selectedPeriodToDaysAgo: {
+        Today: 1,
+        'This Week': 7,
+        'This Month': 31,
+      },
       selectedReport: 'Total Revenue',
       selectedPeriod: 'This Week',
       currentReportData: null,
+      currentDate: Date.now(),
+      // TODO: Change temp launch date to actual launch date
+      productLaunchDate: new Date('01/01/2021'),
     };
 
     this.reportDataStartState = {
@@ -74,13 +82,17 @@ class AnalyticsView extends React.Component {
       this,
     );
     this.generateChartJSData = this.generateChartJSData.bind(this);
+    this.handleCustomerChartJSDataGeneration = this.handleCustomerChartJSDataGeneration.bind(
+      this,
+    );
+    this.generateNVRCChartData = this.generateNVRCChartData.bind(this);
     this.renderAnalyticsViewCharts = this.renderAnalyticsViewCharts.bind(this);
   }
 
   componentDidMount() {
     this.toggleSelectElements(true);
 
-    const currentDate = Date.now();
+    const currentDate = this.state.currentDate;
     const dateAWeekAgoFromNow = this.getDateDaysAgoFromNow(currentDate, 7);
     console.log(
       'currentDate:, dateAWeekAgoFromNow.getTime()',
@@ -169,7 +181,7 @@ class AnalyticsView extends React.Component {
 
     console.log('dailyRevenue', dailyRevenue);
 
-    return this.generateChartJSData({
+    return this.generateChartJSData(null, {
       chartLabel: 'Revenue',
       totalValueLabel: `$${aggregatedRevenue}`,
       generalReportData: dailyRevenue,
@@ -196,7 +208,7 @@ class AnalyticsView extends React.Component {
 
     console.log('dailySales', dailySales);
 
-    return this.generateChartJSData({
+    return this.generateChartJSData(null, {
       chartLabel: 'Sales',
       totalValueLabel: `${aggregatedSales} products`,
       generalReportData: dailySales,
@@ -204,18 +216,108 @@ class AnalyticsView extends React.Component {
   }
 
   generateTotalRevenueTopFiveProductsReportData(transactions) {
-    // TODO
+    // TODO: Product.label(String), Revenue (Int) instead of DateOfSale(String), Revenue (Int)
     return null;
   }
 
   generateTotalSalesTopFiveProductsReportData(transactions) {
-    // TODO
+    // TODO: Product.label(String), Revenue (Int) instead of DateOfSale(String), Revenue (Int)
     return null;
   }
 
-  generateNewVsReturningCustomersReportData(transactions) {
-    // TODO
-    return null;
+  async generateNewVsReturningCustomersReportData(transactions) {
+    console.log('generateNewVsReturningCustomersReportData():', transactions);
+    // NEW = No records exist for that customer(User) before the start date
+    const chartLabel = 'Customers';
+    const customerIDs = new Set();
+    const currentDate = this.state.currentDate;
+    const daysAgo = this.state.selectedPeriodToDaysAgo[
+      this.state.selectedPeriod
+    ];
+    const dateDaysAgoFromNow = this.getDateDaysAgoFromNow(currentDate, daysAgo);
+    let totalNewCustomers = 0;
+    let totalReturningCustomers = 0;
+
+    // Extract all of the customer_id's from the current set of transactions
+    transactions.forEach((transaction) => {
+      customerIDs.add(transaction.customer_id);
+    });
+
+    console.log('customerIDs:', customerIDs);
+
+    const fetchCustomerTransactions = [];
+    const iterateThroughCustomerIDs = (customerID) => {
+      // For each using [LIMIT=1] for latency purposes, see if any transaction records
+      // exist for the user before the date
+      fetchCustomerTransactions.push(
+        this.fetchTransactions({
+          customerID,
+          betweenDates: {
+            // TODO: Fix inconsistency with responses due to the date range...
+            start: this.state.productLaunchDate.getTime(),
+            end: dateDaysAgoFromNow.getTime(),
+          },
+          queryAttributes: {
+            limit: 1,
+          },
+        })
+          .then((transactions) => {
+            console.log(
+              'this.fetchTransactions() transactions for customerID:',
+              customerID,
+              transactions,
+            );
+            return transactions;
+          })
+          .catch((error) => {
+            console.log(
+              'ERROR: this.fetchTransactions() for customerID:',
+              customerID,
+              error,
+            );
+            return [];
+          }),
+      );
+    };
+
+    customerIDs.forEach(iterateThroughCustomerIDs);
+
+    try {
+      const responses = await Promise.all(fetchCustomerTransactions);
+      console.log(
+        'Promise.all(fetchCustomerTransactions) responses:',
+        responses,
+      );
+      responses.forEach((currentCustomerTransactions) => {
+        console.log(
+          'currentCustomerTransactions:',
+          currentCustomerTransactions,
+        );
+        if (
+          !Array.isArray(currentCustomerTransactions) ||
+          currentCustomerTransactions.length === 0
+        ) {
+          // If not, they are a new customer
+          totalNewCustomers += 1;
+        } else {
+          // If so, they are a returning customer
+          totalReturningCustomers += 1;
+        }
+      });
+
+      return this.generateChartJSData('nvrcs', {
+        chartLabel,
+        totalNewCustomers,
+        totalReturningCustomers,
+        totalValueLabel: `${totalNewCustomers} (New) | ${totalReturningCustomers} (Returning)`,
+      });
+    } catch (error) {
+      console.log(
+        'generateNewVsReturningCustomersReportData() Promise.all error:',
+        error,
+      );
+      return null;
+    }
   }
 
   generateRandomHexColor() {
@@ -249,7 +351,22 @@ class AnalyticsView extends React.Component {
     return hexColor;
   }
 
-  generateChartJSData(customReportData) {
+  handleCustomerChartJSDataGeneration(generationType, customReportData) {
+    switch (generationType) {
+      case 'nvrcs':
+        return this.generateNVRCChartData(customReportData);
+      default:
+        return null;
+    }
+  }
+
+  generateChartJSData(customGenerationType, customReportData) {
+    if (customGenerationType !== null) {
+      return this.handleCustomerChartJSDataGeneration(
+        customGenerationType,
+        customReportData,
+      );
+    }
     const currentReportData = JSON.parse(
       JSON.stringify(this.reportDataStartState),
     );
@@ -318,6 +435,73 @@ class AnalyticsView extends React.Component {
     return currentReportData;
   }
 
+  generateNVRCChartData(customReportData) {
+    console.log('this.generateNVRCChartData():', customReportData);
+    const currentReportData = JSON.parse(
+      JSON.stringify(this.reportDataStartState),
+    );
+    const dataLabels = ['New', 'Returning'];
+    const dataValues = [
+      customReportData.totalNewCustomers,
+      customReportData.totalReturningCustomers,
+    ];
+    const chartLabel = customReportData.chartLabel;
+    const chartTitleOptions = {
+      display: true,
+      fontSize: 20,
+    };
+    const chartLegendOptions = {
+      display: true,
+      position: 'right',
+    };
+
+    currentReportData.barChart.data.labels = dataLabels;
+    currentReportData.pieChart.data.labels = dataLabels;
+
+    currentReportData.barChart.data.datasets.push({
+      label: chartLabel,
+      backgroundColor: this.generateRandomHexColor(),
+      borderColor: this.generateRandomHexColor(),
+      borderWidth: 2,
+      data: dataValues,
+    });
+
+    const pieChartBackgroundColors = [];
+    const pieChartHoverBackgroundColors = [];
+
+    dataValues.forEach((v) => {
+      pieChartBackgroundColors.push(this.generateRandomHexColor());
+      pieChartHoverBackgroundColors.push(this.generateRandomHexColor());
+    });
+
+    currentReportData.pieChart.data.datasets.push({
+      label: chartLabel,
+      backgroundColor: pieChartBackgroundColors,
+      hoverBackgroundColor: pieChartHoverBackgroundColors,
+      data: dataValues,
+    });
+
+    currentReportData.barChart.options.title = chartTitleOptions;
+    currentReportData.pieChart.options.title = chartTitleOptions;
+
+    currentReportData.barChart.options.legend = chartLegendOptions;
+    currentReportData.pieChart.options.legend = chartLegendOptions;
+
+    if (customReportData.totalValueLabel !== undefined) {
+      currentReportData.totalValueLabel = customReportData.totalValueLabel;
+    }
+
+    // Disable Line Chart
+    currentReportData.lineChart = null;
+
+    console.log(
+      'generateNVRCChartData() currentReportData:',
+      currentReportData,
+    );
+
+    return currentReportData;
+  }
+
   toggleSelectElements(isDisabled) {
     document
       .querySelectorAll('.MainAnalyticsViewOptionsSelect')
@@ -349,21 +533,27 @@ class AnalyticsView extends React.Component {
 
     this.toggleSelectElements(true);
 
-    this.setState({ loading: true }, () => {
+    this.setState({ loading: true }, async () => {
       if (type === 'report') {
         const selectedReport = prevEventTargetValue;
         if (this.state.transactions.length === 0) {
+          console.log('type(report): this.state.transactions.length === 0');
+
           this.toggleSelectElements(false);
+
           return this.setState({
             currentReportData: null,
             selectedReport,
             loading: false,
           });
         }
-        const currentReportData = this.generateCurrentReportData(
+
+        const currentReportData = await this.generateCurrentReportData(
           selectedReport,
           this.state.transactions,
         );
+
+        console.log('currentReportData (post-processing):', currentReportData);
 
         this.toggleSelectElements(false);
 
@@ -375,15 +565,8 @@ class AnalyticsView extends React.Component {
       }
       if (type === 'period') {
         const selectedPeriod = prevEventTargetValue;
-        const currentDate = Date.now();
-        let daysAgo = 1;
-        if (selectedPeriod === 'This Week') {
-          daysAgo = 7;
-        }
-        if (selectedPeriod === 'This Month') {
-          daysAgo = 30;
-        }
-
+        const currentDate = this.state.currentDate;
+        const daysAgo = this.state.selectedPeriodToDaysAgo[selectedPeriod];
         const dateDaysAgoFromNow = this.getDateDaysAgoFromNow(
           currentDate,
           daysAgo,
@@ -397,9 +580,10 @@ class AnalyticsView extends React.Component {
           },
           queryAttributes: {},
         })
-          .then((transactions) => {
+          .then(async (transactions) => {
             if (transactions.length === 0) {
               this.toggleSelectElements(false);
+
               return this.setState({
                 currentReportData: null,
                 selectedPeriod,
@@ -407,9 +591,14 @@ class AnalyticsView extends React.Component {
               });
             }
 
-            const currentReportData = this.generateCurrentReportData(
+            const currentReportData = await this.generateCurrentReportData(
               this.state.selectedReport,
               transactions,
+            );
+
+            console.log(
+              'currentReportData (post-processing):',
+              currentReportData,
             );
 
             this.toggleSelectElements(false);
@@ -430,26 +619,42 @@ class AnalyticsView extends React.Component {
     });
   }
 
-  generateCurrentReportData(reportType, transactions) {
-    console.log(
-      'generateCurrentReportData() reportType, transactions',
-      reportType,
-      transactions,
-    );
-    switch (reportType) {
-      case 'Total Revenue':
-        return this.generateTotalRevenueReportData(transactions);
-      case 'Total Sales':
-        return this.generateTotalSalesReportData(transactions);
-      case 'Total Revenue: Top 5 Products':
-        return this.generateTotalRevenueTopFiveProductsReportData(transactions);
-      case 'Total Sales: Top 5 Products':
-        return this.generateTotalSalesTopFiveProductsReportData(transactions);
-      case 'New vs Returning Customers':
-        return this.generateNewVsReturningCustomersReportData(transactions);
-      default:
-        return null;
-    }
+  async generateCurrentReportData(reportType, transactions) {
+    return new Promise(async (resolve, reject) => {
+      console.log(
+        'generateCurrentReportData() reportType, transactions',
+        reportType,
+        transactions,
+      );
+      let currentReportData = null;
+      switch (reportType) {
+        case 'Total Revenue':
+          currentReportData = this.generateTotalRevenueReportData(transactions);
+          break;
+        case 'Total Sales':
+          currentReportData = this.generateTotalSalesReportData(transactions);
+          break;
+        case 'Total Revenue: Top 5 Products':
+          currentReportData = this.generateTotalRevenueTopFiveProductsReportData(
+            transactions,
+          );
+          break;
+        case 'Total Sales: Top 5 Products':
+          currentReportData = this.generateTotalSalesTopFiveProductsReportData(
+            transactions,
+          );
+          break;
+        case 'New vs Returning Customers':
+          currentReportData = await this.generateNewVsReturningCustomersReportData(
+            transactions,
+          );
+          break;
+        default:
+          break;
+      }
+
+      resolve(currentReportData);
+    });
   }
 
   renderAnalyticsViewOptions() {
@@ -490,7 +695,10 @@ class AnalyticsView extends React.Component {
   }
 
   renderTotalLabel() {
-    if (this.state.currentReportData.totalValueLabel !== null) {
+    if (
+      this.state.currentReportData !== undefined &&
+      this.state.currentReportData.totalValueLabel !== null
+    ) {
       return (
         <div className='MainAnalyticsViewChartsTotalContainer col-12'>
           <h1>Total</h1>
@@ -519,27 +727,33 @@ class AnalyticsView extends React.Component {
       <div className='MainAnalyticsViewCharts'>
         <div className='MainAnalyticsViewChartsPieBarRow row'>
           {this.renderTotalLabel()}
-          <div className='MainAnalyticsViewChartsPieContainer col-6'>
-            <Bar
-              data={this.state.currentReportData.barChart.data}
-              options={this.state.currentReportData.barChart.options}
-            />
-          </div>
-          <div className='MainAnalyticsViewChartsBarContainer col-6'>
-            <Pie
-              data={this.state.currentReportData.pieChart.data}
-              options={this.state.currentReportData.pieChart.options}
-            />
-          </div>
+          {this.state.currentReportData.barChart && (
+            <div className='MainAnalyticsViewChartsPieContainer col-6'>
+              <Bar
+                data={this.state.currentReportData.barChart.data}
+                options={this.state.currentReportData.barChart.options}
+              />
+            </div>
+          )}
+          {this.state.currentReportData.pieChart && (
+            <div className='MainAnalyticsViewChartsBarContainer col-6'>
+              <Pie
+                data={this.state.currentReportData.pieChart.data}
+                options={this.state.currentReportData.pieChart.options}
+              />
+            </div>
+          )}
         </div>
-        <div className='MainAnalyticsViewChartsLineRow row'>
-          <div className='MainAnalyticsViewChartsLineContainer col-12'>
-            <Line
-              data={this.state.currentReportData.lineChart.data}
-              options={this.state.currentReportData.lineChart.options}
-            />
+        {this.state.currentReportData.lineChart && (
+          <div className='MainAnalyticsViewChartsLineRow row'>
+            <div className='MainAnalyticsViewChartsLineContainer col-12'>
+              <Line
+                data={this.state.currentReportData.lineChart.data}
+                options={this.state.currentReportData.lineChart.options}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     );
   }
