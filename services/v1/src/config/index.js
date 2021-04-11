@@ -11,7 +11,6 @@ module.exports = {
       'EvzJGxOVCKvQOdvwH+qVCHTbvoN4vaXFf66SOYcq',
     region: process.env.AWS_REGION || 'us-west-1',
   },
-  // TODO: Setup CB Notification Webhooks on Coinbase Dev App
   COINBASE: {
     API_KEY: process.env.COINBASE_CLIENT_ID || 'CB_API_KEY',
     API_SECRET_KEY: process.env.COINBASE_CLIENT_SECRET || 'CB_API_SECRET_KEY',
