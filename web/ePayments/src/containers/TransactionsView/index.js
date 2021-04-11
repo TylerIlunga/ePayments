@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import DashboardMenu from '../../components/DashboardMenu';
 import DataTable from '../../components/DataTable';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
+import stringUtils from '../../utils/Strings';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
 
@@ -10,6 +11,8 @@ class TransactionsView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      view: 'list',
+      selectedTransaction: null,
       loadingTableData: true,
       transactions: [],
       tableOffset: 0,
@@ -44,7 +47,14 @@ class TransactionsView extends React.Component {
     this.handleOnChangeRowsPerPage = this.handleOnChangeRowsPerPage.bind(this);
     this.handleOnChangePage = this.handleOnChangePage.bind(this);
     this.handleOnRowClick = this.handleOnRowClick.bind(this);
-    this.renderTransactions = this.renderTransactions.bind(this);
+    this.renderSelectedTransactionDetails = this.renderSelectedTransactionDetails.bind(
+      this,
+    );
+    this.returnToListOfTransactions = this.returnToListOfTransactions.bind(
+      this,
+    );
+    this.renderListOfTransactions = this.renderListOfTransactions.bind(this);
+    this.renderTransactionsView = this.renderTransactionsView.bind(this);
   }
 
   componentDidMount() {
@@ -146,7 +156,9 @@ class TransactionsView extends React.Component {
 
   handleOnRowClick(evt, rowData, toggleDetailPanel) {
     console.log('evt, rowData:', evt, rowData);
-    // TODO: Display "TransactionDetails" view which will be read only (review what we've done for ProductDetails)
+    rowData.tableData = null;
+    delete rowData.tableData;
+    this.setState({ selectedTransaction: rowData, view: 'view' });
   }
 
   renderTransactionTable() {
@@ -164,7 +176,7 @@ class TransactionsView extends React.Component {
     );
   }
 
-  renderTransactions() {
+  renderListOfTransactions() {
     return (
       <div className='MainTransactionViewTransactionsContainer col-10'>
         <div className='MainTransactionViewTransactionsHeaderContainer'>
@@ -177,11 +189,68 @@ class TransactionsView extends React.Component {
     );
   }
 
+  renderTransactionTextInformation(transaction) {
+    return Object.keys(transaction).map((field, i) => {
+      const heading = stringUtils.snakeToCamel(field);
+      if (heading === 'createdAt') {
+        transaction[field] = new Date(Number(transaction[field])).toUTCString();
+      }
+      return (
+        <p key={i}>
+          <strong>{heading}</strong>: {transaction[field]}
+        </p>
+      );
+    });
+  }
+
+  returnToListOfTransactions(evt) {
+    evt.preventDefault();
+    this.setState({
+      view: 'list',
+      selectedTransaction: null,
+    });
+  }
+
+  renderSelectedTransactionDetails() {
+    // amount: 37.5
+    // business_id: 7
+    // coinbase_transaction_id: "cbTransactionResult.id"
+    // created_at: "1618013607611"
+    // currency: "BTC"
+    // customer_id: 8
+    // id: "1cf2d5fd-d3ec-48a1-a4ba-eab90f6ee945"
+    // latitude: "0"
+    // longitude: "0"
+    // product_category: "water"
+    // product_id: 3
+    // quantity: 25
+    // tableData: {id: 0}
+    // token_amount: "${cbTransactionResult.amount.amount}"
+    return (
+      <div className='MainTransactionViewTransactionsContainer col-10'>
+        {this.renderTransactionTextInformation(this.state.selectedTransaction)}
+        <button
+          className='MainTransactionViewSelectedTransactionExitButton'
+          onClick={this.returnToListOfTransactions}
+        >
+          Exit
+        </button>
+      </div>
+    );
+  }
+
+  renderTransactionsView() {
+    if (this.state.selectedTransaction === null && this.state.view === 'list') {
+      return this.renderListOfTransactions();
+    }
+    return this.renderSelectedTransactionDetails();
+  }
+
   render() {
     return (
       <div className='MainTransactionViewContainer row'>
         {this.renderMenuColumn()}
-        {this.renderTransactions()}
+        {this.renderTransactionsView()}
       </div>
     );
   }

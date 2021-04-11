@@ -15,8 +15,6 @@ class AnalyticsView extends React.Component {
       reportTypes: [
         'Total Revenue',
         'Total Sales',
-        'Total Revenue: Top 5 Products',
-        'Total Sales: Top 5 Products',
         'New vs Returning Customers',
       ],
       periodTypes: ['Today', 'This Week', 'This Month'],
@@ -70,12 +68,6 @@ class AnalyticsView extends React.Component {
       this,
     );
     this.generateTotalSalesReportData = this.generateTotalSalesReportData.bind(
-      this,
-    );
-    this.generateTotalRevenueTopFiveProductsReportData = this.generateTotalRevenueTopFiveProductsReportData.bind(
-      this,
-    );
-    this.generateTotalSalesTopFiveProductsReportData = this.generateTotalSalesTopFiveProductsReportData.bind(
       this,
     );
     this.generateNewVsReturningCustomersReportData = this.generateNewVsReturningCustomersReportData.bind(
@@ -213,16 +205,6 @@ class AnalyticsView extends React.Component {
       totalValueLabel: `${aggregatedSales} products`,
       generalReportData: dailySales,
     });
-  }
-
-  generateTotalRevenueTopFiveProductsReportData(transactions) {
-    // TODO: Product.label(String), Revenue (Int) instead of DateOfSale(String), Revenue (Int)
-    return null;
-  }
-
-  generateTotalSalesTopFiveProductsReportData(transactions) {
-    // TODO: Product.label(String), Revenue (Int) instead of DateOfSale(String), Revenue (Int)
-    return null;
   }
 
   async generateNewVsReturningCustomersReportData(transactions) {
@@ -633,16 +615,6 @@ class AnalyticsView extends React.Component {
           break;
         case 'Total Sales':
           currentReportData = this.generateTotalSalesReportData(transactions);
-          break;
-        case 'Total Revenue: Top 5 Products':
-          currentReportData = this.generateTotalRevenueTopFiveProductsReportData(
-            transactions,
-          );
-          break;
-        case 'Total Sales: Top 5 Products':
-          currentReportData = this.generateTotalSalesTopFiveProductsReportData(
-            transactions,
-          );
           break;
         case 'New vs Returning Customers':
           currentReportData = await this.generateNewVsReturningCustomersReportData(
