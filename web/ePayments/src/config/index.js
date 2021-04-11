@@ -1,4 +1,20 @@
+const getDateDaysAgoFromToday = (daysAgo) => {
+  return new Date(todaysDate - daysAgo * 24 * 60 * 60 * 1000);
+};
+
+const todaysDate = new Date();
+const dateAWeekAgoFromToday = getDateDaysAgoFromToday(7);
+const dateAMonthAgoFromToday = getDateDaysAgoFromToday(31);
+
 const config = {
+  getDateDaysAgoFromToday,
+  dateReferences: {
+    Today: todaysDate,
+    'This Week': dateAWeekAgoFromToday,
+    'This Month': dateAMonthAgoFromToday,
+    // TODO: Change temp launch date to actual launch date
+    productLaunchDate: new Date('01/01/2021'),
+  },
   countries: [
     { name: 'Afghanistan', code: 'AF' },
     { name: 'Åland Islands', code: 'AX' },

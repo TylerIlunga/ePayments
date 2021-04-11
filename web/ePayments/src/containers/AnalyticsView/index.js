@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Bar, Pie, Line } from 'react-chartjs-2';
+import config from '../../config';
 import DashboardMenu from '../../components/DashboardMenu';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
 import toastUtils from '../../utils/Toasts';
@@ -9,6 +10,7 @@ import './index.css';
 class AnalyticsView extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       loading: true,
       transactions: [],
@@ -18,17 +20,10 @@ class AnalyticsView extends React.Component {
         'New vs Returning Customers',
       ],
       periodTypes: ['Today', 'This Week', 'This Month'],
-      selectedPeriodToDaysAgo: {
-        Today: 1,
-        'This Week': 7,
-        'This Month': 31,
-      },
+      selectedPeriodToDaysAgo: config.dateReferences,
       selectedReport: 'Total Revenue',
       selectedPeriod: 'This Week',
       currentReportData: null,
-      currentDate: Date.now(),
-      // TODO: Change temp launch date to actual launch date
-      productLaunchDate: new Date('01/01/2021'),
     };
 
     this.reportDataStartState = {
@@ -62,7 +57,9 @@ class AnalyticsView extends React.Component {
     this.renderAnalyticsViewOptions = this.renderAnalyticsViewOptions.bind(
       this,
     );
-    this.handleChangeReport = this.handleChangeReport.bind(this);
+    this.handleOnOptionChange = this.handleOnOptionChange.bind(this);
+    this.handleReportChangeType = this.handleReportChangeType.bind(this);
+    this.handlePeriodChangeType = this.handlePeriodChangeType.bind(this);
     this.generateCurrentReportData = this.generateCurrentReportData.bind(this);
     this.generateTotalRevenueReportData = this.generateTotalRevenueReportData.bind(
       this,
@@ -84,19 +81,14 @@ class AnalyticsView extends React.Component {
   componentDidMount() {
     this.toggleSelectElements(true);
 
-    const currentDate = this.state.currentDate;
-    const dateAWeekAgoFromNow = this.getDateDaysAgoFromNow(currentDate, 7);
-    console.log(
-      'currentDate:, dateAWeekAgoFromNow.getTime()',
-      currentDate,
-      dateAWeekAgoFromNow.getTime(),
-    );
+    const todaysDate = this.state.selectedPeriodToDaysAgo['Today'];
+    const dateAWeekAgo = this.state.selectedPeriodToDaysAgo['This Week'];
     this.fetchTransactions({
       // businessID: this.props.user.id
       businessID: 7,
       betweenDates: {
-        start: dateAWeekAgoFromNow.getTime(),
-        end: currentDate,
+        start: dateAWeekAgo.getTime(),
+        end: todaysDate.getTime(),
       },
       queryAttributes: {},
     })
@@ -123,11 +115,8 @@ class AnalyticsView extends React.Component {
       });
   }
 
-  getDateDaysAgoFromNow(now, daysAgo) {
-    return new Date(now - daysAgo * 24 * 60 * 60 * 1000);
-  }
-
   fetchTransactions(queryData) {
+    console.log('fetchTransactions() queryData:', queryData);
     return new Promise((resolve, reject) => {
       this.BusinessTransactionService.listTransactions(queryData)
         .then((res) => {
@@ -171,7 +160,7 @@ class AnalyticsView extends React.Component {
       }
     });
 
-    console.log('dailyRevenue', dailyRevenue);
+    console.log('generateTotalRevenueReportData() dailyRevenue', dailyRevenue);
 
     return this.generateChartJSData(null, {
       chartLabel: 'Revenue',
@@ -198,7 +187,7 @@ class AnalyticsView extends React.Component {
       }
     });
 
-    console.log('dailySales', dailySales);
+    console.log('generateTotalSalesReportData () dailySales', dailySales);
 
     return this.generateChartJSData(null, {
       chartLabel: 'Sales',
@@ -207,16 +196,24 @@ class AnalyticsView extends React.Component {
     });
   }
 
-  async generateNewVsReturningCustomersReportData(transactions) {
-    console.log('generateNewVsReturningCustomersReportData():', transactions);
+  async generateNewVsReturningCustomersReportData(
+    transactions,
+    selectedPeriod,
+  ) {
+    console.log(
+      'generateNewVsReturningCustomersReportData() transactions, selectedPeriod:',
+      transactions,
+      selectedPeriod,
+    );
     // NEW = No records exist for that customer(User) before the start date
     const chartLabel = 'Customers';
     const customerIDs = new Set();
-    const currentDate = this.state.currentDate;
-    const daysAgo = this.state.selectedPeriodToDaysAgo[
-      this.state.selectedPeriod
+    const productLaunchDate = this.state.selectedPeriodToDaysAgo[
+      'productLaunchDate'
     ];
-    const dateDaysAgoFromNow = this.getDateDaysAgoFromNow(currentDate, daysAgo);
+    const dateDaysAgoFromToday = this.state.selectedPeriodToDaysAgo[
+      selectedPeriod
+    ];
     let totalNewCustomers = 0;
     let totalReturningCustomers = 0;
 
@@ -225,23 +222,31 @@ class AnalyticsView extends React.Component {
       customerIDs.add(transaction.customer_id);
     });
 
-    console.log('customerIDs:', customerIDs);
+    console.log(
+      'generateNewVsReturningCustomersReportData() customerIDs:',
+      customerIDs,
+    );
 
+    // Fetch transactions for each customer (ID)
     const fetchCustomerTransactions = [];
     const iterateThroughCustomerIDs = (customerID) => {
-      // For each using [LIMIT=1] for latency purposes, see if any transaction records
-      // exist for the user before the date
+      // NOTE: Using [LIMIT=1] for latency purposes
+      const startDateTime = productLaunchDate.getTime();
+      const endDateTime = dateDaysAgoFromToday.getTime();
+      console.log(
+        'iterateThroughCustomerIDs() startDateTime, endDateTime, selectedPeriod',
+        startDateTime,
+        endDateTime,
+        selectedPeriod,
+      );
       fetchCustomerTransactions.push(
         this.fetchTransactions({
           customerID,
           betweenDates: {
-            // TODO: Fix inconsistency with responses due to the date range...
-            start: this.state.productLaunchDate.getTime(),
-            end: dateDaysAgoFromNow.getTime(),
+            start: startDateTime,
+            end: endDateTime,
           },
-          queryAttributes: {
-            limit: 1,
-          },
+          queryAttributes: { limit: 1 },
         })
           .then((transactions) => {
             console.log(
@@ -265,24 +270,23 @@ class AnalyticsView extends React.Component {
     customerIDs.forEach(iterateThroughCustomerIDs);
 
     try {
-      const responses = await Promise.all(fetchCustomerTransactions);
-      console.log(
-        'Promise.all(fetchCustomerTransactions) responses:',
-        responses,
+      const fetchCustomerTransactionsResponses = await Promise.all(
+        fetchCustomerTransactions,
       );
-      responses.forEach((currentCustomerTransactions) => {
-        console.log(
-          'currentCustomerTransactions:',
-          currentCustomerTransactions,
-        );
+      console.log(
+        'Promise.all(fetchCustomerTransactions) fetchCustomerTransactionsResponses:',
+        fetchCustomerTransactionsResponses,
+      );
+      fetchCustomerTransactionsResponses.forEach((customerTransactions) => {
+        console.log('customerTransactions:', customerTransactions);
         if (
-          !Array.isArray(currentCustomerTransactions) ||
-          currentCustomerTransactions.length === 0
+          !Array.isArray(customerTransactions) ||
+          customerTransactions.length === 0
         ) {
-          // If not, they are a new customer
+          // No transactions before the current period's date? New customer
           totalNewCustomers += 1;
         } else {
-          // If so, they are a returning customer
+          // Transactions? Returning customer
           totalReturningCustomers += 1;
         }
       });
@@ -329,7 +333,7 @@ class AnalyticsView extends React.Component {
       hexColor += availableSymbols[randomIndex];
     }
 
-    console.log('hexColor:', hexColor);
+    console.log('generateRandomHexColor() hexColor:', hexColor);
     return hexColor;
   }
 
@@ -418,7 +422,7 @@ class AnalyticsView extends React.Component {
   }
 
   generateNVRCChartData(customReportData) {
-    console.log('this.generateNVRCChartData():', customReportData);
+    console.log('generateNVRCChartData():', customReportData);
     const currentReportData = JSON.parse(
       JSON.stringify(this.reportDataStartState),
     );
@@ -504,109 +508,120 @@ class AnalyticsView extends React.Component {
     );
   }
 
-  handleChangeReport(evt, type) {
-    console.log(
-      'handleChangeReport() evt.target.value, type:',
-      evt.target.value,
-      type,
+  async handleReportChangeType(selectedReport) {
+    console.log('handleReportChangeType():', selectedReport);
+    if (this.state.transactions.length === 0) {
+      this.toggleSelectElements(false);
+
+      return this.setState({
+        currentReportData: null,
+        selectedReport,
+        loading: false,
+      });
+    }
+
+    const currentReportData = await this.generateCurrentReportData(
+      this.state.transactions,
+      selectedReport,
+      this.state.selectedPeriod,
     );
 
-    const prevEventTargetValue = evt.target.value;
+    console.log(
+      'handleReportChangeType() currentReportData (post-processing):',
+      currentReportData,
+    );
 
-    this.toggleSelectElements(true);
+    this.toggleSelectElements(false);
 
-    this.setState({ loading: true }, async () => {
-      if (type === 'report') {
-        const selectedReport = prevEventTargetValue;
-        if (this.state.transactions.length === 0) {
-          console.log('type(report): this.state.transactions.length === 0');
+    return this.setState({
+      currentReportData,
+      selectedReport,
+      loading: false,
+    });
+  }
+
+  handlePeriodChangeType(selectedPeriod) {
+    console.log('handlePeriodChangeType() selectedPeriod:', selectedPeriod);
+    const todaysDate = this.state.selectedPeriodToDaysAgo['Today'];
+    const dateDaysAgoFromToday = this.state.selectedPeriodToDaysAgo[
+      selectedPeriod
+    ];
+    this.fetchTransactions({
+      // businessID: this.props.user.id
+      businessID: 7,
+      betweenDates: {
+        start: dateDaysAgoFromToday.getTime(),
+        end: todaysDate.getTime(),
+      },
+      queryAttributes: {},
+    })
+      .then(async (transactions) => {
+        if (transactions.length === 0) {
+          console.log(
+            'handlePeriodChangeType() this.fetchTransactions() transactions:',
+            transactions,
+          );
 
           this.toggleSelectElements(false);
 
           return this.setState({
             currentReportData: null,
-            selectedReport,
+            selectedPeriod,
             loading: false,
           });
         }
 
         const currentReportData = await this.generateCurrentReportData(
-          selectedReport,
-          this.state.transactions,
+          transactions,
+          this.state.selectedReport,
+          selectedPeriod,
         );
 
-        console.log('currentReportData (post-processing):', currentReportData);
+        console.log(
+          'handlePeriodChangeType() currentReportData (post-processing):',
+          currentReportData,
+        );
 
         this.toggleSelectElements(false);
 
-        return this.setState({
+        this.setState({
           currentReportData,
-          selectedReport,
+          selectedPeriod,
+          transactions,
           loading: false,
         });
-      }
-      if (type === 'period') {
-        const selectedPeriod = prevEventTargetValue;
-        const currentDate = this.state.currentDate;
-        const daysAgo = this.state.selectedPeriodToDaysAgo[selectedPeriod];
-        const dateDaysAgoFromNow = this.getDateDaysAgoFromNow(
-          currentDate,
-          daysAgo,
-        );
-        this.fetchTransactions({
-          // businessID: this.props.user.id
-          businessID: 7,
-          betweenDates: {
-            start: dateDaysAgoFromNow.getTime(),
-            end: currentDate,
-          },
-          queryAttributes: {},
-        })
-          .then(async (transactions) => {
-            if (transactions.length === 0) {
-              this.toggleSelectElements(false);
-
-              return this.setState({
-                currentReportData: null,
-                selectedPeriod,
-                loading: false,
-              });
-            }
-
-            const currentReportData = await this.generateCurrentReportData(
-              this.state.selectedReport,
-              transactions,
-            );
-
-            console.log(
-              'currentReportData (post-processing):',
-              currentReportData,
-            );
-
-            this.toggleSelectElements(false);
-
-            this.setState({
-              currentReportData,
-              selectedPeriod,
-              transactions,
-              loading: false,
-            });
-          })
-          .catch((error) => {
-            this.toggleSelectElements(false);
-            this.displayToastMessage('error', error);
-            this.setState({ loading: false });
-          });
-      }
-    });
+      })
+      .catch((error) => {
+        this.toggleSelectElements(false);
+        this.displayToastMessage('error', error);
+        this.setState({ loading: false });
+      });
   }
 
-  async generateCurrentReportData(reportType, transactions) {
+  async handleOnOptionChange(evt, type) {
+    console.log(
+      'handleOnOptionChange() evt.target.value, type:',
+      evt.target.value,
+      type,
+    );
+
+    this.toggleSelectElements(true);
+
+    if (type === 'report') {
+      return this.handleReportChangeType(evt.target.value);
+    }
+    if (type === 'period') {
+      return this.handlePeriodChangeType(evt.target.value);
+    }
+  }
+
+  async generateCurrentReportData(transactions, reportType, selectedPeriod) {
     return new Promise(async (resolve, reject) => {
       console.log(
-        'generateCurrentReportData() reportType, transactions',
-        reportType,
+        'generateCurrentReportData() transactions, reportType, selectedPeriod',
         transactions,
+        reportType,
+        selectedPeriod,
       );
       let currentReportData = null;
       switch (reportType) {
@@ -619,6 +634,7 @@ class AnalyticsView extends React.Component {
         case 'New vs Returning Customers':
           currentReportData = await this.generateNewVsReturningCustomersReportData(
             transactions,
+            selectedPeriod,
           );
           break;
         default:
@@ -636,7 +652,7 @@ class AnalyticsView extends React.Component {
           <select
             value={this.state.selectedReport}
             className='MainAnalyticsViewOptionsSelect'
-            onChange={(evt) => this.handleChangeReport(evt, 'report')}
+            onChange={(evt) => this.handleOnOptionChange(evt, 'report')}
           >
             {this.state.reportTypes.map((reportType, i) => {
               return (
@@ -651,7 +667,7 @@ class AnalyticsView extends React.Component {
           <select
             value={this.state.selectedPeriod}
             className='MainAnalyticsViewOptionsSelect'
-            onChange={(evt) => this.handleChangeReport(evt, 'period')}
+            onChange={(evt) => this.handleOnOptionChange(evt, 'period')}
           >
             {this.state.periodTypes.map((periodType, i) => {
               return (
