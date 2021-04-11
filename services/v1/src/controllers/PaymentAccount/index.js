@@ -137,7 +137,8 @@ module.exports = {
       if (replaceAccount) {
         transaction = await dbConfig.getConnection().transaction();
         await dbConfig.PaymentAccount.destroy({
-          where: { transaction, user_id: userID, profile_id: profileID },
+          transaction,
+          where: { user_id: userID, profile_id: profileID },
         });
       }
       const newPaymentAccount = await dbConfig.PaymentAccount.create(
