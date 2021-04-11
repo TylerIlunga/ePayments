@@ -52,7 +52,7 @@ class SessionService {
 
   logOut() {
     return new Promise((resolve, reject) => {
-      this.networkRequest(`${this.url}/logout`)
+      this.networkRequest(`${this.url}/logout`, {}, 'text')
         .then((res) => {
           if (res.error) {
             throw res.error;

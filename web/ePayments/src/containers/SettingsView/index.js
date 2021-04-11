@@ -32,8 +32,9 @@ class SettingsView extends React.Component {
 
     // Test Customer User
     this.user = {
+      id: 10,
       type: 'customer',
-      email: 'x@y.com',
+      email: 'tyler@mizudev.com',
     };
     this.profile = {
       id: 1,
@@ -59,7 +60,7 @@ class SettingsView extends React.Component {
 
     this.state = {
       activeOption: 'Profile',
-      options: ['Profile', 'Payments', 'Reset Password', 'Log Out'],
+      options: ['Profile', 'Payments', 'Log Out'],
       updatingProfile: false,
       // updatedUserProfile: { ...this.props.profile },
       updatedUserProfile: { ...this.profile },
@@ -93,8 +94,8 @@ class SettingsView extends React.Component {
       this,
     );
     this.startCoinbaseOAuth = this.startCoinbaseOAuth.bind(this);
-    this.renderResetPasswordView = this.renderResetPasswordView.bind(this);
     this.renderLogOutView = this.renderLogOutView.bind(this);
+    this.logUserOut = this.logUserOut.bind(this);
   }
 
   componentDidMount() {
@@ -153,6 +154,8 @@ class SettingsView extends React.Component {
 
   toggleAutoConvertToFiat(evt) {
     evt.preventDefault();
+
+    this.displayToastMessage('info', 'Updating...');
 
     // this.PaymentAccountService.toggleAutoConvertToFiatFeature({
     //   id: this.props.paymentAccount.id,
@@ -413,8 +416,6 @@ class SettingsView extends React.Component {
   startCoinbaseOAuth(evt) {
     evt.preventDefault();
 
-    // TODO: LEFT OUT HERE
-
     // this.PaymentAccountService.fetchCoinbaseOauthLink({
     //   userID: this.props.user.id,
     //   email: this.props.user.email,
@@ -495,17 +496,48 @@ class SettingsView extends React.Component {
     );
   }
 
-  renderResetPasswordView() {
-    return (
-      <div className='SettingsViewResetPasswordContainer'>
-        Reset Password View!!!!
-      </div>
-    );
+  logUserOut(evt) {
+    evt.preventDefault();
+
+    this.displayToastMessage('info', 'Logging out...');
+
+    this.SessionService.logOut()
+      .then((res) => {
+        console.log('this.SessionService.logOut() res:', res);
+        if (res !== 'OK') {
+          throw 'Log Out Failure: Please try again';
+        }
+
+        this.displayToastMessage('success', 'Success');
+
+        this.props.history.replace('/');
+      })
+      .catch((error) => {
+        console.log(
+          'this.PaymentAccountService.toggleAutoConvertToFiatFeature error:',
+          error,
+        );
+        if (typeof error !== 'string') {
+          error = 'Log Out Failure: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
   }
 
   renderLogOutView() {
     return (
-      <div className='SettingsViewLogOutViewContainer'>Log Out View!!!!</div>
+      <div className='SettingsViewLogOutViewContainer'>
+        {this.renderActiveOptionContentHeader()}
+        <div className='SettingsViewLogOutViewAYSContainer'>
+          <p>Are you sure you want to log out? We don't want you to go :(</p>
+        </div>
+        <button
+          className='SettingsViewLogOutViewImSureButton'
+          onClick={this.logUserOut}
+        >
+          I'm Sure
+        </button>
+      </div>
     );
   }
 
@@ -515,8 +547,6 @@ class SettingsView extends React.Component {
         return this.renderProfileView();
       case 'Payments':
         return this.renderPaymentsView();
-      case 'Reset Password':
-        return this.renderResetPasswordView();
       case 'Log Out':
         return this.renderLogOutView();
       default:
