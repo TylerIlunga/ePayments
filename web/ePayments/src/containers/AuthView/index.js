@@ -38,6 +38,7 @@ class AuthView extends React.Component {
     this.UserService = new UserService();
     this.displayToastMessage = toastUtils.displayToastMessage;
 
+    this.renderAuthFormContent = this.renderAuthFormContent.bind(this);
     this.renderSignUpView = this.renderSignUpView.bind(this);
     this.updateSignUpLogInForm = this.updateSignUpLogInForm.bind(this);
     this.updateActivateAccountForm = this.updateActivateAccountForm.bind(this);
@@ -371,7 +372,7 @@ class AuthView extends React.Component {
 
   renderSignUpView() {
     return (
-      <div className='MainAuthViewContainer'>
+      <div className='AuthViewFormContainer col-4'>
         <div className='SignUpViewHeader'>
           <h1>Sign Up</h1>
         </div>
@@ -430,55 +431,53 @@ class AuthView extends React.Component {
 
   renderLogInView() {
     return (
-      <div className='MainAuthViewContainer'>
-        <div className='LogInViewHeader'>
-          <h1>Log In</h1>
-        </div>
-        <div className='LogInViewFormContainer'>
-          <form className='LogInViewForm'>
-            <label className='LogInViewFormEmailLabel'>Email Address:</label>
+      <div className='AuthViewFormContainer col-sm-4 col-12'>
+        <div className='AuthViewFormRow row'>
+          <div className='AuthViewFormHeader'>
+            <p>Log In</p>
+          </div>
+          <form className='AuthViewForm'>
             <input
-              className='LogInViewFormEmailInput'
+              className='AuthViewFormInput'
               type='text'
               value={this.state.signUpLogInForm.email}
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
-              placeholder={'w@xyz.com'}
+              placeholder='Email Address'
             />
-            <label className='LogInViewFormPasswordLabel'>Password:</label>
+            <br />
             <input
-              className='LogInViewFormPasswordInput'
+              className='AuthViewFormInput'
               type='password'
               value={this.state.signUpLogInForm.password}
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'password')}
-              placeholder={'************'}
+              placeholder='Password'
             />
+            <br />
             <input
-              className='LogInViewFormLogInButton'
+              className='AuthViewFormButton'
               type='button'
               value='Log In'
               onClick={this.logUserIn}
             />
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='AuthViewOptionsLink'
+                href='#signUp'
+                onClick={(evt) => this.setState({ view: 'signUp' })}
+              >
+                Sign Up
+              </a>
+            </div>
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='AuthViewOptionsLink'
+                href='#forgotPassword'
+                onClick={(evt) => this.setState({ view: 'forgotPassword' })}
+              >
+                Forgot Password
+              </a>
+            </div>
           </form>
-        </div>
-        <div className='LogInViewOptionsContainer'>
-          <div className='LogInViewOptionsLinkContainer'>
-            <a
-              className='LogInViewOptionsLink'
-              href='#signUp'
-              onClick={(evt) => this.setState({ view: 'signUp' })}
-            >
-              Sign Up
-            </a>
-          </div>
-          <div className='LogInViewOptionsLinkContainer'>
-            <a
-              className='LogInViewOptionsLink'
-              href='#forgotPassword'
-              onClick={(evt) => this.setState({ view: 'forgotPassword' })}
-            >
-              Forgot Password
-            </a>
-          </div>
         </div>
       </div>
     );
@@ -486,7 +485,7 @@ class AuthView extends React.Component {
 
   renderActivateAccountView() {
     return (
-      <div className='MainAuthViewContainer'>
+      <div className='AuthViewFormContainer col-4'>
         <div className='ActivateAccountViewHeader'>
           <h1>Activate Account</h1>
         </div>
@@ -528,7 +527,7 @@ class AuthView extends React.Component {
 
   renderForgotPasswordView() {
     return (
-      <div className='MainAuthViewContainer'>
+      <div className='AuthViewFormContainer col-4'>
         <div className='ForgotPasswordViewHeader'>
           <h1>Forgot Password</h1>
         </div>
@@ -578,7 +577,7 @@ class AuthView extends React.Component {
 
   renderResetPasswordView() {
     return (
-      <div className='MainAuthViewContainer'>
+      <div className='AuthViewFormContainer col-4'>
         <div className='ResetPasswordViewHeader'>
           <h1>Reset Password</h1>
         </div>
@@ -674,7 +673,20 @@ class AuthView extends React.Component {
     );
   }
 
-  render() {
+  renderAuthInfoContent() {
+    return (
+      <div className='AuthInfoContentContainer col-sm-8 col-12'>
+        <div className='AuthInfoContentLabelContainer row'>
+          <p className='AuthInfoContentBrandLabel'>ePayments</p>
+          <p className='AuthInfoContentDescriptionLabel'>
+            Accept cryptocurrency. Spend cryptocurrency
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  renderAuthFormContent() {
     switch (this.state.view) {
       case 'logIn':
         return this.renderLogInView();
@@ -687,6 +699,19 @@ class AuthView extends React.Component {
       default:
         return this.renderSignUpView();
     }
+  }
+
+  renderAuthView() {
+    return (
+      <div className='MainAuthViewContainer row'>
+        {this.renderAuthInfoContent()}
+        {this.renderAuthFormContent()}
+      </div>
+    );
+  }
+
+  render() {
+    return this.renderAuthView();
   }
 }
 
