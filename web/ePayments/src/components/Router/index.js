@@ -37,10 +37,15 @@ import PageNotFoundView from '../PageNotFoundView';
 const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
   // TODO: Use props.allCookies instead of cookieOpts?
   const [cookies] = cookieOpts;
+  // const sessionExists =
+  //   props.router.location !== undefined ||
+  //   props.router.location.state !== undefined ||
+  //   props.router.location.state.session !== undefined ||
+  //   !props.router.location.state.session;
   const sessionExists =
-    props.router.location !== undefined ||
-    props.router.location.state !== undefined ||
-    props.router.location.state.session !== undefined ||
+    props.router.location &&
+    props.router.location.state &&
+    props.router.location.state.session &&
     !props.router.location.state.session;
   // TODO: Make sure to set state.session to false for logging out...
   //   if (

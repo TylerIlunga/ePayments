@@ -69,6 +69,29 @@ class BusinessProductService {
         });
     });
   }
+
+  createNewProduct(businessID, newProductData) {
+    newProductData.businessID = businessID;
+
+    return new Promise((resolve, reject) => {
+      this.networkRequest(`${this.url}/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newProductData),
+      })
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('createNewProduct() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('createNewProduct() error:', error);
+          reject(error);
+        });
+    });
+  }
 }
 
 export default BusinessProductService;

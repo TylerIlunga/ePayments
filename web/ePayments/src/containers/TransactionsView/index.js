@@ -109,10 +109,10 @@ class TransactionsView extends React.Component {
   }
 
   renderTableHeader() {
-    if (this.state.transactions !== null) {
-      return;
+    if (this.state.loadingTableData) {
+      return <p className='TransactionsHeaderLabel'>Loading...</p>;
     }
-    return <p className='TransactionsHeaderLabel'>Loading...</p>;
+    return <p className='TransactionsHeaderLabel'>Transactions</p>;
   }
 
   handleOnChangeRowsPerPage(pageSize) {
@@ -164,7 +164,7 @@ class TransactionsView extends React.Component {
   renderTransactionTable() {
     return (
       <DataTable
-        title='Transactions'
+        title='History'
         isLoading={this.state.loadingTableData}
         data={this.state.transactions}
         columns={this.state.tableColumns}

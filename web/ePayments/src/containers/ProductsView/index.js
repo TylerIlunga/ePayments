@@ -29,6 +29,14 @@ class ProductsView extends React.Component {
     this.state = {
       selectedProduct,
       view,
+      newProductData: {
+        sku: '',
+        label: '',
+        description: '',
+        price: '',
+        category: '',
+        inventoryCount: 0,
+      },
       selectedProductUpdates: {},
       loadingProducts: true,
       products: [],
@@ -102,12 +110,16 @@ class ProductsView extends React.Component {
     this.persistSelectedProductUpdate = this.persistSelectedProductUpdate.bind(
       this,
     );
+    this.renderCreateProductForm = this.renderCreateProductForm.bind(this);
+    this.toggleCreateProductView = this.toggleCreateProductView.bind(this);
+    this.updateNewProductData = this.updateNewProductData.bind(this);
+    this.createNewProduct = this.createNewProduct.bind(this);
   }
 
   componentDidMount() {
     this.fetchProducts({
       // TODO: (UNCOMMENT) businessID: this.props.user.id,
-      businessID: 7,
+      businessID: 9,
       queryAttributes: {
         limit: 5,
         order: 'DESC',
@@ -185,8 +197,11 @@ class ProductsView extends React.Component {
         </p>
       );
     }
+    if (this.state.view === 'create') {
+      return <p className='ProductsHeaderLabel'>Create</p>;
+    }
     if (this.state.products !== null) {
-      return;
+      return <p className='ProductsHeaderLabel'>Products</p>;
     }
     return <p className='ProductsHeaderLabel'>Loading...</p>;
   }
@@ -199,7 +214,7 @@ class ProductsView extends React.Component {
       cb = () => {
         this.fetchProducts({
           // TODO: (UNCOMMENT) businessID: this.props.user.id,
-          businessID: 7,
+          businessID: 9,
           queryAttributes: {
             offset: this.state.productsTableOffset,
             limit: pageSize,
@@ -212,10 +227,10 @@ class ProductsView extends React.Component {
       cb = () => {
         this.fetchProductTransactions({
           // TODO: (UNCOMMENT) businessID: this.props.user.id,
-          businessID: 7,
+          businessID: 9,
           queryAttributes: {
             // TODO: (UNCOMMENT) businessID: this.props.user.id,
-            businessID: 7,
+            businessID: 9,
             productID: this.state.selectedProduct.id,
             offset: this.state.transactionsTableOffset,
             limit: pageSize,
@@ -251,7 +266,7 @@ class ProductsView extends React.Component {
         if (this.state.products.length < productsTableOffset + pageSize) {
           this.fetchProducts({
             // TODO: (UNCOMMENT) businessID: this.props.user.id,
-            businessID: 7,
+            businessID: 9,
             queryAttributes: {
               offset: productsTableOffset,
               limit: pageSize,
@@ -289,10 +304,10 @@ class ProductsView extends React.Component {
         ) {
           this.fetchProductTransactions({
             // TODO: (UNCOMMENT) businessID: this.props.user.id,
-            businessID: 7,
+            businessID: 9,
             queryAttributes: {
               // TODO: (UNCOMMENT) businessID: this.props.user.id,
-              businessID: 7,
+              businessID: 9,
               productID: this.state.selectedProduct.id,
               offset: transactionsTableOffset,
               limit: pageSize,
@@ -313,7 +328,7 @@ class ProductsView extends React.Component {
   renderProductsTable() {
     return (
       <DataTable
-        title='Products'
+        title='Inventory'
         isLoading={this.state.loadingProducts}
         data={this.state.products}
         columns={this.state.productsTableColumns}
@@ -331,11 +346,56 @@ class ProductsView extends React.Component {
     );
   }
 
+  generateNewProductSku() {
+    const availableSymbols = [
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+    ];
+    let productSku = '';
+    let index = 0;
+
+    while (index++ <= 15) {
+      const randomIndex = Math.floor(Math.random() * availableSymbols.length);
+      productSku += availableSymbols[randomIndex];
+    }
+
+    console.log('generateNewProductSku() productSku:', productSku);
+    return productSku;
+  }
+
+  toggleCreateProductView(evt) {
+    evt.preventDefault();
+    this.setState({
+      view: 'create',
+      newProductData: {
+        ...this.state.newProductData,
+        sku: this.generateNewProductSku(),
+      },
+    });
+  }
+
   renderListOfProducts() {
     return (
       <div className='MainProductViewContainer col-10'>
         <div className='MainProductViewHeaderContainer'>
           {this.renderViewHeader()}
+        </div>
+        <div className='MainProductViewCreateProductButtonContainer'>
+          <button onClick={this.toggleCreateProductView}>Create Product</button>
         </div>
         <div className='MainProductViewTableContainer'>
           {this.renderProductsTable()}
@@ -350,6 +410,22 @@ class ProductsView extends React.Component {
       view: 'list',
       showProductTransactions: false,
     });
+  }
+
+  updateNewProductData(evt, field) {
+    this.setState(
+      {
+        newProductData: {
+          ...this.state.newProductData,
+          [field]: evt.target.value,
+        },
+      },
+      () =>
+        console.log(
+          'new this.state.newProductData:',
+          this.state.newProductData,
+        ),
+    );
   }
 
   updateSelectedProductField(evt, field) {
@@ -473,10 +549,10 @@ class ProductsView extends React.Component {
           onClick={(evt) =>
             this.fetchProductTransactions({
               // TODO: (UNCOMMENT) businessID: this.props.user.id,
-              businessID: 7,
+              businessID: 9,
               queryAttributes: {
                 // TODO: (UNCOMMENT) businessID: this.props.user.id,
-                businessID: 7,
+                businessID: 9,
                 productID: this.state.selectedProduct.id,
                 limit: 5,
                 order: 'DESC',
@@ -508,6 +584,137 @@ class ProductsView extends React.Component {
     );
   }
 
+  newProductDataIsValid(newProductData) {
+    const {
+      sku,
+      label,
+      description,
+      price,
+      category,
+      inventoryCount,
+    } = newProductData;
+    if (!(sku && label && description && price && category)) {
+      return { error: 'Please provide values for all fields.' };
+    }
+    if (inventoryCount === 0) {
+      return { error: 'Inventory count can not be zero.' };
+    }
+    if (isNaN(price)) {
+      return { error: 'The price should be a valid number.' };
+    }
+    if (isNaN(inventoryCount)) {
+      return { error: 'The inventory count should be a valid number.' };
+    }
+    return null;
+  }
+
+  createNewProduct(evt) {
+    evt.preventDefault();
+
+    const validationResult = this.newProductDataIsValid(
+      this.state.newProductData,
+    );
+
+    if (validationResult !== null) {
+      return this.displayToastMessage('error', validationResult.error);
+    }
+
+    // this.BusinessProductService.createNewProduct(
+    //   this.props.user.id,
+    //   this.state.newProductData,
+    // )
+    this.BusinessProductService.createNewProduct(9, this.state.newProductData)
+      .then((res) => {
+        console.log('this.BusinessProductService.createNewProduct() res:', res);
+        if (res.error) {
+          throw res.error;
+        }
+        this.displayToastMessage('success', 'Success');
+        this.fetchProducts({
+          // TODO: (UNCOMMENT) businessID: this.props.user.id,
+          businessID: 9,
+          queryAttributes: {
+            limit: 5,
+            order: 'DESC',
+          },
+        });
+        this.setState({
+          view: 'list',
+          newProductData: {
+            sku: '',
+            label: '',
+            description: '',
+            price: '',
+            category: '',
+            inventoryCount: 0,
+          },
+        });
+      })
+      .catch((error) => {
+        console.log(
+          'this.BusinessProductService.createNewProduct error:',
+          error,
+        );
+        if (typeof error !== 'string') {
+          error = 'Creation failure: Please try again';
+        }
+        this.displayToastMessage('error', error);
+      });
+  }
+
+  renderCreateProductForm() {
+    return (
+      <div className='ProductViewDetailsMainContainer col-10'>
+        <div className='ProductViewDetailsHeaderContainer'>
+          {this.renderViewHeader()}
+        </div>
+        <div className='MainProductViewCreateFormContainer'>
+          <form className='MainProductViewCreateForm'>
+            <label>Sku:</label>
+            <input disabled value={this.state.newProductData.sku} />
+            <label>Category:</label>
+            <input
+              value={this.state.newProductData.category}
+              onChange={(e) => this.updateNewProductData(e, 'category')}
+            />
+            <label>Label:</label>
+            <input
+              value={this.state.newProductData.label}
+              onChange={(e) => this.updateNewProductData(e, 'label')}
+            />
+            <label>Description:</label>
+            <input
+              value={this.state.newProductData.description}
+              onChange={(e) => this.updateNewProductData(e, 'description')}
+            />
+            <label>Price:</label>
+            <input
+              value={this.state.newProductData.price}
+              onChange={(e) => this.updateNewProductData(e, 'price')}
+            />
+            <label>Inventory Count:</label>
+            <input
+              value={this.state.newProductData.inventoryCount}
+              onChange={(e) => this.updateNewProductData(e, 'inventoryCount')}
+            />
+            <button
+              className='MainProductViewCreateFormCreateButton'
+              onClick={(e) => this.setState({ view: 'list' })}
+            >
+              Exit
+            </button>
+            <button
+              className='MainProductViewCreateFormCreateButton'
+              onClick={this.createNewProduct}
+            >
+              Create
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   renderSelectedProductDetails() {
     return (
       <div className='ProductViewDetailsMainContainer col-10'>
@@ -527,6 +734,9 @@ class ProductsView extends React.Component {
   renderProductView() {
     if (this.state.selectedProduct === null && this.state.view === 'list') {
       return this.renderListOfProducts();
+    }
+    if (this.state.view === 'create') {
+      return this.renderCreateProductForm();
     }
     return this.renderSelectedProductDetails();
   }
