@@ -49,6 +49,7 @@ class AuthView extends React.Component {
     this.activateUsersAccount = this.activateUsersAccount.bind(this);
     this.sendResetPasswordToken = this.sendResetPasswordToken.bind(this);
     this.resetUsersPassword = this.resetUsersPassword.bind(this);
+    this.handleChangeAuthFormTo = this.handleChangeAuthFormTo.bind(this);
   }
 
   updateSignUpLogInForm(evt, field) {
@@ -370,6 +371,11 @@ class AuthView extends React.Component {
       });
   }
 
+  handleChangeAuthFormTo(evt, view) {
+    evt.preventDefault();
+    this.setState({ view });
+  }
+
   renderLogInView() {
     return (
       <div className='AuthViewFormContainer col-sm-4 col-12'>
@@ -402,7 +408,7 @@ class AuthView extends React.Component {
               <a
                 className='AuthViewOptionsLink'
                 href='#signUp'
-                onClick={(evt) => this.setState({ view: 'signUp' })}
+                onClick={(e) => this.handleChangeAuthFormTo(e, 'signUp')}
               >
                 Sign Up
               </a>
@@ -411,7 +417,9 @@ class AuthView extends React.Component {
               <a
                 className='AuthViewOptionsLink'
                 href='#forgotPassword'
-                onClick={(evt) => this.setState({ view: 'forgotPassword' })}
+                onClick={(e) =>
+                  this.handleChangeAuthFormTo(e, 'forgotPassword')
+                }
               >
                 Forgot Password
               </a>
@@ -483,7 +491,7 @@ class AuthView extends React.Component {
               <a
                 className='ForgotPasswordViewOptionsLink'
                 href='#signUp'
-                onClick={(evt) => this.setState({ view: 'signUp' })}
+                onClick={(e) => this.handleChangeAuthFormTo(e, 'signUp')}
               >
                 Sign Up
               </a>
@@ -492,7 +500,7 @@ class AuthView extends React.Component {
               <a
                 className='ForgotPasswordViewOptionsLink'
                 href='#logIn'
-                onClick={(evt) => this.setState({ view: 'logIn' })}
+                onClick={(e) => this.handleChangeAuthFormTo(e, 'logIn')}
               >
                 Log In
               </a>
@@ -564,7 +572,7 @@ class AuthView extends React.Component {
               <a
                 className='ResetPasswordViewOptionsLink'
                 href='#signUp'
-                onClick={(evt) => this.setState({ view: 'signUp' })}
+                onClick={(e) => this.handleChangeAuthFormTo(e, 'signUp')}
               >
                 Sign Up
               </a>
@@ -573,7 +581,7 @@ class AuthView extends React.Component {
               <a
                 className='ResetPasswordViewOptionsLink'
                 href='#logIn'
-                onClick={(evt) => this.setState({ view: 'logIn' })}
+                onClick={(e) => this.handleChangeAuthFormTo(e, 'logIn')}
               >
                 Log In
               </a>
@@ -625,7 +633,7 @@ class AuthView extends React.Component {
               <a
                 className='SignUpViewOptionsLink'
                 href='#logIn'
-                onClick={(evt) => this.setState({ view: 'logIn' })}
+                onClick={(e) => this.handleChangeAuthFormTo(e, 'logIn')}
               >
                 Log In
               </a>
