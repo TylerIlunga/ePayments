@@ -11,7 +11,7 @@ class AuthView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'logIn',
+      view: 'signUp',
       signUpLogInForm: {
         email: '',
         password: '',
@@ -370,65 +370,6 @@ class AuthView extends React.Component {
       });
   }
 
-  renderSignUpView() {
-    return (
-      <div className='AuthViewFormContainer col-4'>
-        <div className='SignUpViewHeader'>
-          <h1>Sign Up</h1>
-        </div>
-        <div className='SignUpViewFormContainer'>
-          <form className='SignUpViewForm'>
-            <label className='SignUpViewFormEmailLabel'>Email Address:</label>
-            <input
-              className='SignUpViewFormEmailInput'
-              type='text'
-              value={this.state.signUpLogInForm.email}
-              onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
-              placeholder={'w@xyz.com'}
-            />
-            <label className='SignUpViewFormPasswordLabel'>Password:</label>
-            <input
-              className='SignUpViewFormPasswordInput'
-              type='password'
-              value={this.state.signUpLogInForm.password}
-              onChange={(evt) => this.updateSignUpLogInForm(evt, 'password')}
-              placeholder={'************'}
-            />
-            <label className='SignUpViewFormPasswordLabel'>
-              Confirm Password:
-            </label>
-            <input
-              className='SignUpViewFormPasswordInput'
-              type='password'
-              value={this.state.signUpLogInForm.confirmPassword}
-              onChange={(evt) =>
-                this.updateSignUpLogInForm(evt, 'confirmPassword')
-              }
-              placeholder={'************'}
-            />
-            <input
-              className='SignUpViewFormCreateButton'
-              type='button'
-              value='Create Account'
-              onClick={this.signNewUserUp}
-            />
-          </form>
-        </div>
-        <div className='SignUpViewOptionsContainer'>
-          <div className='SignUpViewOptionsLinkContainer'>
-            <a
-              className='SignUpViewOptionsLink'
-              href='#logIn'
-              onClick={(evt) => this.setState({ view: 'logIn' })}
-            >
-              Log In
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   renderLogInView() {
     return (
       <div className='AuthViewFormContainer col-sm-4 col-12'>
@@ -444,7 +385,6 @@ class AuthView extends React.Component {
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
               placeholder='Email Address'
             />
-            <br />
             <input
               className='AuthViewFormInput'
               type='password'
@@ -452,7 +392,6 @@ class AuthView extends React.Component {
               onChange={(evt) => this.updateSignUpLogInForm(evt, 'password')}
               placeholder='Password'
             />
-            <br />
             <input
               className='AuthViewFormButton'
               type='button'
@@ -485,36 +424,30 @@ class AuthView extends React.Component {
 
   renderActivateAccountView() {
     return (
-      <div className='AuthViewFormContainer col-4'>
-        <div className='ActivateAccountViewHeader'>
-          <h1>Activate Account</h1>
-        </div>
-        <div className='ActivateAccountViewFormContainer'>
-          <form className='ActivateAccountViewForm'>
-            <label className='ActivateAccountViewFormEmailLabel'>
-              Email Address:
-            </label>
+      <div className='AuthViewFormContainer col-sm-4 col-12'>
+        <div className='AuthViewFormRow row'>
+          <div className='AuthViewFormHeader'>
+            <p>Activate Account</p>
+          </div>
+          <form className='AuthViewForm'>
             <input
-              className='ActivateAccountViewFormEmailInput'
+              className='AuthViewFormInput'
               type='text'
               value={this.state.activateAccountForm.email}
               onChange={(evt) => this.updateActivateAccountForm(evt, 'email')}
-              placeholder={'w@xyz.com'}
+              placeholder='Email Address'
             />
-            <label className='ActivateAccountViewFormPasswordLabel'>
-              Activation Token:
-            </label>
             <input
-              className='ActivateAccountViewFormPasswordInput'
+              className='AuthViewFormInput'
               type='text'
               value={this.state.activateAccountForm.activationToken}
               onChange={(evt) =>
                 this.updateActivateAccountForm(evt, 'activationToken')
               }
-              placeholder={'38239ds32msaDSj239asnma...'}
+              placeholder='Activation Token'
             />
             <input
-              className='ActivateAccountViewFormActivateButton'
+              className='AuthViewFormButton'
               type='button'
               value='Activate'
               onClick={this.activateUsersAccount}
@@ -527,49 +460,44 @@ class AuthView extends React.Component {
 
   renderForgotPasswordView() {
     return (
-      <div className='AuthViewFormContainer col-4'>
-        <div className='ForgotPasswordViewHeader'>
-          <h1>Forgot Password</h1>
-        </div>
-        <div className='ForgotPasswordViewFormContainer'>
-          <form className='ForgotPasswordViewForm'>
-            <label className='ForgotPasswordViewFormEmailLabel'>
-              Email Address:
-            </label>
+      <div className='AuthViewFormContainer col-sm-4 col-12'>
+        <div className='AuthViewFormRow row'>
+          <div className='AuthViewFormHeader'>
+            <p>Forgot Password</p>
+          </div>
+          <form className='AuthViewForm'>
             <input
-              className='ForgotPasswordViewFormEmailInput'
+              className='AuthViewFormInput'
               type='text'
               value={this.state.forgotPasswordForm.email}
               onChange={(evt) => this.updateForgotPasswordForm(evt, 'email')}
-              placeholder={'w@xyz.com'}
+              placeholder='Email Address'
             />
             <input
-              className='ForgotPasswordViewFormSubmitButton'
+              className='AuthViewFormButton'
               type='button'
               value='Submit'
               onClick={this.sendResetPasswordToken}
             />
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='ForgotPasswordViewOptionsLink'
+                href='#signUp'
+                onClick={(evt) => this.setState({ view: 'signUp' })}
+              >
+                Sign Up
+              </a>
+            </div>
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='ForgotPasswordViewOptionsLink'
+                href='#logIn'
+                onClick={(evt) => this.setState({ view: 'logIn' })}
+              >
+                Log In
+              </a>
+            </div>
           </form>
-        </div>
-        <div className='ForgotPasswordViewOptionsContainer'>
-          <div className='ForgotPasswordViewOptionsLinkContainer'>
-            <a
-              className='ForgotPasswordViewOptionsLink'
-              href='#signUp'
-              onClick={(evt) => this.setState({ view: 'signUp' })}
-            >
-              Sign Up
-            </a>
-          </div>
-          <div className='ForgotPasswordViewOptionsLinkContainer'>
-            <a
-              className='ForgotPasswordViewOptionsLink'
-              href='#logIn'
-              onClick={(evt) => this.setState({ view: 'logIn' })}
-            >
-              Log In
-            </a>
-          </div>
         </div>
       </div>
     );
@@ -577,97 +505,132 @@ class AuthView extends React.Component {
 
   renderResetPasswordView() {
     return (
-      <div className='AuthViewFormContainer col-4'>
-        <div className='ResetPasswordViewHeader'>
-          <h1>Reset Password</h1>
-        </div>
-        <div className='ResetPasswordViewFormContainer'>
-          <form className='ResetPasswordViewForm'>
-            <label className='ResetPasswordViewFormEmailLabel'>
-              Email Address:
-            </label>
+      <div className='AuthViewFormContainer col-sm-4 col-12'>
+        <div className='AuthViewFormRow row'>
+          <div className='AuthViewFormHeader'>
+            <p>Reset Password</p>
+          </div>
+          <form className='AuthViewForm'>
             <input
-              className='ResetPasswordViewFormEmailInput'
+              className='AuthViewFormInput'
               type='text'
               value={this.state.resetPasswordForm.email}
               onChange={(evt) => this.updateResetPasswordForm(evt, 'email')}
-              placeholder={'w@xyz.com'}
+              placeholder='Email Address'
             />
-            <label className='ResetPasswordViewFormEmailLabel'>
-              Reset Token:
-            </label>
             <input
-              className='ResetPasswordViewFormResetTokenInput'
+              className='AuthViewFormInput'
               type='text'
               value={this.state.resetPasswordForm.resetPasswordToken}
               onChange={(evt) =>
                 this.updateResetPasswordForm(evt, 'resetPasswordToken')
               }
-              placeholder={'38239ds32msaDSj239asnma...'}
+              placeholder='Reset Token'
             />
-            <label className='ResetPasswordViewFormOldPasswordLabel'>
-              Old Password:
-            </label>
             <input
-              className='ResetPasswordViewFormOldPasswordInput'
+              className='AuthViewFormInput'
               type='password'
               value={this.state.resetPasswordForm.oldPassword}
               onChange={(evt) =>
                 this.updateResetPasswordForm(evt, 'oldPassword')
               }
-              placeholder={'************'}
+              placeholder='Old Password'
             />
-            <label className='ResetPasswordViewFormNewPasswordLabel'>
-              New Password:
-            </label>
             <input
-              className='ResetPasswordViewFormNewPasswordInput'
+              className='AuthViewFormInput'
               type='password'
               value={this.state.resetPasswordForm.newPassword}
               onChange={(evt) =>
                 this.updateResetPasswordForm(evt, 'newPassword')
               }
-              placeholder={'************'}
+              placeholder='New Password'
             />
-            <label className='ResetPasswordViewFormConfirmPasswordLabel'>
-              Confirm Password:
-            </label>
             <input
-              className='ResetPasswordViewFormConfirmPasswordInput'
+              className='AuthViewFormInput'
               type='password'
               value={this.state.resetPasswordForm.confirmPassword}
               onChange={(evt) =>
                 this.updateResetPasswordForm(evt, 'confirmPassword')
               }
-              placeholder={'************'}
+              placeholder='Confirm Password'
             />
             <input
-              className='ResetPasswordViewFormSubmitButton'
+              className='AuthViewFormButton'
               type='button'
               value='Submit'
               onClick={this.resetUsersPassword}
             />
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='ResetPasswordViewOptionsLink'
+                href='#signUp'
+                onClick={(evt) => this.setState({ view: 'signUp' })}
+              >
+                Sign Up
+              </a>
+            </div>
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='ResetPasswordViewOptionsLink'
+                href='#logIn'
+                onClick={(evt) => this.setState({ view: 'logIn' })}
+              >
+                Log In
+              </a>
+            </div>
           </form>
         </div>
-        <div className='ResetPasswordViewOptionsContainer'>
-          <div className='ResetPasswordViewOptionsLinkContainer'>
-            <a
-              className='ResetPasswordViewOptionsLink'
-              href='#signUp'
-              onClick={(evt) => this.setState({ view: 'signUp' })}
-            >
-              Sign Up
-            </a>
+      </div>
+    );
+  }
+
+  renderSignUpView() {
+    return (
+      <div className='AuthViewFormContainer col-sm-4 col-12'>
+        <div className='AuthViewFormRow row'>
+          <div className='AuthViewFormHeader'>
+            <p>Sign Up</p>
           </div>
-          <div className='ResetPasswordViewOptionsLinkContainer'>
-            <a
-              className='ResetPasswordViewOptionsLink'
-              href='#logIn'
-              onClick={(evt) => this.setState({ view: 'logIn' })}
-            >
-              Log In
-            </a>
-          </div>
+          <form className='AuthViewForm'>
+            <input
+              className='AuthViewFormInput'
+              type='text'
+              value={this.state.signUpLogInForm.email}
+              onChange={(evt) => this.updateSignUpLogInForm(evt, 'email')}
+              placeholder='Email Address'
+            />
+            <input
+              className='AuthViewFormInput'
+              type='password'
+              value={this.state.signUpLogInForm.password}
+              onChange={(evt) => this.updateSignUpLogInForm(evt, 'password')}
+              placeholder='Password'
+            />
+            <input
+              className='AuthViewFormInput'
+              type='password'
+              value={this.state.signUpLogInForm.confirmPassword}
+              onChange={(evt) =>
+                this.updateSignUpLogInForm(evt, 'confirmPassword')
+              }
+              placeholder='Confirm Password'
+            />
+            <input
+              className='AuthViewFormButton'
+              type='button'
+              value='Create Account'
+              onClick={this.signNewUserUp}
+            />
+            <div className='AuthViewOptionsLinkContainer'>
+              <a
+                className='SignUpViewOptionsLink'
+                href='#logIn'
+                onClick={(evt) => this.setState({ view: 'logIn' })}
+              >
+                Log In
+              </a>
+            </div>
+          </form>
         </div>
       </div>
     );
