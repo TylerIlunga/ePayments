@@ -1,8 +1,8 @@
 {
-  "name": "Auth",
+  "name": "ePaymentsAPI",
   "version": "1.0.0",
-  "description": "Web service for Authentication",
-  "main": "app.js",
+  "description": "The API for ePayments",
+  "main": "./src/server",
   "scripts": {
     "start": "node ./src/server",
     "dev": "nodemon ./src/server",
@@ -22,7 +22,6 @@
     "express": "^4.17.1",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
-    "mobile-detect": "^1.4.4",
     "morgan": "^1.9.1",
     "pg": "^8.5.1",
     "pq": "0.0.3",
