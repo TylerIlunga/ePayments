@@ -5,13 +5,8 @@
 const axios = require('axios');
 const rax = require('retry-axios');
 const Errors = require('../errors');
-const MobileDetect = require('mobile-detect');
 
 module.exports = {
-  requestIsFromMobileDevice(req) {
-    const userAgent = req.headers['user-agent'];
-    return userAgent ? new MobileDetect(userAgent).mobile() : null;
-  },
   request({ method, url, headers, body, timeout, meta }) {
     return axios({
       method,
