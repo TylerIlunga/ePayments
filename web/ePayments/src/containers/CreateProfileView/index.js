@@ -23,20 +23,12 @@ class CreateProfileView extends React.Component {
     };
     this.ProfileService = new ProfileService();
     this.displayToastMessage = toastUtils.displayToastMessage;
+    this.profileTypeIsActive = this.profileTypeIsActive.bind(this);
     this.validInput = this.validInput.bind(this);
     this.updateProfileForm = this.updateProfileForm.bind(this);
     this.createNewProfile = this.createNewProfile.bind(this);
     this.renderBusinessProfileForm = this.renderBusinessProfileForm.bind(this);
     this.renderCustomerProfileForm = this.renderCustomerProfileForm.bind(this);
-  }
-
-  imageToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
   }
 
   async updateProfileForm(evt, formType, field) {
@@ -113,58 +105,13 @@ class CreateProfileView extends React.Component {
       });
   }
 
-  renderBusinessProfileForm() {
-    return (
-      <div className='CreateProfileViewBusinessFormContainer'>
-        <form className='CreateProfileViewForm'>
-          <label>Public Email Address:</label>
-          <input
-            className='CreateProfileViewBusinessFormEmailInput'
-            type='text'
-            value={this.state.businessProfileForm.publicEmail}
-            onChange={(evt) =>
-              this.updateProfileForm(evt, 'businessProfileForm', 'publicEmail')
-            }
-            placeholder={'w@xyz.com'}
-          />
-          <label>Public Phone Number:</label>
-          <input
-            className='CreateProfileViewBusinessFormPhoneInput'
-            type='text'
-            value={this.state.businessProfileForm.phoneNumber}
-            onChange={(evt) =>
-              this.updateProfileForm(evt, 'businessProfileForm', 'phoneNumber')
-            }
-            placeholder={'+1 123-456-7890'}
-          />
-          <label>Public Address:</label>
-          <input
-            className='CreateProfileViewBusinessFormAddressInput'
-            type='text'
-            value={this.state.businessProfileForm.address}
-            onChange={(evt) =>
-              this.updateProfileForm(evt, 'businessProfileForm', 'address')
-            }
-            placeholder={'123 First Street Applewood, CA 90001'}
-          />
-          <input
-            className='SignUpViewFormCreateButton'
-            type='button'
-            value='Create Profile'
-            onClick={(evt) => this.createNewProfile(evt, 'Business')}
-          />
-        </form>
-      </div>
-    );
-  }
-
   renderCustomerProfileForm() {
     return (
-      <div className='CreateProfileViewCustomerFormContainer'>
+      <div className='CreateProfileViewFormContainer'>
         <form className='CreateProfileViewForm'>
-          <label>Country:</label>
+          <label className='CreateProfileViewFormLabel'>Country:</label>
           <select
-            className='CreateProfileViewCustomerFormPhoneInput'
+            className='CreateProfileViewFormSelectInput'
             value={this.state.customerProfileForm.country}
             onChange={(evt) =>
               this.updateProfileForm(evt, 'customerProfileForm', 'country')
@@ -176,9 +123,9 @@ class CreateProfileView extends React.Component {
               </option>
             ))}
           </select>
-          <label>Public Username:</label>
+          <label className='CreateProfileViewFormLabel'>Public Username:</label>
           <input
-            className='CreateProfileViewCustomerFormAddressInput'
+            className='CreateProfileViewFormInput'
             type='text'
             value={this.state.customerProfileForm.username}
             onChange={(evt) =>
@@ -187,7 +134,7 @@ class CreateProfileView extends React.Component {
             placeholder={'coinperson123'}
           />
           <input
-            className='SignUpViewFormCreateButton'
+            className='CreateProfileViewFormButton'
             type='button'
             value='Create Profile'
             onClick={(evt) => this.createNewProfile(evt, 'Customer')}
@@ -197,33 +144,110 @@ class CreateProfileView extends React.Component {
     );
   }
 
+  renderBusinessProfileForm() {
+    return (
+      <div className='CreateProfileViewFormContainer'>
+        <form className='CreateProfileViewForm'>
+          <label className='CreateProfileViewFormLabel'>
+            Public Email Address:
+          </label>
+          <input
+            className='CreateProfileViewFormInput'
+            type='text'
+            value={this.state.businessProfileForm.publicEmail}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'publicEmail')
+            }
+            placeholder={'w@xyz.com'}
+          />
+          <label className='CreateProfileViewFormLabel'>
+            Public Phone Number:
+          </label>
+          <input
+            className='CreateProfileViewFormInput'
+            type='text'
+            value={this.state.businessProfileForm.phoneNumber}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'phoneNumber')
+            }
+            placeholder={'+1 123-456-7890'}
+          />
+          <label className='CreateProfileViewFormLabel'>Public Address:</label>
+          <input
+            className='CreateProfileViewFormInput'
+            type='text'
+            value={this.state.businessProfileForm.address}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'address')
+            }
+            placeholder={'123 First Street Applewood, CA 90001'}
+          />
+          <input
+            className='CreateProfileViewFormButton'
+            type='button'
+            value='Create Profile'
+            onClick={(evt) => this.createNewProfile(evt, 'Business')}
+          />
+        </form>
+      </div>
+    );
+  }
+
   renderFormOption() {
     switch (this.state.view) {
-      case 'business':
-        return this.renderBusinessProfileForm();
-      default:
+      case 'customer':
         return this.renderCustomerProfileForm();
+      default:
+        return this.renderBusinessProfileForm();
     }
+  }
+
+  renderCreateProfileHeader() {
+    return (
+      <div className='CreateProfileHeaderContainer row'>
+        <p>Create your Profile</p>
+      </div>
+    );
+  }
+
+  profileTypeIsActive(profileType) {
+    if (this.state.view === profileType) {
+      return 'CreateProfileViewFormOptionActive';
+    }
+    return '';
+  }
+
+  renderUserTypeOptions() {
+    return (
+      <div className='CreateProfileViewFormOptionsContainer row'>
+        <div
+          className={`CreateProfileViewFormOption col-6 ${this.profileTypeIsActive(
+            'customer',
+          )}`}
+          onClick={(evt) => this.setState({ view: 'customer' })}
+        >
+          <p>Customer</p>
+        </div>
+        <div
+          className={`CreateProfileViewFormOption col-6 ${this.profileTypeIsActive(
+            'business',
+          )}`}
+          onClick={(evt) => this.setState({ view: 'business' })}
+        >
+          <p>Business</p>
+        </div>
+      </div>
+    );
   }
 
   render() {
     return (
       <div className='MainCreateProfileViewContainer'>
-        <div className='CreateProfileViewFormOptions'>
-          <div
-            className='CreateProfileViewFormOption'
-            onClick={(evt) => this.setState({ view: 'customer' })}
-          >
-            Customer
-          </div>
-          <div
-            className='CreateProfileViewFormOption'
-            onClick={(evt) => this.setState({ view: 'business' })}
-          >
-            Business
-          </div>
+        <div className='MainCreateProfileViewRow row'>
+          {this.renderCreateProfileHeader()}
+          {this.renderUserTypeOptions()}
+          {this.renderFormOption()}
         </div>
-        {this.renderFormOption()}
       </div>
     );
   }

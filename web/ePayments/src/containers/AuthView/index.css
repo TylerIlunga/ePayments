@@ -65,9 +65,14 @@
   width: 100%;
   padding: 5px;
   margin: 10px 0px;
-  outline: 0;
   border-width: 0 0 1px;
   border-color: black;
+}
+
+.AuthViewFormInput:focus {
+  transition: border-color 1s;
+  border-width: 0 0 2px;
+  border-color: red;
 }
 
 .AuthViewFormButton {
