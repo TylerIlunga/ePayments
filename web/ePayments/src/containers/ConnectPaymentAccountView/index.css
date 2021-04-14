@@ -1,0 +1,63 @@
+.MainConnectPAViewContainer {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+.MainConnectPAViewRow {
+  margin: 0px;
+  width: 66.667%;
+  height: 75%;
+}
+
+.MainConnectPAViewHeader {
+  margin: 0px;
+  height: 10%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  /* background-color: red; */
+}
+
+.MainConnectPAViewHeader p {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.MainConnectPAViewOptionsContainer {
+  margin: 0px;
+  padding: 0px;
+  height: 90%;
+  width: 100%;
+  justify-content: center;
+  /* background-color: lightblue; */
+}
+
+.MainConnectPAViewOptionButton {
+  width: 66.667%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border: solid 2px white;
+  border-radius: 5px;
+  background: rgb(22, 82, 240);
+  margin-top: 40px;
+  color: white;
+}
+
+.MainConnectPAViewOptionButton:hover {
+  background: white;
+  color: rgb(22, 82, 240);
+}
+
+.MainConnectPAViewOptionButton p {
+  font-size: 15px;
+  font-weight: 900;
+}

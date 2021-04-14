@@ -92,15 +92,17 @@ class ConnectPaymentAccountView extends React.Component {
   render() {
     return (
       <div className='MainConnectPAViewContainer'>
-        <div className='MainConnectPAViewHeader'>
-          <p>Choose which payment service you would like to connect to</p>
-        </div>
-        <div className='MainConnectPAViewOptionsContainer'>
-          <div
-            className='MainConnectPAViewOption'
-            onClick={this.startCoinbaseOAuth}
-          >
-            <p>Coinbase</p>
+        <div className='MainConnectPAViewRow row'>
+          <div className='MainConnectPAViewHeader row'>
+            <p>Select a payment service:</p>
+          </div>
+          <div className='MainConnectPAViewOptionsContainer row'>
+            <div
+              className='MainConnectPAViewOptionButton'
+              onClick={this.startCoinbaseOAuth}
+            >
+              <p>Coinbase</p>
+            </div>
           </div>
         </div>
       </div>
