@@ -77,14 +77,14 @@ const Router = (props) => {
             exact
           />
           <Route
-            path='/profile/create*'
+            path='/profile/create'
             component={(h) =>
               handleProtectedRoutes(h, props, cookieOpts, CreateProfileView)
             }
             exact
           />
           <Route
-            path='/payments/connect*'
+            path='/payments/connect'
             component={(h) =>
               handleProtectedRoutes(
                 h,
@@ -96,7 +96,7 @@ const Router = (props) => {
             exact
           />
           <Route
-            path='/h/transactions*'
+            path='/h/transactions'
             component={(h) =>
               handleProtectedRoutes(h, props, cookieOpts, TransactionsView)
             }

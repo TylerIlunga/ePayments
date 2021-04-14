@@ -1,7 +1,12 @@
 import React from 'react';
+import './index.css';
 
 const PageNotFoundView = () => {
-  return <h1>404 Page Not Found</h1>;
+  return (
+    <div className='MainPageNotFoundViewContainer'>
+      <p>404: Page Not Found :(</p>
+    </div>
+  );
 };
 
 export default PageNotFoundView;

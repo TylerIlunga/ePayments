@@ -1,0 +1,14 @@
+.MainPageNotFoundViewContainer {
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.MainPageNotFoundViewContainer p {
+  font-size: 40px;
+  font-weight: 400;
+  color: white;
+}
