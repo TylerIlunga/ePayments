@@ -55,6 +55,7 @@
 .MainConnectPAViewOptionButton:hover {
   background: white;
   color: rgb(22, 82, 240);
+  cursor: pointer;
 }
 
 .MainConnectPAViewOptionButton p {
