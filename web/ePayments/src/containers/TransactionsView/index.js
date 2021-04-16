@@ -55,9 +55,6 @@ class TransactionsView extends React.Component {
     this.renderSelectedTransactionDetails = this.renderSelectedTransactionDetails.bind(
       this,
     );
-    this.returnToListOfTransactions = this.returnToListOfTransactions.bind(
-      this,
-    );
     this.renderListOfTransactions = this.renderListOfTransactions.bind(this);
     this.renderTransactionsView = this.renderTransactionsView.bind(this);
   }
@@ -136,6 +133,9 @@ class TransactionsView extends React.Component {
     if (this.state.loadingTableData) {
       return <p className='TransactionsHeaderLabel'>Loading...</p>;
     }
+    if (this.state.view === 'details') {
+      return <p className='TransactionsHeaderLabel'>Transaction Details</p>;
+    }
     return <p className='TransactionsHeaderLabel'>Transactions</p>;
   }
 
@@ -182,7 +182,7 @@ class TransactionsView extends React.Component {
     console.log('evt, rowData:', evt, rowData);
     rowData.tableData = null;
     delete rowData.tableData;
-    this.setState({ selectedTransaction: rowData, view: 'view' });
+    this.setState({ selectedTransaction: rowData, view: 'details' });
   }
 
   renderTransactionTable() {
@@ -203,10 +203,10 @@ class TransactionsView extends React.Component {
   renderListOfTransactions() {
     return (
       <div className='TransactionsViewContentContainer col-sm-11 col-12'>
-        <div className='TransactionsViewTransactionsHeaderContainer'>
+        <div className='TransactionsViewContentHeaderContainer'>
           {this.renderTableHeader()}
         </div>
-        <div className='TransactionsViewTransactionsTableContainer'>
+        <div className='TransactionsViewContentTableContainer'>
           {this.renderTransactionTable()}
         </div>
       </div>
@@ -214,10 +214,25 @@ class TransactionsView extends React.Component {
   }
 
   renderTransactionTextInformation(transaction) {
+    // businessId, customerId, productId
+    delete transaction.business_id;
+    delete transaction.customer_id;
+    delete transaction.product_id;
+
     return Object.keys(transaction).map((field, i) => {
-      const heading = stringUtils.snakeToCamel(field);
-      if (heading === 'createdAt') {
+      let heading = '';
+      const headingSplit = field.split('_');
+      if (headingSplit.length === 1) {
+        heading = stringUtils.capitalize(field);
+      } else {
+        headingSplit.forEach((word) => {
+          heading += `${stringUtils.capitalize(word)} `;
+        });
+        heading = heading.trim();
+      }
+      if (field === 'created_at') {
         transaction[field] = new Date(Number(transaction[field])).toUTCString();
+        heading = 'Date';
       }
       return (
         <p key={i}>
@@ -227,38 +242,34 @@ class TransactionsView extends React.Component {
     });
   }
 
-  returnToListOfTransactions(evt) {
-    evt.preventDefault();
-    this.setState({
-      view: 'list',
-      selectedTransaction: null,
-    });
+  renderTransactionLocation(transaction) {
+    // TODO: https://developers.google.com/maps/documentation/embed/get-started
+    if (
+      transaction.latitude &&
+      transaction.longitude &&
+      transaction.latitude > 0 &&
+      transaction.longitude > 0
+    ) {
+      return <div>Google Map here</div>;
+    }
   }
 
   renderSelectedTransactionDetails() {
-    // amount: 37.5
-    // business_id: 7
-    // coinbase_transaction_id: "cbTransactionResult.id"
-    // created_at: "1618013607611"
-    // currency: "BTC"
-    // customer_id: 8
-    // id: "1cf2d5fd-d3ec-48a1-a4ba-eab90f6ee945"
-    // latitude: "0"
-    // longitude: "0"
-    // product_category: "water"
-    // product_id: 3
-    // quantity: 25
-    // tableData: {id: 0}
-    // token_amount: "${cbTransactionResult.amount.amount}"
     return (
       <div className='TransactionsViewContentContainer col-sm-11 col-12'>
-        {this.renderTransactionTextInformation(this.state.selectedTransaction)}
-        <button
-          className='TransactionsViewSelectedTransactionExitButton'
-          onClick={this.returnToListOfTransactions}
-        >
-          Exit
-        </button>
+        <div className='TransactionsViewContentHeaderContainer row'>
+          {this.renderTableHeader()}
+        </div>
+        <div className='TransactionViewDetailsContainer row'>
+          <div className='TransactionViewDetailsLabelContainer col-6'>
+            {this.renderTransactionTextInformation(
+              this.state.selectedTransaction,
+            )}
+          </div>
+          <div className='TransactionViewDetailsMapContainer col-6'>
+            {this.renderTransactionLocation(this.state.selectedTransaction)}
+          </div>
+        </div>
       </div>
     );
   }
