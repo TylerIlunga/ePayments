@@ -12,6 +12,7 @@ class TransactionsView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayMobileMenuModal: false,
       view: 'list',
       selectedTransaction: null,
       loadingTableData: true,
@@ -41,6 +42,9 @@ class TransactionsView extends React.Component {
 
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessTransactionService = new BusinessTransactionService();
+    this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
+      this,
+    );
     this.fetchTransactions = this.fetchTransactions.bind(this);
     this.renderMenuColumn = this.renderMenuColumn.bind(this);
     this.renderTableHeader = this.renderTableHeader.bind(this);
@@ -98,14 +102,28 @@ class TransactionsView extends React.Component {
       });
   }
 
-  renderBrandRow() {
-    return <BrandHeader history={this.props.history} />;
+  handleToggleMobileMenuModal(e) {
+    e.preventDefault();
+    this.setState({
+      displayMobileMenuModal: !this.state.displayMobileMenuModal,
+    });
   }
 
-  renderMenuColumn() {
+  renderBrandRow() {
+    return (
+      <BrandHeader
+        history={this.props.history}
+        displayMobileMenuModal={this.state.displayMobileMenuModal}
+        onToggleMobileMenuModal={this.handleToggleMobileMenuModal}
+      />
+    );
+  }
+
+  renderMenuColumn(isMobile) {
     return (
       <DashboardMenu
-        colSize='col-1'
+        isMobile={isMobile}
+        colSize='col-sm-1'
         activeOption='Transactions'
         user={this.props.user}
         history={this.props.history}
@@ -184,7 +202,7 @@ class TransactionsView extends React.Component {
 
   renderListOfTransactions() {
     return (
-      <div className='TransactionsViewContentContainer col-11'>
+      <div className='TransactionsViewContentContainer col-sm-11 col-12'>
         <div className='TransactionsViewTransactionsHeaderContainer'>
           {this.renderTableHeader()}
         </div>
@@ -233,7 +251,7 @@ class TransactionsView extends React.Component {
     // tableData: {id: 0}
     // token_amount: "${cbTransactionResult.amount.amount}"
     return (
-      <div className='TransactionsViewContentContainer col-11'>
+      <div className='TransactionsViewContentContainer col-sm-11 col-12'>
         {this.renderTransactionTextInformation(this.state.selectedTransaction)}
         <button
           className='TransactionsViewSelectedTransactionExitButton'
@@ -253,11 +271,21 @@ class TransactionsView extends React.Component {
   }
 
   render() {
+    if (this.state.displayMobileMenuModal) {
+      return (
+        <div className='MainTransactionsViewContainer row'>
+          {this.renderBrandRow()}
+          <div className='TransactionsViewMenuContentContainer row'>
+            {this.renderMenuColumn(true)}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='MainTransactionsViewContainer row'>
         {this.renderBrandRow()}
         <div className='TransactionsViewMenuContentContainer row'>
-          {this.renderMenuColumn()}
+          {this.renderMenuColumn(false)}
           {this.renderTransactionsView()}
         </div>
       </div>

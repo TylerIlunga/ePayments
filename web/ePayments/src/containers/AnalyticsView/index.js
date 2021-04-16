@@ -2,17 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import config from '../../config';
+import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
-import BrandHeader from '../../components/BrandHeader';
 
 class AnalyticsView extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      displayMobileMenuModal: false,
       loading: true,
       transactions: [],
       reportTypes: [
@@ -54,6 +55,9 @@ class AnalyticsView extends React.Component {
 
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessTransactionService = new BusinessTransactionService();
+    this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
+      this,
+    );
     this.renderAnalyticsViewHeader = this.renderAnalyticsViewHeader.bind(this);
     this.renderAnalyticsViewOptions = this.renderAnalyticsViewOptions.bind(
       this,
@@ -747,14 +751,28 @@ class AnalyticsView extends React.Component {
     );
   }
 
-  renderBrandRow() {
-    return <BrandHeader history={this.props.history} />;
+  handleToggleMobileMenuModal(e) {
+    e.preventDefault();
+    this.setState({
+      displayMobileMenuModal: !this.state.displayMobileMenuModal,
+    });
   }
 
-  renderMenuColumn() {
+  renderBrandRow() {
+    return (
+      <BrandHeader
+        history={this.props.history}
+        displayMobileMenuModal={this.state.displayMobileMenuModal}
+        onToggleMobileMenuModal={this.handleToggleMobileMenuModal}
+      />
+    );
+  }
+
+  renderMenuColumn(isMobile) {
     return (
       <DashboardMenu
-        colSize='col-1'
+        isMobile={isMobile}
+        colSize='col-sm-1'
         activeOption='Analytics'
         user={this.props.user}
         history={this.props.history}
@@ -765,7 +783,7 @@ class AnalyticsView extends React.Component {
 
   renderAnalyticsView() {
     return (
-      <div className='AnalyticsViewContainer col-11'>
+      <div className='AnalyticsViewContentContainer col-sm-11 col-12'>
         {this.renderAnalyticsViewHeader()}
         {this.renderAnalyticsViewOptions()}
         {this.renderAnalyticsViewCharts()}
@@ -774,11 +792,21 @@ class AnalyticsView extends React.Component {
   }
 
   render() {
+    if (this.state.displayMobileMenuModal) {
+      return (
+        <div className='MainTransactionsViewContainer row'>
+          {this.renderBrandRow()}
+          <div className='TransactionsViewMenuContentContainer row'>
+            {this.renderMenuColumn(true)}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='MainAnalyticsViewContainer row'>
         {this.renderBrandRow()}
         <div className='AnalyticsViewMenuContentContainer row'>
-          {this.renderMenuColumn()}
+          {this.renderMenuColumn(false)}
           {this.renderAnalyticsView()}
         </div>
       </div>

@@ -8,10 +8,40 @@
   color: white;
 }
 
-.BrandHeaderRow a {
+.BrandHeaderRowLabelContainer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.BrandHeaderRowLabelContainer a {
   font-size: 20px;
   font-weight: 900;
   padding: 0px;
   text-decoration: none;
   color: white;
+}
+
+.BrandHeaderRowMenuContainer {
+  display: none;
+}
+
+@media screen and (max-width: 1100px) {
+  .BrandHeaderRow {
+    padding: 0px 10px;
+  }
+  .BrandHeaderRowLabelContainer {
+    width: 50%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .BrandHeaderRowMenuContainer {
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
 }

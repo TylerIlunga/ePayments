@@ -15,6 +15,10 @@ const DashboardMenu = (props) => {
     { logo: <SettingsApplicationsRoundedIcon />, label: 'Settings' },
   ];
 
+  const appendMobileStyleAttribute = (isMobile) => {
+    return !isMobile ? '' : '-Mobile';
+  };
+
   const evaluateSegueAction = (view) => {
     console.log('evaluateSegueAction();', props.user.type, view);
     if (
@@ -52,7 +56,11 @@ const DashboardMenu = (props) => {
   };
 
   return (
-    <div className={`MainDashboardMenuContainer ${props.colSize}`}>
+    <div
+      className={`MainDashboardMenuContainer${appendMobileStyleAttribute(
+        props.isMobile,
+      )} ${props.colSize}`}
+    >
       {menuOptions.map((option, i) => {
         return (
           <div
@@ -66,7 +74,7 @@ const DashboardMenu = (props) => {
                 props.activeOption,
               )}`}
             >
-              {/* <div className='DashboardMenuColOptionChild'>{option.logo}</div> */}
+              {/* TODO: Include or NOT: <div className='DashboardMenuColOptionChild'>{option.logo}</div> */}
               <p>{option.label}</p>
             </div>
           </div>

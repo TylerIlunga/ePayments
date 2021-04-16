@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
 import DataTable from '../../components/DataTable';
 import BusinessProductService from '../../services/BusinessProductService';
@@ -7,7 +8,6 @@ import BusinessTransactionService from '../../services/BusinessTransactionServic
 import toastUtils from '../../utils/Toasts';
 import stringUtils from '../../utils/Strings';
 import './index.css';
-import BrandHeader from '../../components/BrandHeader';
 
 // TODO: Add CreateProduct feature
 class ProductsView extends React.Component {
@@ -28,6 +28,7 @@ class ProductsView extends React.Component {
     }
 
     this.state = {
+      displayMobileMenuModal: false,
       selectedProduct,
       view,
       newProductData: {
@@ -87,6 +88,9 @@ class ProductsView extends React.Component {
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessProductService = new BusinessProductService();
     this.BusinessTransactionService = new BusinessTransactionService();
+    this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
+      this,
+    );
     this.fetchProducts = this.fetchProducts.bind(this);
     this.fetchProductTransactions = this.fetchProductTransactions.bind(this);
     this.renderViewHeader = this.renderViewHeader.bind(this);
@@ -179,14 +183,28 @@ class ProductsView extends React.Component {
       });
   }
 
-  renderBrandRow() {
-    return <BrandHeader history={this.props.history} />;
+  handleToggleMobileMenuModal(e) {
+    e.preventDefault();
+    this.setState({
+      displayMobileMenuModal: !this.state.displayMobileMenuModal,
+    });
   }
 
-  renderMenuColumn() {
+  renderBrandRow() {
+    return (
+      <BrandHeader
+        history={this.props.history}
+        displayMobileMenuModal={this.state.displayMobileMenuModal}
+        onToggleMobileMenuModal={this.handleToggleMobileMenuModal}
+      />
+    );
+  }
+
+  renderMenuColumn(isMobile) {
     return (
       <DashboardMenu
-        colSize='col-1'
+        isMobile={isMobile}
+        colSize='col-sm-1'
         activeOption='Products'
         user={this.props.user}
         history={this.props.history}
@@ -396,7 +414,7 @@ class ProductsView extends React.Component {
 
   renderListOfProducts() {
     return (
-      <div className='ProductsViewContainer col-11'>
+      <div className='ProductsViewContentContainer col-sm-11 col-12'>
         <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
@@ -670,7 +688,7 @@ class ProductsView extends React.Component {
 
   renderCreateProductForm() {
     return (
-      <div className='ProductViewDetailsMainContainer col-11'>
+      <div className='ProductsViewContentContainer col-sm-11 col-12'>
         <div className='ProductViewDetailsHeaderContainer'>
           {this.renderViewHeader()}
         </div>
@@ -723,7 +741,7 @@ class ProductsView extends React.Component {
 
   renderSelectedProductDetails() {
     return (
-      <div className='ProductViewDetailsMainContainer col-11'>
+      <div className='ProductsViewContentContainer col-sm-11 col-12'>
         <div className='ProductViewDetailsHeaderContainer'>
           {this.renderViewHeader()}
         </div>
@@ -748,11 +766,21 @@ class ProductsView extends React.Component {
   }
 
   render() {
+    if (this.state.displayMobileMenuModal) {
+      return (
+        <div className='MainTransactionsViewContainer row'>
+          {this.renderBrandRow()}
+          <div className='TransactionsViewMenuContentContainer row'>
+            {this.renderMenuColumn(true)}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='MainProductsViewContainer row'>
         {this.renderBrandRow()}
         <div className='ProductsViewMenuContentContainer row'>
-          {this.renderMenuColumn()}
+          {this.renderMenuColumn(false)}
           {this.renderProductView()}
         </div>
       </div>

@@ -244,6 +244,7 @@ class CheckoutView extends React.Component {
   }
 
   renderScanView() {
+    // TODO: Add BrandHeader to CheckoutView
     return (
       <div className='MainCheckoutViewContainer'>
         <div className='CheckoutViewHeaderContainer'>

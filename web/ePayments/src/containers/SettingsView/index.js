@@ -60,6 +60,7 @@ class SettingsView extends React.Component {
     };
 
     this.state = {
+      displayMobileMenuModal: false,
       activeOption: 'Profile',
       options: ['Profile', 'Payments', 'Log Out'],
       updatingProfile: false,
@@ -78,6 +79,9 @@ class SettingsView extends React.Component {
     this.SessionService = new SessionService();
     this.UserService = new UserService();
     this.PaymentAccountService = new PaymentAccountService();
+    this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
+      this,
+    );
     this.renderSettingsView = this.renderSettingsView.bind(this);
     this.renderActiveOptionContent = this.renderActiveOptionContent.bind(this);
     this.renderCustomerProfileView = this.renderCustomerProfileView.bind(this);
@@ -108,14 +112,28 @@ class SettingsView extends React.Component {
     window.removeEventListener('message', this.windowOAuthCBMessageHandler);
   }
 
-  renderBrandRow() {
-    return <BrandHeader history={this.props.history} />;
+  handleToggleMobileMenuModal(e) {
+    e.preventDefault();
+    this.setState({
+      displayMobileMenuModal: !this.state.displayMobileMenuModal,
+    });
   }
 
-  renderMenuColumn() {
+  renderBrandRow() {
+    return (
+      <BrandHeader
+        history={this.props.history}
+        displayMobileMenuModal={this.state.displayMobileMenuModal}
+        onToggleMobileMenuModal={this.handleToggleMobileMenuModal}
+      />
+    );
+  }
+
+  renderMenuColumn(isMobile) {
     return (
       <DashboardMenu
-        colSize='col-1'
+        isMobile={isMobile}
+        colSize='col-sm-1'
         activeOption='Settings'
         user={this.props.user}
         history={this.props.history}
@@ -562,7 +580,7 @@ class SettingsView extends React.Component {
 
   renderSettingsView() {
     return (
-      <div className='SettingsViewContainer col-11 row'>
+      <div className='SettingsViewContentContainer col-sm-11 col-12 row'>
         <div className='SettingsViewOptionsContainer col-2'>
           {this.state.options.map((option, i) => (
             <div
@@ -574,7 +592,7 @@ class SettingsView extends React.Component {
             </div>
           ))}
         </div>
-        <div className='SettingsViewActiveOptionContainer col-11'>
+        <div className='SettingsViewActiveOptionContainer col-sm-11 col-12'>
           {this.renderActiveOptionContent()}
         </div>
       </div>
@@ -582,11 +600,21 @@ class SettingsView extends React.Component {
   }
 
   render() {
+    if (this.state.displayMobileMenuModal) {
+      return (
+        <div className='MainSettingsViewContainer row'>
+          {this.renderBrandRow()}
+          <div className='SettingsViewMenuContentContainer row'>
+            {this.renderMenuColumn(true)}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className='MainSettingsViewContainer row'>
         {this.renderBrandRow()}
         <div className='SettingsViewMenuContentContainer row'>
-          {this.renderMenuColumn()}
+          {this.renderMenuColumn(false)}
           {this.renderSettingsView()}
         </div>
       </div>

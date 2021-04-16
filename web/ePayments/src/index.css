@@ -32,3 +32,9 @@ p {
   margin: 0px;
   padding: 0px;
 }
+
+@media screen and (max-width: 1100px) {
+  body {
+    background-color: black;
+  }
+}
