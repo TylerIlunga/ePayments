@@ -131,12 +131,12 @@ class TransactionsView extends React.Component {
 
   renderTableHeader() {
     if (this.state.loadingTableData) {
-      return <p className='TransactionsHeaderLabel'>Loading...</p>;
+      return <p className='StdContentHeaderLabel'>Loading...</p>;
     }
     if (this.state.view === 'details') {
-      return <p className='TransactionsHeaderLabel'>Transaction Details</p>;
+      return <p className='StdContentHeaderLabel'>Transaction Details</p>;
     }
-    return <p className='TransactionsHeaderLabel'>Transactions</p>;
+    return <p className='StdContentHeaderLabel'>Transactions</p>;
   }
 
   handleOnChangeRowsPerPage(pageSize) {
@@ -202,11 +202,11 @@ class TransactionsView extends React.Component {
 
   renderListOfTransactions() {
     return (
-      <div className='TransactionsViewContentContainer col-sm-11 col-12'>
-        <div className='TransactionsViewContentHeaderContainer'>
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='StdViewContentHeaderContainer'>
           {this.renderTableHeader()}
         </div>
-        <div className='TransactionsViewContentTableContainer'>
+        <div className='StdViewContentTableContainer'>
           {this.renderTransactionTable()}
         </div>
       </div>
@@ -256,8 +256,8 @@ class TransactionsView extends React.Component {
 
   renderSelectedTransactionDetails() {
     return (
-      <div className='TransactionsViewContentContainer col-sm-11 col-12'>
-        <div className='TransactionsViewContentHeaderContainer row'>
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='StdViewContentHeaderContainer row'>
           {this.renderTableHeader()}
         </div>
         <div className='TransactionViewDetailsContainer row'>
@@ -284,18 +284,18 @@ class TransactionsView extends React.Component {
   render() {
     if (this.state.displayMobileMenuModal) {
       return (
-        <div className='MainTransactionsViewContainer row'>
+        <div className='MainStdViewContainer row'>
           {this.renderBrandRow()}
-          <div className='TransactionsViewMenuContentContainer row'>
+          <div className='StdViewMenuContentContainer row'>
             {this.renderMenuColumn(true)}
           </div>
         </div>
       );
     }
     return (
-      <div className='MainTransactionsViewContainer row'>
+      <div className='MainStdViewContainer row'>
         {this.renderBrandRow()}
-        <div className='TransactionsViewMenuContentContainer row'>
+        <div className='StdViewMenuContentContainer row'>
           {this.renderMenuColumn(false)}
           {this.renderTransactionsView()}
         </div>

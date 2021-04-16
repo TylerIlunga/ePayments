@@ -9,7 +9,6 @@ import toastUtils from '../../utils/Toasts';
 import stringUtils from '../../utils/Strings';
 import './index.css';
 
-// TODO: Add CreateProduct feature
 class ProductsView extends React.Component {
   constructor(props) {
     super(props);
@@ -29,6 +28,7 @@ class ProductsView extends React.Component {
 
     this.state = {
       displayMobileMenuModal: false,
+      displayQRCodeModal: false,
       selectedProduct,
       view,
       newProductData: {
@@ -37,7 +37,7 @@ class ProductsView extends React.Component {
         description: '',
         price: '',
         category: '',
-        inventoryCount: 0,
+        inventoryCount: '',
       },
       selectedProductUpdates: {},
       loadingProducts: true,
@@ -104,11 +104,14 @@ class ProductsView extends React.Component {
     );
     this.handleOnRowClick = this.handleOnRowClick.bind(this);
     this.renderProductView = this.renderProductView.bind(this);
-    this.exitProductDetailsView = this.exitProductDetailsView.bind(this);
     this.renderSelectedProductDetails = this.renderSelectedProductDetails.bind(
       this,
     );
     this.renderSelectedProduct = this.renderSelectedProduct.bind(this);
+    this.renderSelectedProductQRCode = this.renderSelectedProductQRCode.bind(
+      this,
+    );
+    this.handleDisplayQRCodeModal = this.handleDisplayQRCodeModal.bind(this);
     this.updateSelectedProductField = this.updateSelectedProductField.bind(
       this,
     );
@@ -216,18 +219,18 @@ class ProductsView extends React.Component {
   renderViewHeader() {
     if (this.state.selectedProduct !== null) {
       return (
-        <p className='ProductsHeaderLabel'>
+        <p className='StdContentHeaderLabel'>
           {`Product #${this.state.selectedProduct.id}: ${this.state.selectedProduct.label}`}
         </p>
       );
     }
     if (this.state.view === 'create') {
-      return <p className='ProductsHeaderLabel'>Create</p>;
+      return <p className='StdContentHeaderLabel'>New Product</p>;
     }
     if (this.state.products !== null) {
-      return <p className='ProductsHeaderLabel'>Products</p>;
+      return <p className='StdContentHeaderLabel'>Products</p>;
     }
-    return <p className='ProductsHeaderLabel'>Loading...</p>;
+    return <p className='StdContentHeaderLabel'>Loading...</p>;
   }
 
   handleOnChangeRowsPerPage(table, pageSize) {
@@ -414,26 +417,20 @@ class ProductsView extends React.Component {
 
   renderListOfProducts() {
     return (
-      <div className='ProductsViewContentContainer col-sm-11 col-12'>
+      <div className='StdViewContentContainer col-sm-11 col-12'>
         <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
         <div className='ProductsViewCreateProductButtonContainer'>
-          <button onClick={this.toggleCreateProductView}>Create Product</button>
+          <button onClick={this.toggleCreateProductView}>
+            Add to Inventory
+          </button>
         </div>
         <div className='ProductsViewTableContainer'>
           {this.renderProductsTable()}
         </div>
       </div>
     );
-  }
-
-  exitProductDetailsView() {
-    this.setState({
-      selectedProduct: null,
-      view: 'list',
-      showProductTransactions: false,
-    });
   }
 
   updateNewProductData(evt, field) {
@@ -504,65 +501,6 @@ class ProductsView extends React.Component {
         this.displayToastMessage('error', error);
         this.setState({ loadingProducts: false });
       });
-  }
-
-  renderSelectedProduct() {
-    const businessID = this.state.selectedProduct.user_id;
-    const productID = this.state.selectedProduct.id;
-    const sku = this.state.selectedProduct.sku;
-    // NOTE: QR Scanner will split on ":" to get each attribute to create a transaction.
-    const productQRCode = `https://chart.googleapis.com/chart?cht=qr&chl=${businessID}:${productID}:${sku}&chs=160x160&chld=L|0`;
-    return (
-      <form className='ProductsViewDetails'>
-        <label>ID: {productID}</label>
-        <label>SKU: {sku}</label>
-        <label>Category: </label>
-        <input
-          type='text'
-          value={this.state.selectedProduct.category}
-          onChange={(evt) => this.updateSelectedProductField(evt, 'category')}
-        />
-        <label>Label: </label>
-        <input
-          type='text'
-          value={this.state.selectedProduct.label}
-          onChange={(evt) => this.updateSelectedProductField(evt, 'label')}
-        />
-        <label>Description: </label>
-        <input
-          type='text'
-          value={this.state.selectedProduct.description}
-          onChange={(evt) =>
-            this.updateSelectedProductField(evt, 'description')
-          }
-        />
-        <label>Price: </label>
-        <input
-          type='text'
-          value={this.state.selectedProduct.price}
-          onChange={(evt) => this.updateSelectedProductField(evt, 'price')}
-        />
-        <label>Inventory: </label>
-        <input
-          type='text'
-          value={this.state.selectedProduct.inventory_count}
-          onChange={(evt) =>
-            this.updateSelectedProductField(evt, 'inventory_count')
-          }
-        />
-        <img alt='productQRCode' src={productQRCode} />
-        <input
-          type='button'
-          value='Exit'
-          onClick={this.exitProductDetailsView}
-        />
-        <input
-          type='button'
-          value='Update'
-          onClick={this.persistSelectedProductUpdate}
-        />
-      </form>
-    );
   }
 
   renderSelectedProductTransactions() {
@@ -688,47 +626,39 @@ class ProductsView extends React.Component {
 
   renderCreateProductForm() {
     return (
-      <div className='ProductsViewContentContainer col-sm-11 col-12'>
-        <div className='ProductViewDetailsHeaderContainer'>
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
         <div className='ProductsViewCreateFormContainer'>
           <form className='ProductsViewCreateForm'>
-            <label>Sku:</label>
-            <input disabled value={this.state.newProductData.sku} />
-            <label>Category:</label>
             <input
               value={this.state.newProductData.category}
               onChange={(e) => this.updateNewProductData(e, 'category')}
+              placeholder='Category'
             />
-            <label>Label:</label>
             <input
               value={this.state.newProductData.label}
               onChange={(e) => this.updateNewProductData(e, 'label')}
+              placeholder='Label'
             />
-            <label>Description:</label>
             <input
               value={this.state.newProductData.description}
               onChange={(e) => this.updateNewProductData(e, 'description')}
+              placeholder='Description'
             />
-            <label>Price:</label>
             <input
               value={this.state.newProductData.price}
               onChange={(e) => this.updateNewProductData(e, 'price')}
+              placeholder='Price'
             />
-            <label>Inventory Count:</label>
             <input
               value={this.state.newProductData.inventoryCount}
               onChange={(e) => this.updateNewProductData(e, 'inventoryCount')}
+              placeholder='Inventory Count'
             />
             <button
-              className='ProductsViewCreateFormCreateButton'
-              onClick={(e) => this.setState({ view: 'list' })}
-            >
-              Exit
-            </button>
-            <button
-              className='ProductsViewCreateFormCreateButton'
+              className='ProductsViewFormButton'
               onClick={this.createNewProduct}
             >
               Create
@@ -739,18 +669,113 @@ class ProductsView extends React.Component {
     );
   }
 
+  renderSelectedProduct() {
+    return (
+      <div className='ProductsViewDetailsFormContainer col-sm-8 col-12'>
+        <form className='ProductsViewDetailsForm'>
+          <label>ID: {this.state.selectedProduct.id}</label>
+          <label>SKU: {this.state.selectedProduct.sku}</label>
+          <label>Category: </label>
+          <input
+            type='text'
+            value={this.state.selectedProduct.category}
+            onChange={(evt) => this.updateSelectedProductField(evt, 'category')}
+          />
+          <label>Label: </label>
+          <input
+            type='text'
+            value={this.state.selectedProduct.label}
+            onChange={(evt) => this.updateSelectedProductField(evt, 'label')}
+          />
+          <label>Description: </label>
+          <input
+            type='text'
+            value={this.state.selectedProduct.description}
+            onChange={(evt) =>
+              this.updateSelectedProductField(evt, 'description')
+            }
+          />
+          <label>Price: </label>
+          <input
+            type='text'
+            value={this.state.selectedProduct.price}
+            onChange={(evt) => this.updateSelectedProductField(evt, 'price')}
+          />
+          <label>Inventory: </label>
+          <input
+            type='text'
+            value={this.state.selectedProduct.inventory_count}
+            onChange={(evt) =>
+              this.updateSelectedProductField(evt, 'inventory_count')
+            }
+          />
+          <button
+            className='ProductsViewFormButton'
+            onClick={this.persistSelectedProductUpdate}
+          >
+            Update
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  handleDisplayQRCodeModal(evt) {
+    evt.preventDefault();
+    this.setState({ displayQRCodeModal: !this.state.displayQRCodeModal });
+  }
+
+  renderSelectedProductQRCode(fillView) {
+    const businessID = this.state.selectedProduct.user_id;
+    const productID = this.state.selectedProduct.id;
+    const sku = this.state.selectedProduct.sku;
+    // NOTE: QR Scanner will split on ":" to get each attribute to create a transaction.
+    const productQRCode = `https://chart.googleapis.com/chart?cht=qr&chl=${businessID}:${productID}:${sku}&chs=285x285&chld=L|0`;
+    if (fillView) {
+      return (
+        <div className='StdViewContentContainer col-sm-11 col-12'>
+          <div className='ProductsViewHeaderContainer'>
+            {this.renderViewHeader()}
+          </div>
+          <div className='ProductsViewDetailsContainer row'>
+            <div className='ProductsViewProductQRContainer col-12'>
+              <img
+                alt='productQRCode'
+                src={productQRCode}
+                onClick={this.handleDisplayQRCodeModal}
+              />
+            </div>
+          </div>
+          {/* <div className='ProductsViewTransactionsContainer'>
+          {this.renderSelectedProductTransactions()}
+        </div> */}
+        </div>
+      );
+    }
+    return (
+      <div className='ProductsViewProductQRContainer col-sm-4 col-12'>
+        <img
+          alt='productQRCode'
+          src={productQRCode}
+          onClick={this.handleDisplayQRCodeModal}
+        />
+      </div>
+    );
+  }
+
   renderSelectedProductDetails() {
     return (
-      <div className='ProductsViewContentContainer col-sm-11 col-12'>
-        <div className='ProductViewDetailsHeaderContainer'>
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
-        <div className='ProductsViewDetailsContainer'>
+        <div className='ProductsViewDetailsContainer row'>
           {this.renderSelectedProduct()}
+          {this.renderSelectedProductQRCode(false)}
         </div>
-        <div className='ProductsViewTransactionsContainer'>
+        {/* <div className='ProductsViewTransactionsContainer'>
           {this.renderSelectedProductTransactions()}
-        </div>
+        </div> */}
       </div>
     );
   }
@@ -762,24 +787,27 @@ class ProductsView extends React.Component {
     if (this.state.view === 'create') {
       return this.renderCreateProductForm();
     }
+    if (this.state.displayQRCodeModal) {
+      return this.renderSelectedProductQRCode(true);
+    }
     return this.renderSelectedProductDetails();
   }
 
   render() {
     if (this.state.displayMobileMenuModal) {
       return (
-        <div className='MainTransactionsViewContainer row'>
+        <div className='MainStdViewContainer row'>
           {this.renderBrandRow()}
-          <div className='TransactionsViewMenuContentContainer row'>
+          <div className='StdViewMenuContentContainer row'>
             {this.renderMenuColumn(true)}
           </div>
         </div>
       );
     }
     return (
-      <div className='MainProductsViewContainer row'>
+      <div className='MainStdViewContainer row'>
         {this.renderBrandRow()}
-        <div className='ProductsViewMenuContentContainer row'>
+        <div className='StdViewMenuContentContainer row'>
           {this.renderMenuColumn(false)}
           {this.renderProductView()}
         </div>

@@ -98,6 +98,12 @@
   border-color: black;
 }
 
+.CreateProfileViewFormInput:focus {
+  outline: none;
+  border-width: 0 0 2px;
+  border-color: red;
+}
+
 .CreateProfileViewFormButton {
   width: 100%;
   height: 50px;

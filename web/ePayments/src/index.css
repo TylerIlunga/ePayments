@@ -35,6 +35,6 @@ p {
 
 @media screen and (max-width: 1100px) {
   body {
-    background-color: black;
+    background: linear-gradient(to right, rgb(20, 136, 204), rgb(43, 50, 178));
   }
 }

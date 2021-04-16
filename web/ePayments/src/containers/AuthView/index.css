@@ -70,7 +70,7 @@
 }
 
 .AuthViewFormInput:focus {
-  transition: border-color 1s;
+  outline: none;
   border-width: 0 0 2px;
   border-color: red;
 }
