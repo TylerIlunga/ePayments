@@ -6,6 +6,7 @@ import DashboardMenu from '../../components/DashboardMenu';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
+import BrandHeader from '../../components/BrandHeader';
 
 class AnalyticsView extends React.Component {
   constructor(props) {
@@ -746,10 +747,15 @@ class AnalyticsView extends React.Component {
     );
   }
 
+  renderBrandRow() {
+    return <BrandHeader history={this.props.history} />;
+  }
+
   renderMenuColumn() {
     return (
       <DashboardMenu
-        colSize='col-2'
+        colSize='col-1'
+        activeOption='Analytics'
         user={this.props.user}
         history={this.props.history}
         displayToastMessage={this.displayToastMessage}
@@ -759,7 +765,7 @@ class AnalyticsView extends React.Component {
 
   renderAnalyticsView() {
     return (
-      <div className='AnalyticsViewContainer col-10'>
+      <div className='AnalyticsViewContainer col-11'>
         {this.renderAnalyticsViewHeader()}
         {this.renderAnalyticsViewOptions()}
         {this.renderAnalyticsViewCharts()}
@@ -770,8 +776,11 @@ class AnalyticsView extends React.Component {
   render() {
     return (
       <div className='MainAnalyticsViewContainer row'>
-        {this.renderMenuColumn()}
-        {this.renderAnalyticsView()}
+        {this.renderBrandRow()}
+        <div className='AnalyticsViewMenuContentContainer row'>
+          {this.renderMenuColumn()}
+          {this.renderAnalyticsView()}
+        </div>
       </div>
     );
   }

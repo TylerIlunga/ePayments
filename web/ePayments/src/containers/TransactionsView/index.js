@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
 import DataTable from '../../components/DataTable';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
@@ -97,10 +98,15 @@ class TransactionsView extends React.Component {
       });
   }
 
+  renderBrandRow() {
+    return <BrandHeader history={this.props.history} />;
+  }
+
   renderMenuColumn() {
     return (
       <DashboardMenu
-        colSize='col-2'
+        colSize='col-1'
+        activeOption='Transactions'
         user={this.props.user}
         history={this.props.history}
         displayToastMessage={this.displayToastMessage}
@@ -178,11 +184,11 @@ class TransactionsView extends React.Component {
 
   renderListOfTransactions() {
     return (
-      <div className='MainTransactionViewTransactionsContainer col-10'>
-        <div className='MainTransactionViewTransactionsHeaderContainer'>
+      <div className='TransactionsViewContentContainer col-11'>
+        <div className='TransactionsViewTransactionsHeaderContainer'>
           {this.renderTableHeader()}
         </div>
-        <div className='MainTransactionViewTransactionsTableContainer'>
+        <div className='TransactionsViewTransactionsTableContainer'>
           {this.renderTransactionTable()}
         </div>
       </div>
@@ -227,10 +233,10 @@ class TransactionsView extends React.Component {
     // tableData: {id: 0}
     // token_amount: "${cbTransactionResult.amount.amount}"
     return (
-      <div className='MainTransactionViewTransactionsContainer col-10'>
+      <div className='TransactionsViewContentContainer col-11'>
         {this.renderTransactionTextInformation(this.state.selectedTransaction)}
         <button
-          className='MainTransactionViewSelectedTransactionExitButton'
+          className='TransactionsViewSelectedTransactionExitButton'
           onClick={this.returnToListOfTransactions}
         >
           Exit
@@ -248,9 +254,12 @@ class TransactionsView extends React.Component {
 
   render() {
     return (
-      <div className='MainTransactionViewContainer row'>
-        {this.renderMenuColumn()}
-        {this.renderTransactionsView()}
+      <div className='MainTransactionsViewContainer row'>
+        {this.renderBrandRow()}
+        <div className='TransactionsViewMenuContentContainer row'>
+          {this.renderMenuColumn()}
+          {this.renderTransactionsView()}
+        </div>
       </div>
     );
   }

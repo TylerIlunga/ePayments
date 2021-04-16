@@ -1,3 +1,38 @@
-.DashboardMenuColContainer {
-  background-color: lightcyan;
+.MainDashboardMenuContainer {
+  height: 100%;
+  background-color: black;
+  color: white;
+  padding: 0px;
+}
+
+.DashboardMenuColOption {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  padding: 25px 30px;
+}
+
+.DashboardMenuColOption p {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.DashboardMenuColOption:hover {
+  border: 1px solid black;
+  background-color: white;
+  color: black;
+  transition: 400ms;
+}
+
+.DashboardMenuColOption-Active {
+  border-right: 1px solid black;
+  background-color: white;
+  color: black;
+}
+
+.DashboardMenuColOption-Active p {
+  font-size: 16px;
+  font-weight: 900;
 }

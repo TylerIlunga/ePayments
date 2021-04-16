@@ -1,0 +1,17 @@
+.BrandHeaderRow {
+  height: 10%;
+  width: 100%;
+  padding: 0px 30px;
+  display: flex;
+  align-items: center;
+  background-color: black;
+  color: white;
+}
+
+.BrandHeaderRow a {
+  font-size: 20px;
+  font-weight: 900;
+  padding: 0px;
+  text-decoration: none;
+  color: white;
+}

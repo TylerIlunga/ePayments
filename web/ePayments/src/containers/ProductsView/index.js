@@ -7,6 +7,7 @@ import BusinessTransactionService from '../../services/BusinessTransactionServic
 import toastUtils from '../../utils/Toasts';
 import stringUtils from '../../utils/Strings';
 import './index.css';
+import BrandHeader from '../../components/BrandHeader';
 
 // TODO: Add CreateProduct feature
 class ProductsView extends React.Component {
@@ -178,10 +179,15 @@ class ProductsView extends React.Component {
       });
   }
 
+  renderBrandRow() {
+    return <BrandHeader history={this.props.history} />;
+  }
+
   renderMenuColumn() {
     return (
       <DashboardMenu
-        colSize='col-2'
+        colSize='col-1'
+        activeOption='Products'
         user={this.props.user}
         history={this.props.history}
         displayToastMessage={this.displayToastMessage}
@@ -390,14 +396,14 @@ class ProductsView extends React.Component {
 
   renderListOfProducts() {
     return (
-      <div className='MainProductViewContainer col-10'>
-        <div className='MainProductViewHeaderContainer'>
+      <div className='ProductsViewContainer col-11'>
+        <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
-        <div className='MainProductViewCreateProductButtonContainer'>
+        <div className='ProductsViewCreateProductButtonContainer'>
           <button onClick={this.toggleCreateProductView}>Create Product</button>
         </div>
-        <div className='MainProductViewTableContainer'>
+        <div className='ProductsViewTableContainer'>
           {this.renderProductsTable()}
         </div>
       </div>
@@ -489,7 +495,7 @@ class ProductsView extends React.Component {
     // NOTE: QR Scanner will split on ":" to get each attribute to create a transaction.
     const productQRCode = `https://chart.googleapis.com/chart?cht=qr&chl=${businessID}:${productID}:${sku}&chs=160x160&chld=L|0`;
     return (
-      <form className='MainProductViewDetails'>
+      <form className='ProductsViewDetails'>
         <label>ID: {productID}</label>
         <label>SKU: {sku}</label>
         <label>Category: </label>
@@ -664,12 +670,12 @@ class ProductsView extends React.Component {
 
   renderCreateProductForm() {
     return (
-      <div className='ProductViewDetailsMainContainer col-10'>
+      <div className='ProductViewDetailsMainContainer col-11'>
         <div className='ProductViewDetailsHeaderContainer'>
           {this.renderViewHeader()}
         </div>
-        <div className='MainProductViewCreateFormContainer'>
-          <form className='MainProductViewCreateForm'>
+        <div className='ProductsViewCreateFormContainer'>
+          <form className='ProductsViewCreateForm'>
             <label>Sku:</label>
             <input disabled value={this.state.newProductData.sku} />
             <label>Category:</label>
@@ -698,13 +704,13 @@ class ProductsView extends React.Component {
               onChange={(e) => this.updateNewProductData(e, 'inventoryCount')}
             />
             <button
-              className='MainProductViewCreateFormCreateButton'
+              className='ProductsViewCreateFormCreateButton'
               onClick={(e) => this.setState({ view: 'list' })}
             >
               Exit
             </button>
             <button
-              className='MainProductViewCreateFormCreateButton'
+              className='ProductsViewCreateFormCreateButton'
               onClick={this.createNewProduct}
             >
               Create
@@ -717,14 +723,14 @@ class ProductsView extends React.Component {
 
   renderSelectedProductDetails() {
     return (
-      <div className='ProductViewDetailsMainContainer col-10'>
+      <div className='ProductViewDetailsMainContainer col-11'>
         <div className='ProductViewDetailsHeaderContainer'>
           {this.renderViewHeader()}
         </div>
-        <div className='MainProductViewDetailsContainer'>
+        <div className='ProductsViewDetailsContainer'>
           {this.renderSelectedProduct()}
         </div>
-        <div className='MainProductViewTransactionsContainer'>
+        <div className='ProductsViewTransactionsContainer'>
           {this.renderSelectedProductTransactions()}
         </div>
       </div>
@@ -743,9 +749,12 @@ class ProductsView extends React.Component {
 
   render() {
     return (
-      <div className='MainProductViewContainer row'>
-        {this.renderMenuColumn()}
-        {this.renderProductView()}
+      <div className='MainProductsViewContainer row'>
+        {this.renderBrandRow()}
+        <div className='ProductsViewMenuContentContainer row'>
+          {this.renderMenuColumn()}
+          {this.renderProductView()}
+        </div>
       </div>
     );
   }

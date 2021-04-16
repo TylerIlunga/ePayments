@@ -45,17 +45,28 @@ const DashboardMenu = (props) => {
     props.history.push(`/h/${view}`);
   };
 
+  const optionIsActive = (optionLabel, activeOptionLabel) => {
+    if (optionLabel === activeOptionLabel) {
+      return 'DashboardMenuColOption-Active';
+    }
+  };
+
   return (
-    <div className={`DashboardMenuColContainer ${props.colSize}`}>
+    <div className={`MainDashboardMenuContainer ${props.colSize}`}>
       {menuOptions.map((option, i) => {
         return (
           <div
             key={i}
-            className='DashboardMenuColOption'
+            className='DashboardMenuColOptionContainer'
             onClick={(evt) => segueTo(evt, option.label.toLowerCase())}
           >
-            <div className='DashboardMenuColOptionIcon'>{option.logo}</div>
-            <div className='DashboardMenuColOptionLabel'>
+            <div
+              className={`DashboardMenuColOption ${optionIsActive(
+                option.label,
+                props.activeOption,
+              )}`}
+            >
+              {/* <div className='DashboardMenuColOptionChild'>{option.logo}</div> */}
               <p>{option.label}</p>
             </div>
           </div>

@@ -1,0 +1,11 @@
+.MainProductsViewContainer {
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+.ProductsViewMenuContentContainer {
+  height: 90%;
+  width: 100%;
+}

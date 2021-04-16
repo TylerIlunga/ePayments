@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import config from '../../config';
+import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
 import { updatePaymentAccount } from '../../redux/actions/paymentAccount';
 import { setProfile } from '../../redux/actions/profile';
@@ -107,10 +108,15 @@ class SettingsView extends React.Component {
     window.removeEventListener('message', this.windowOAuthCBMessageHandler);
   }
 
+  renderBrandRow() {
+    return <BrandHeader history={this.props.history} />;
+  }
+
   renderMenuColumn() {
     return (
       <DashboardMenu
-        colSize='col-2'
+        colSize='col-1'
+        activeOption='Settings'
         user={this.props.user}
         history={this.props.history}
         displayToastMessage={this.displayToastMessage}
@@ -556,7 +562,7 @@ class SettingsView extends React.Component {
 
   renderSettingsView() {
     return (
-      <div className='SettingsViewContainer col-10 row'>
+      <div className='SettingsViewContainer col-11 row'>
         <div className='SettingsViewOptionsContainer col-2'>
           {this.state.options.map((option, i) => (
             <div
@@ -568,7 +574,7 @@ class SettingsView extends React.Component {
             </div>
           ))}
         </div>
-        <div className='SettingsViewActiveOptionContainer col-10'>
+        <div className='SettingsViewActiveOptionContainer col-11'>
           {this.renderActiveOptionContent()}
         </div>
       </div>
@@ -578,8 +584,11 @@ class SettingsView extends React.Component {
   render() {
     return (
       <div className='MainSettingsViewContainer row'>
-        {this.renderMenuColumn()}
-        {this.renderSettingsView()}
+        {this.renderBrandRow()}
+        <div className='SettingsViewMenuContentContainer row'>
+          {this.renderMenuColumn()}
+          {this.renderSettingsView()}
+        </div>
       </div>
     );
   }
