@@ -364,13 +364,30 @@ class AnalyticsView extends React.Component {
     const dataLabels = Object.keys(customReportData.generalReportData);
     const dataValues = Object.values(customReportData.generalReportData);
     const chartLabel = customReportData.chartLabel;
-    const chartTitleOptions = {
-      display: true,
-      fontSize: 20,
+    const chartScaleOptions = {
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+            fontColor: 'white',
+          },
+        },
+      ],
+      xAxes: [
+        {
+          ticks: {
+            fontColor: 'white',
+          },
+        },
+      ],
     };
     const chartLegendOptions = {
       display: true,
       position: 'right',
+      labels: {
+        fontColor: 'white',
+        fontSize: 14,
+      },
     };
 
     currentReportData.barChart.data.labels = dataLabels;
@@ -409,9 +426,8 @@ class AnalyticsView extends React.Component {
       data: dataValues,
     });
 
-    currentReportData.barChart.options.title = chartTitleOptions;
-    currentReportData.lineChart.options.title = chartTitleOptions;
-    currentReportData.pieChart.options.title = chartTitleOptions;
+    currentReportData.barChart.options.scales = chartScaleOptions;
+    currentReportData.lineChart.options.scales = chartScaleOptions;
 
     currentReportData.barChart.options.legend = chartLegendOptions;
     currentReportData.lineChart.options.legend = chartLegendOptions;
@@ -437,7 +453,7 @@ class AnalyticsView extends React.Component {
       customReportData.totalReturningCustomers,
     ];
     const chartLabel = customReportData.chartLabel;
-    const chartTitleOptions = {
+    const chartScaleOptions = {
       display: true,
       fontSize: 20,
     };
@@ -472,8 +488,8 @@ class AnalyticsView extends React.Component {
       data: dataValues,
     });
 
-    currentReportData.barChart.options.title = chartTitleOptions;
-    currentReportData.pieChart.options.title = chartTitleOptions;
+    currentReportData.barChart.options.title = chartScaleOptions;
+    currentReportData.pieChart.options.title = chartScaleOptions;
 
     currentReportData.barChart.options.legend = chartLegendOptions;
     currentReportData.pieChart.options.legend = chartLegendOptions;
@@ -692,8 +708,7 @@ class AnalyticsView extends React.Component {
     ) {
       return (
         <div className='MainAnalyticsViewChartsTotalContainer col-12'>
-          <h1>Total</h1>
-          <p>{this.state.currentReportData.totalValueLabel}</p>
+          <p>Total: {this.state.currentReportData.totalValueLabel}</p>
         </div>
       );
     }
@@ -702,24 +717,24 @@ class AnalyticsView extends React.Component {
   renderAnalyticsViewCharts() {
     if (this.state.loading) {
       return (
-        <div className='MainAnalyticsViewCharts'>
+        <div className='AnalyticsViewChartsInfoContainer'>
           <p>Loading...</p>
         </div>
       );
     }
     if (this.state.currentReportData === null) {
       return (
-        <div className='MainAnalyticsViewCharts'>
+        <div className='AnalyticsViewChartsInfoContainer'>
           <p>No Data To Show</p>
         </div>
       );
     }
     return (
-      <div className='MainAnalyticsViewCharts'>
+      <div className='AnalyticsViewChartsContainer'>
         <div className='MainAnalyticsViewChartsPieBarRow row'>
           {this.renderTotalLabel()}
           {this.state.currentReportData.barChart && (
-            <div className='MainAnalyticsViewChartsPieContainer col-6'>
+            <div className='MainAnalyticsViewChartsPieContainer col-sm-6 col-12'>
               <Bar
                 data={this.state.currentReportData.barChart.data}
                 options={this.state.currentReportData.barChart.options}
@@ -727,7 +742,7 @@ class AnalyticsView extends React.Component {
             </div>
           )}
           {this.state.currentReportData.pieChart && (
-            <div className='MainAnalyticsViewChartsBarContainer col-6'>
+            <div className='MainAnalyticsViewChartsBarContainer col-sm-6 col-12'>
               <Pie
                 data={this.state.currentReportData.pieChart.data}
                 options={this.state.currentReportData.pieChart.options}
@@ -786,9 +801,7 @@ class AnalyticsView extends React.Component {
           {this.renderAnalyticsViewHeader()}
         </div>
         {this.renderAnalyticsViewOptions()}
-        <div className='AnalyticsViewChartsContainer row'>
-          {this.renderAnalyticsViewCharts()}
-        </div>
+        {this.renderAnalyticsViewCharts()}
       </div>
     );
   }

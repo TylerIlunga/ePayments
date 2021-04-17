@@ -41,10 +41,47 @@
   direction: rtl;
 }
 
+.AnalyticsViewChartsInfoContainer {
+  height: 80%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.AnalyticsViewChartsInfoContainer p {
+  font-size: 32px;
+  font-weight: bold;
+}
+
 .AnalyticsViewChartsContainer {
   height: 80%;
   width: 100%;
   overflow-y: scroll;
+  color: white;
+}
+
+.MainAnalyticsViewChartsPieBarRow {
+  width: 100%;
+  padding: 30px 16px;
+}
+
+.MainAnalyticsViewChartsTotalContainer p {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.MainAnalyticsViewChartsPieContainer {
+  height: 100%;
+}
+
+.MainAnalyticsViewChartsBarContainer {
+  height: 100%;
+}
+
+.MainAnalyticsViewChartsLineRow {
+  width: 100%;
 }
 
 @media screen and (max-width: 1100px) {

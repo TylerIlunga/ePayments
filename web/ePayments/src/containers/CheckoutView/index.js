@@ -241,10 +241,10 @@ class CheckoutView extends React.Component {
   renderCheckoutDetailsView() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12'>
-        <div className='StdViewContentHeaderContainer row'>
+        <div className='StdViewContentHeaderContainer'>
           {this.renderCheckoutHeader()}
         </div>
-        <div className='CheckoutViewContentContainer row'>
+        <div className='CheckoutViewContentContainer'>
           {this.renderProductDetails()}
           {this.renderConfirmationButtons()}
         </div>
