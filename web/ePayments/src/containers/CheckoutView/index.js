@@ -1,15 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import QrReader from 'react-qr-reader';
-import toastUtils from '../../utils/Toasts';
-import './index.css';
+import QrReader from 'modern-react-qr-reader';
+import BrandHeader from '../../components/BrandHeader';
+import DashboardMenu from '../../components/DashboardMenu';
 import BusinessProductService from '../../services/BusinessProductService';
 import BusinessTransactionService from '../../services/BusinessTransactionService';
+import toastUtils from '../../utils/Toasts';
+import './index.css';
 
 class CheckoutView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayMobileMenuModal: false,
       loading: false,
       view: 'scan',
       scannedProduct: null,
@@ -19,7 +22,17 @@ class CheckoutView extends React.Component {
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessProductService = new BusinessProductService();
     this.BusinessTransactionService = new BusinessTransactionService();
-
+    this.renderBrandRow = this.renderBrandRow.bind(this);
+    this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
+      this,
+    );
+    this.renderMenuColumn = this.renderMenuColumn.bind(this);
+    this.renderCheckoutHeader = this.renderCheckoutHeader.bind(this);
+    this.renderCheckoutView = this.renderCheckoutView.bind(this);
+    this.renderScanView = this.renderScanView.bind(this);
+    this.renderQRScanner = this.renderQRScanner.bind(this);
+    this.handleScanSuccess = this.handleScanSuccess.bind(this);
+    this.handleScanError = this.handleScanError.bind(this);
     this.renderCheckoutDetailsView = this.renderCheckoutDetailsView.bind(this);
     this.computeTotalPrice = this.computeTotalPrice.bind(this);
     this.fetchUsersLocation = this.fetchUsersLocation.bind(this);
@@ -27,10 +40,47 @@ class CheckoutView extends React.Component {
     this.handleUpdateCheckoutQuantity = this.handleUpdateCheckoutQuantity.bind(
       this,
     );
-    this.renderScanView = this.renderScanView.bind(this);
-    this.handleScanSuccess = this.handleScanSuccess.bind(this);
-    this.handleScanError = this.handleScanError.bind(this);
-    this.segueToHome = this.segueToHome.bind(this);
+  }
+
+  handleToggleMobileMenuModal(e) {
+    e.preventDefault();
+    this.setState({
+      displayMobileMenuModal: !this.state.displayMobileMenuModal,
+    });
+  }
+
+  renderBrandRow() {
+    return (
+      <BrandHeader
+        history={this.props.history}
+        displayMobileMenuModal={this.state.displayMobileMenuModal}
+        onToggleMobileMenuModal={this.handleToggleMobileMenuModal}
+      />
+    );
+  }
+
+  renderMenuColumn(isMobile) {
+    return (
+      <DashboardMenu
+        isMobile={isMobile}
+        colSize='col-sm-1'
+        activeOption='Checkout'
+        user={this.props.user}
+        history={this.props.history}
+        displayToastMessage={this.displayToastMessage}
+      />
+    );
+  }
+
+  renderCheckoutHeader() {
+    if (this.state.scannedProduct && this.state.view === 'checkoutDetails') {
+      return (
+        <p className='StdContentHeaderLabel'>
+          Product: {this.state.scannedProduct.label}
+        </p>
+      );
+    }
+    return <p className='StdContentHeaderLabel'>Scan QR Code</p>;
   }
 
   computeTotalPrice() {
@@ -128,9 +178,6 @@ class CheckoutView extends React.Component {
           SKU: {this.state.scannedProduct.sku}
         </p>
         <p className='MainCheckoutViewProductDetailsLabel'>
-          Product: {this.state.scannedProduct.label}
-        </p>
-        <p className='MainCheckoutViewProductDetailsLabel'>
           Description: {this.state.scannedProduct.description}
         </p>
         <p className='MainCheckoutViewProductDetailsLabel'>
@@ -186,12 +233,18 @@ class CheckoutView extends React.Component {
 
   renderCheckoutDetailsView() {
     return (
-      <div className='MainCheckoutViewContainer'>
-        {this.renderProductDetails()}
-        {this.renderConfirmationButtons()}
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='StdViewContentHeaderContainer row'>
+          {this.renderCheckoutHeader()}
+        </div>
+        <div className='CheckoutViewContentContainer row'>
+          {this.renderProductDetails()}
+          {this.renderConfirmationButtons()}
+        </div>
       </div>
     );
   }
+
   handleScanSuccess(dataFromScan) {
     if (dataFromScan === null) {
       return;
@@ -239,37 +292,65 @@ class CheckoutView extends React.Component {
     this.displayToastMessage('error', error);
   }
 
-  segueToHome() {
-    this.props.history.replace('/h/transactions');
+  renderQRScanner() {
+    return (
+      <div className='CheckoutViewQRScannerContainer'>
+        {/* NOTE: LEFTOFFHERE...Due to browser implementations the camera can only be accessed over https or localhost. */}
+        <QrReader
+          delay={300}
+          onError={this.handleScanError}
+          onScan={this.handleScanSuccess}
+          style={{
+            width: '300px',
+            padding: '0',
+            margin: '0',
+          }}
+          facingMode={'environment'}
+        />
+      </div>
+    );
   }
 
   renderScanView() {
-    // TODO: Add BrandHeader to CheckoutView
     return (
-      <div className='MainCheckoutViewContainer'>
-        <div className='CheckoutViewHeaderContainer'>
-          <p>Scan QR Code</p>
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='StdViewContentHeaderContainer row'>
+          {this.renderCheckoutHeader()}
         </div>
-        <div className='CheckoutViewQRScannerContainer'>
-          <QrReader
-            delay={300}
-            onError={this.handleScanError}
-            onScan={this.handleScanSuccess}
-            style={{ width: '100%' }}
-          />
-        </div>
-        <div className='CheckoutViewHomeButtonContainer'>
-          <button onClick={this.segueToHome}>Exit</button>
+        <div className='CheckoutViewContentContainer row'>
+          {this.renderQRScanner()}
         </div>
       </div>
     );
   }
 
-  render() {
+  renderCheckoutView() {
     if (this.state.scannedProduct && this.state.view === 'checkoutDetails') {
       return this.renderCheckoutDetailsView();
     }
     return this.renderScanView();
+  }
+
+  render() {
+    if (this.state.displayMobileMenuModal) {
+      return (
+        <div className='MainStdViewContainer row'>
+          {this.renderBrandRow()}
+          <div className='StdViewMenuContentContainer row'>
+            {this.renderMenuColumn(true)}
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className='MainStdViewContainer row'>
+        {this.renderBrandRow()}
+        <div className='StdViewMenuContentContainer row'>
+          {this.renderMenuColumn(false)}
+          {this.renderCheckoutView()}
+        </div>
+      </div>
+    );
   }
 }
 

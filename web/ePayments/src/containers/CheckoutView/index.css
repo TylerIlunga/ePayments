@@ -1,0 +1,15 @@
+.CheckoutViewContentContainer {
+  height: 90%;
+  width: 100%;
+  padding: 0px 16px;
+  /* background-color: red; */
+}
+
+.CheckoutViewQRScannerContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  /* background-color: red; */
+}
