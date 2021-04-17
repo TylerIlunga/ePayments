@@ -296,15 +296,15 @@ class SettingsView extends React.Component {
   renderUpdateProfileButtons() {
     if (this.state.updatingProfile) {
       return (
-        <div className='SettingsViewProfileViewInputButtonsContainer'>
+        <div className='SettingsViewActionButtonContainer'>
           <button
-            className='SettingsViewProfileViewInputButton'
+            className='SettingsViewActionButton'
             onClick={(e) => this.toggleUpdatingProfileState(e, false)}
           >
             Cancel
           </button>
           <button
-            className='SettingsViewProfileViewInputButton'
+            className='SettingsViewActionButton'
             onClick={this.updateUserProfile}
           >
             Submit
@@ -313,9 +313,9 @@ class SettingsView extends React.Component {
       );
     }
     return (
-      <div className='SettingsViewProfileViewInputButtonsContainer'>
+      <div className='SettingsViewActionButtonContainer'>
         <button
-          className='SettingsViewProfileViewInputButton'
+          className='SettingsViewActionButton'
           onClick={(e) => this.toggleUpdatingProfileState(e, true)}
         >
           Update
@@ -329,7 +329,8 @@ class SettingsView extends React.Component {
       <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
-          <label>Type: {this.props.user.type}</label>
+          {/* <label>Type: {this.props.user.type}</label> */}
+          <label>Type: {this.user.type}</label>
           <label>Email Address: </label>
           <input
             className='SettingsViewProfileViewInput'
@@ -357,8 +358,8 @@ class SettingsView extends React.Component {
               this.handleUpdatingUserProfileField(evt, 'address')
             }
           />
-          {this.renderUpdateProfileButtons()}
         </form>
+        {this.renderUpdateProfileButtons()}
       </div>
     );
   }
@@ -368,7 +369,8 @@ class SettingsView extends React.Component {
       <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
-          <label>Type: {this.props.user.type}</label>
+          {/* <label>Type: {this.props.user.type}</label> */}
+          <label>Type: {this.user.type}</label>
           <label>Username: </label>
           <input
             className='SettingsViewProfileViewInput'
@@ -392,8 +394,8 @@ class SettingsView extends React.Component {
               </option>
             ))}
           </select>
-          {this.renderUpdateProfileButtons()}
         </form>
+        {this.renderUpdateProfileButtons()}
       </div>
     );
   }
@@ -484,21 +486,19 @@ class SettingsView extends React.Component {
       <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewPaymentsViewInfoContainer'>
-          <p>
-            <span className='SettingsViewPaymentsViewInfoHeader'>
-              Coinbase Account ID:
-            </span>
-            {paymentAccount.coinbase_account_id}
-          </p>
-          <p>
-            <span className='SettingsViewPaymentsViewInfoHeader'>
-              Coinbase Bitcoin Address:
-            </span>
-            {paymentAccount.coinbase_bitcoin_address}
-          </p>
           <form className='SettingsViewPaymentsViewInfoConvertForm'>
-            <label className='SettingsViewPaymentsViewInfoHeader'>
-              Auto-Convert Payments To Fiat:
+            <label>
+              <strong>Coinbase Account ID:</strong>
+              {` ${paymentAccount.coinbase_account_id}`}
+            </label>
+            <br />
+            <label>
+              <strong>Coinbase Bitcoin Address:</strong>
+              {` ${paymentAccount.coinbase_bitcoin_address}`}
+            </label>
+            <br />
+            <label>
+              <strong>Auto-Convert Payments To Fiat:</strong>
             </label>
             <select
               className='SettingsViewPaymentsViewInfoConvertFormInput'
@@ -510,12 +510,14 @@ class SettingsView extends React.Component {
               <option value='false'>Disabled</option>
             </select>
           </form>
-          <button
-            className='SettingsViewPaymentsViewInfoButton'
-            onClick={this.startCoinbaseOAuth}
-          >
-            Update
-          </button>
+          <div className='SettingsViewActionButtonContainer'>
+            <button
+              className='SettingsViewActionButton'
+              onClick={this.startCoinbaseOAuth}
+            >
+              Update
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -556,12 +558,14 @@ class SettingsView extends React.Component {
         <div className='SettingsViewLogOutViewAYSContainer'>
           <p>Are you sure you want to log out? We don't want you to go :(</p>
         </div>
-        <button
-          className='SettingsViewLogOutViewImSureButton'
-          onClick={this.logUserOut}
-        >
-          I'm Sure
-        </button>
+        <div className='SettingsViewActionButtonContainer'>
+          <button
+            className='SettingsViewActionButton'
+            onClick={this.logUserOut}
+          >
+            I'm Sure
+          </button>
+        </div>
       </div>
     );
   }

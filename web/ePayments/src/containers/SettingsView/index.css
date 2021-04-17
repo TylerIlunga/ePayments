@@ -42,8 +42,73 @@
   font-weight: 900;
 }
 
-@media screen and (max-width: 1100px) {
-  .MainDashboardMenuContainer {
-    display: none;
-  }
+.SettingsViewProfileViewInfoForm {
+  height: 65%;
+  padding: 0px 16px;
+}
+
+.SettingsViewProfileViewInfoForm label {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  width: 100%;
+  margin: 10px 0px;
+}
+
+.SettingsViewProfileViewInfoForm input {
+  width: 100%;
+  padding: 5px;
+  border-width: 0px 0px 1px;
+  border-color: white;
+  background-color: transparent;
+  color: white;
+}
+
+.SettingsViewActionButtonContainer {
+  height: 15%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.SettingsViewActionButton {
+  width: 75%;
+  padding: 12px 0px;
+  margin: 15px 0px;
+  border-radius: 5px;
+  border: solid 2px white;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: transparent;
+  color: white;
+}
+
+.SettingsViewActionButton:hover {
+  background: white;
+  color: rgb(20, 136, 204);
+  transition: 300ms;
+}
+
+.SettingsViewPaymentsViewInfoContainer {
+  height: 65%;
+  padding: 0px 16px;
+}
+
+.SettingsViewPaymentsViewInfoConvertForm {
+  height: 100%;
+}
+
+.SettingsViewPaymentsViewInfoConvertForm label {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  margin: 10px 0px;
+}
+
+.SettingsViewLogOutViewAYSContainer {
+  height: 65%;
+  padding: 0px 16px;
+  color: white;
 }
