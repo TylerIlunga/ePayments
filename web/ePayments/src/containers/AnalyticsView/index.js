@@ -507,9 +507,9 @@ class AnalyticsView extends React.Component {
 
   renderAnalyticsViewHeader() {
     return (
-      <div className='MainAnalyticsViewHeader'>
-        <p>{this.state.loading ? 'Loading...' : 'Analytics'}</p>
-      </div>
+      <p className='StdContentHeaderLabel'>
+        {this.state.loading ? 'Loading...' : 'Analytics'}
+      </p>
     );
   }
 
@@ -652,11 +652,10 @@ class AnalyticsView extends React.Component {
 
   renderAnalyticsViewOptions() {
     return (
-      <div className='MainAnalyticsViewOptionsContainer'>
-        <div className='MainAnalyticsViewOptionsReports'>
+      <div className='AnalyticsViewOptionsContainer row'>
+        <div className='AnalyticsViewReportTypeCol col-6'>
           <select
             value={this.state.selectedReport}
-            className='MainAnalyticsViewOptionsSelect'
             onChange={(evt) => this.handleOnOptionChange(evt, 'report')}
           >
             {this.state.reportTypes.map((reportType, i) => {
@@ -668,10 +667,9 @@ class AnalyticsView extends React.Component {
             })}
           </select>
         </div>
-        <div className='MainAnalyticsViewOptionsPeriods'>
+        <div className='AnalyticsViewPeriodTypeCol col-6'>
           <select
             value={this.state.selectedPeriod}
-            className='MainAnalyticsViewOptionsSelect'
             onChange={(evt) => this.handleOnOptionChange(evt, 'period')}
           >
             {this.state.periodTypes.map((periodType, i) => {
@@ -783,10 +781,14 @@ class AnalyticsView extends React.Component {
 
   renderAnalyticsView() {
     return (
-      <div className='AnalyticsViewContentContainer col-sm-11 col-12'>
-        {this.renderAnalyticsViewHeader()}
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='StdViewContentHeaderContainer row'>
+          {this.renderAnalyticsViewHeader()}
+        </div>
         {this.renderAnalyticsViewOptions()}
-        {this.renderAnalyticsViewCharts()}
+        <div className='AnalyticsViewChartsContainer row'>
+          {this.renderAnalyticsViewCharts()}
+        </div>
       </div>
     );
   }
@@ -794,18 +796,18 @@ class AnalyticsView extends React.Component {
   render() {
     if (this.state.displayMobileMenuModal) {
       return (
-        <div className='MainTransactionsViewContainer row'>
+        <div className='MainStdViewContainer row'>
           {this.renderBrandRow()}
-          <div className='TransactionsViewMenuContentContainer row'>
+          <div className='StdViewMenuContentContainer row'>
             {this.renderMenuColumn(true)}
           </div>
         </div>
       );
     }
     return (
-      <div className='MainAnalyticsViewContainer row'>
+      <div className='MainStdViewContainer row'>
         {this.renderBrandRow()}
-        <div className='AnalyticsViewMenuContentContainer row'>
+        <div className='StdViewMenuContentContainer row'>
           {this.renderMenuColumn(false)}
           {this.renderAnalyticsView()}
         </div>

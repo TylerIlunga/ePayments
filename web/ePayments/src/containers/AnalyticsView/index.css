@@ -1,19 +1,50 @@
-.MainAnalyticsViewContainer {
-  height: 100%;
+.AnalyticsViewOptionsContainer {
+  height: 10%;
   width: 100%;
-  margin: 0px;
   padding: 0px;
+  margin: 0px;
+  display: flex;
+  align-items: center;
 }
 
-.AnalyticsViewMenuContentContainer {
-  height: 90%;
+.AnalyticsViewReportTypeCol {
+  height: 100%;
+  width: 50%;
+  padding: 0px 26px;
+  margin: 0px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.AnalyticsViewReportTypeCol select {
+  height: 50%;
   width: 100%;
 }
 
-.AnalyticsViewContentContainer {
+.AnalyticsViewPeriodTypeCol {
   height: 100%;
-  width: 90%;
-  background-color: white;
+  width: 50%;
+  padding: 0px 26px;
+  margin: 0px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.AnalyticsViewPeriodTypeCol select {
+  height: 50%;
+  width: 100%;
+  text-align-last: right;
+  -ms-text-align-last: right;
+  -moz-text-align-last: right;
+  direction: rtl;
+}
+
+.AnalyticsViewChartsContainer {
+  height: 80%;
+  width: 100%;
+  overflow-y: scroll;
 }
 
 @media screen and (max-width: 1100px) {
