@@ -2,7 +2,8 @@ const config = {
   networkRequest(url, reqOptions = {}, resType = 'json') {
     reqOptions = {
       ...reqOptions,
-      credentials: 'include',
+      // NOTE: NO CORS
+      // credentials: 'include',
     };
     return fetch(url, reqOptions)
       .then((res) => {

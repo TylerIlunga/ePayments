@@ -84,6 +84,7 @@ class SettingsView extends React.Component {
     );
     this.renderSettingsView = this.renderSettingsView.bind(this);
     this.renderActiveOptionContent = this.renderActiveOptionContent.bind(this);
+    this.settingsOptionIsActive = this.settingsOptionIsActive.bind(this);
     this.renderCustomerProfileView = this.renderCustomerProfileView.bind(this);
     this.renderBusinessProfileView = this.renderBusinessProfileView.bind(this);
     this.handleUpdatingUserProfileField = this.handleUpdatingUserProfileField.bind(
@@ -154,8 +155,8 @@ class SettingsView extends React.Component {
 
   renderActiveOptionContentHeader() {
     return (
-      <div className='SettingsViewActiveOptionHeader'>
-        <h1>{this.state.activeOption}</h1>
+      <div className='StdViewContentHeaderContainer'>
+        <p className='StdContentHeaderLabel'>{this.state.activeOption}</p>
       </div>
     );
   }
@@ -325,7 +326,7 @@ class SettingsView extends React.Component {
 
   renderBusinessProfileView() {
     return (
-      <div className='SettingsViewProfileViewContainer'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           <label>Type: {this.props.user.type}</label>
@@ -364,7 +365,7 @@ class SettingsView extends React.Component {
 
   renderCustomerProfileView() {
     return (
-      <div className='SettingsViewProfileViewContainer'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           <label>Type: {this.props.user.type}</label>
@@ -480,7 +481,7 @@ class SettingsView extends React.Component {
     // const paymentAccount = this.props.paymentAccount;
     const paymentAccount = this.paymentAccount;
     return (
-      <div className='SettingsViewPaymentsViewContainer'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewPaymentsViewInfoContainer'>
           <p>
@@ -550,7 +551,7 @@ class SettingsView extends React.Component {
 
   renderLogOutView() {
     return (
-      <div className='SettingsViewLogOutViewContainer'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewLogOutViewAYSContainer'>
           <p>Are you sure you want to log out? We don't want you to go :(</p>
@@ -578,23 +579,33 @@ class SettingsView extends React.Component {
     }
   }
 
+  settingsOptionIsActive(option) {
+    if (option === this.state.activeOption) {
+      return 'SettingsViewOption-Active';
+    }
+  }
+
   renderSettingsView() {
     return (
-      <div className='SettingsViewContentContainer col-sm-11 col-12 row'>
-        <div className='SettingsViewOptionsContainer col-2'>
+      <div className='StdViewContentContainer col-sm-11 col-12 row'>
+        <div className='SettingsViewOptionsContainer col-1'>
           {this.state.options.map((option, i) => (
             <div
               key={i}
-              className='SettingsViewOption'
+              className='SettingsViewOptionContainer'
               onClick={(evt) => this.setState({ activeOption: option })}
             >
-              <p>{option}</p>
+              <div
+                className={`SettingsViewOption ${this.settingsOptionIsActive(
+                  option,
+                )}`}
+              >
+                <p>{option}</p>
+              </div>
             </div>
           ))}
         </div>
-        <div className='SettingsViewActiveOptionContainer col-sm-11 col-12'>
-          {this.renderActiveOptionContent()}
-        </div>
+        {this.renderActiveOptionContent()}
       </div>
     );
   }
@@ -602,18 +613,18 @@ class SettingsView extends React.Component {
   render() {
     if (this.state.displayMobileMenuModal) {
       return (
-        <div className='MainSettingsViewContainer row'>
+        <div className='MainStdViewContainer row'>
           {this.renderBrandRow()}
-          <div className='SettingsViewMenuContentContainer row'>
+          <div className='StdViewMenuContentContainer row'>
             {this.renderMenuColumn(true)}
           </div>
         </div>
       );
     }
     return (
-      <div className='MainSettingsViewContainer row'>
+      <div className='MainStdViewContainer row'>
         {this.renderBrandRow()}
-        <div className='SettingsViewMenuContentContainer row'>
+        <div className='StdViewMenuContentContainer row'>
           {this.renderMenuColumn(false)}
           {this.renderSettingsView()}
         </div>
