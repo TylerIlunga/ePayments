@@ -18,32 +18,32 @@ class SettingsView extends React.Component {
     super(props);
 
     // // Test Business User
-    // this.user = {
-    //   type: 'business',
-    //   email: 'w@xyz.com',
-    // };
-    // this.profile = {
-    //   id: 1,
-    //   user_id: 9,
-    //   address: '123 First Street',
-    //   phone_number: '2012109600',
-    //   public_email: 'w@xyz.com',
-    //   created_at: '1617549020305',
-    // };
-
-    // Test Customer User
     this.user = {
-      id: 10,
-      type: 'customer',
-      email: 'tyler@mizudev.com',
+      type: 'business',
+      email: 'w@xyz.com',
     };
     this.profile = {
       id: 1,
-      user_id: 10,
-      country: 'US',
-      username: 'cguy',
-      created_at: '1617549020309',
+      user_id: 9,
+      address: '123 First Street',
+      phone_number: '2012109600',
+      public_email: 'w@xyz.com',
+      created_at: '1617549020305',
     };
+
+    // Test Customer User
+    // this.user = {
+    //   id: 10,
+    //   type: 'customer',
+    //   email: 'tyler@mizudev.com',
+    // };
+    // this.profile = {
+    //   id: 1,
+    //   user_id: 10,
+    //   country: 'US',
+    //   username: 'cguy',
+    //   created_at: '1617549020309',
+    // };
     this.paymentAccount = {
       id: 6,
       user_id: 9,
@@ -144,7 +144,7 @@ class SettingsView extends React.Component {
   }
 
   toggleProfileInputEnableStatus(isDisabled) {
-    document.querySelectorAll('.SettingsViewProfileViewInput').forEach((el) => {
+    document.querySelectorAll('.SettingsViewInput').forEach((el) => {
       if (isDisabled) {
         el.setAttribute('disabled', isDisabled);
       } else {
@@ -326,14 +326,14 @@ class SettingsView extends React.Component {
 
   renderBusinessProfileView() {
     return (
-      <div className='StdViewContentContainer col-11'>
+      <div className='SettingsViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           {/* <label>Type: {this.props.user.type}</label> */}
           <label>Type: {this.user.type}</label>
           <label>Email Address: </label>
           <input
-            className='SettingsViewProfileViewInput'
+            className='SettingsViewInput'
             type='text'
             value={this.state.updatedUserProfile.public_email}
             onChange={(evt) =>
@@ -342,7 +342,7 @@ class SettingsView extends React.Component {
           />
           <label>Phone Number: </label>
           <input
-            className='SettingsViewProfileViewInput'
+            className='SettingsViewInput'
             type='text'
             value={this.state.updatedUserProfile.phone_number}
             onChange={(evt) =>
@@ -351,7 +351,7 @@ class SettingsView extends React.Component {
           />
           <label>Street Address: </label>
           <input
-            className='SettingsViewProfileViewInput'
+            className='SettingsViewInput'
             type='text'
             value={this.state.updatedUserProfile.address}
             onChange={(evt) =>
@@ -366,14 +366,14 @@ class SettingsView extends React.Component {
 
   renderCustomerProfileView() {
     return (
-      <div className='StdViewContentContainer col-11'>
+      <div className='SettingsViewContentContainer col-12'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           {/* <label>Type: {this.props.user.type}</label> */}
           <label>Type: {this.user.type}</label>
           <label>Username: </label>
           <input
-            className='SettingsViewProfileViewInput'
+            className='SettingsViewInput'
             type='text'
             value={this.state.updatedUserProfile.username}
             onChange={(evt) =>
@@ -382,7 +382,7 @@ class SettingsView extends React.Component {
           />
           <label>Country: </label>
           <select
-            className='SettingsViewProfileViewInput'
+            className='SettingsViewInput'
             value={this.state.updatedUserProfile.country}
             onChange={(evt) =>
               this.handleUpdatingUserProfileField(evt, 'country')
@@ -483,7 +483,7 @@ class SettingsView extends React.Component {
     // const paymentAccount = this.props.paymentAccount;
     const paymentAccount = this.paymentAccount;
     return (
-      <div className='StdViewContentContainer col-11'>
+      <div className='SettingsViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewPaymentsViewInfoContainer'>
           <form className='SettingsViewPaymentsViewInfoConvertForm'>
@@ -501,7 +501,7 @@ class SettingsView extends React.Component {
               <strong>Auto-Convert Payments To Fiat:</strong>
             </label>
             <select
-              className='SettingsViewPaymentsViewInfoConvertFormInput'
+              className='SettingsViewInput'
               // value={String(this.props.paymentAccount.auto_convert_to_fiat)}
               value={String(this.paymentAccount.auto_convert_to_fiat)}
               onChange={(evt) => this.toggleAutoConvertToFiat(evt)}
@@ -553,7 +553,7 @@ class SettingsView extends React.Component {
 
   renderLogOutView() {
     return (
-      <div className='StdViewContentContainer col-11'>
+      <div className='SettingsViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewLogOutViewAYSContainer'>
           <p>Are you sure you want to log out? We don't want you to go :(</p>
@@ -592,20 +592,16 @@ class SettingsView extends React.Component {
   renderSettingsView() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12 row'>
-        <div className='SettingsViewOptionsContainer col-1'>
+        <div className='SettingsViewOptionsContainer col-12'>
           {this.state.options.map((option, i) => (
             <div
               key={i}
-              className='SettingsViewOptionContainer'
+              className={`SettingsViewOption ${this.settingsOptionIsActive(
+                option,
+              )}`}
               onClick={(evt) => this.setState({ activeOption: option })}
             >
-              <div
-                className={`SettingsViewOption ${this.settingsOptionIsActive(
-                  option,
-                )}`}
-              >
-                <p>{option}</p>
-              </div>
+              <p>{option}</p>
             </div>
           ))}
         </div>

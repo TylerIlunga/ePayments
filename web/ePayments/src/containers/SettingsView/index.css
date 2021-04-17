@@ -1,14 +1,17 @@
+.SettingsViewContentContainer {
+  height: 100%;
+  width: 90%;
+  background: linear-gradient(to right, rgb(20, 136, 204), rgb(43, 50, 178));
+  /* background: linear-gradient(to right, rgb(116, 116, 191), rgb(52, 138, 199)); */
+}
+
 .SettingsViewOptionsContainer {
   height: 100%;
-  padding: 16px;
+  width: 10%;
+  padding: 0px;
   margin: 0px;
   background-color: white;
   color: black;
-  padding: 0px;
-}
-
-.SettingsViewOptionContainer {
-  width: 100%;
 }
 
 .SettingsViewOption {
@@ -18,7 +21,8 @@
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  padding: 25px 10px;
+  padding: 0px;
+  height: 10%;
 }
 
 .SettingsViewOption p {
@@ -44,6 +48,7 @@
 
 .SettingsViewProfileViewInfoForm {
   height: 65%;
+  width: 100%;
   padding: 0px 16px;
 }
 
@@ -55,7 +60,7 @@
   margin: 10px 0px;
 }
 
-.SettingsViewProfileViewInfoForm input {
+.SettingsViewInput {
   width: 100%;
   padding: 5px;
   border-width: 0px 0px 1px;
@@ -111,4 +116,18 @@
   height: 65%;
   padding: 0px 16px;
   color: white;
+}
+
+@media screen and (max-width: 1100px) {
+  .SettingsViewOptionsContainer {
+    height: 20%;
+    width: 100%;
+  }
+  .SettingsViewOption {
+    height: 33.33%;
+  }
+  .SettingsViewContentContainer {
+    height: 80%;
+    width: 100%;
+  }
 }
