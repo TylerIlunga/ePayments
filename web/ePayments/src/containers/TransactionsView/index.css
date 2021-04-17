@@ -62,4 +62,7 @@
   .StdViewContentContainer {
     width: 100%;
   }
+  .TransactionViewDetailsMapContainer {
+    padding: 20px 0px;
+  }
 }

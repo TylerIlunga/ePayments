@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import config from '../../config';
 import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
 import DataTable from '../../components/DataTable';
@@ -243,14 +244,25 @@ class TransactionsView extends React.Component {
   }
 
   renderTransactionLocation(transaction) {
-    // TODO: https://developers.google.com/maps/documentation/embed/get-started
     if (
       transaction.latitude &&
       transaction.longitude &&
-      transaction.latitude > 0 &&
-      transaction.longitude > 0
+      transaction.latitude !== 0 &&
+      transaction.longitude !== 0
     ) {
-      return <div>Google Map here</div>;
+      const src = `https://www.google.com/maps/embed/v1/place?key=${config.GoogleMapsEmbedAPI.key}
+      &q=${transaction.latitude},${transaction.longitude}`;
+      return (
+        <iframe
+          title='Transaction Location'
+          width='600'
+          height='450'
+          style={{ border: '0' }}
+          loading='lazy'
+          allowfullscreen
+          src={src}
+        ></iframe>
+      );
     }
   }
 
@@ -261,12 +273,12 @@ class TransactionsView extends React.Component {
           {this.renderTableHeader()}
         </div>
         <div className='TransactionViewDetailsContainer row'>
-          <div className='TransactionViewDetailsLabelContainer col-6'>
+          <div className='TransactionViewDetailsLabelContainer col-sm-6 col-12'>
             {this.renderTransactionTextInformation(
               this.state.selectedTransaction,
             )}
           </div>
-          <div className='TransactionViewDetailsMapContainer col-6'>
+          <div className='TransactionViewDetailsMapContainer col-sm-6 col-12'>
             {this.renderTransactionLocation(this.state.selectedTransaction)}
           </div>
         </div>

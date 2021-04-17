@@ -15,6 +15,9 @@ const config = {
     // TODO: Change temp launch date to actual launch date
     productLaunchDate: new Date('01/01/2021'),
   },
+  GoogleMapsEmbedAPI: {
+    key: process.env.REACT_APP_GOOGLE_MAPS_EMBED_API_KEY || 'nokey',
+  },
   countries: [
     { name: 'Afghanistan', code: 'AF' },
     { name: 'Åland Islands', code: 'AX' },
