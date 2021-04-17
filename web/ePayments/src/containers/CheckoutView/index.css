@@ -1,5 +1,10 @@
+.CheckoutViewHeaderLabel {
+  font-size: 30px;
+  font-weight: 900;
+}
+
 .CheckoutViewContentContainer {
-  height: 90%;
+  height: 70%;
   width: 100%;
   padding: 0px 16px;
   /* background-color: red; */
@@ -12,4 +17,81 @@
   justify-content: center;
   align-items: flex-start;
   /* background-color: red; */
+}
+
+.MainCheckoutViewProductDetailsContainer {
+  height: 90%;
+  width: 100%;
+}
+
+.MainCheckoutViewProductDetailsLabel {
+  padding: 18px 0px;
+  font-size: 18px;
+  font-weight: 200;
+  color: white;
+}
+
+.MainCheckoutViewProductInventoryInput {
+  margin-left: 10px;
+  text-align: center;
+}
+
+.MainCheckoutViewProductInventoryInput {
+  width: 45px;
+  height: 42px;
+  line-height: 1.65;
+  margin-left: 10px;
+  padding-left: 10px;
+  border: 1px solid #eee;
+}
+
+.MainCheckoutViewProductInventoryInput:focus {
+  outline: 0;
+}
+
+.CheckoutViewTotalPriceLabel {
+  padding: 13px 0px;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.MainCheckoutViewConfirmationButtonsContainer {
+  height: 30%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.MainCheckoutViewButton {
+  width: 75%;
+  padding: 12px 0px;
+  margin: 15px 0px;
+  border-radius: 5px;
+  border: solid 2px white;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
+.DeclineButton {
+  background: red;
+}
+
+.ConfirmButton {
+  background: #85bb65;
+}
+
+.DeclineButton:hover {
+  background: white;
+  color: red;
+  transition: 300ms;
+}
+
+.ConfirmButton:hover {
+  background: white;
+  color: #85bb65;
+  transition: 300ms;
 }

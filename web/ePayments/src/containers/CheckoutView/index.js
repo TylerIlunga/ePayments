@@ -14,7 +14,12 @@ class CheckoutView extends React.Component {
     this.state = {
       displayMobileMenuModal: false,
       loading: false,
-      view: 'scan',
+      view: 'checkoutDetails',
+      QrReaderStyle: {
+        width: '300px',
+        padding: '0',
+        margin: '0',
+      },
       scannedProduct: null,
       checkoutQuantity: 1,
     };
@@ -75,7 +80,7 @@ class CheckoutView extends React.Component {
   renderCheckoutHeader() {
     if (this.state.scannedProduct && this.state.view === 'checkoutDetails') {
       return (
-        <p className='StdContentHeaderLabel'>
+        <p className='StdContentHeaderLabel CheckoutViewHeaderLabel'>
           Product: {this.state.scannedProduct.label}
         </p>
       );
@@ -113,6 +118,7 @@ class CheckoutView extends React.Component {
 
   handleTransaction(evt, status) {
     if (status === 'decline') {
+      this.displayToastMessage('error', 'Transaction Denied');
       return this.setState({ scannedProduct: null, view: 'scan' });
     }
 
@@ -187,16 +193,17 @@ class CheckoutView extends React.Component {
           Price: ${this.state.scannedProduct.price}
         </p>
         <label className='MainCheckoutViewProductDetailsLabel'>
-          <strong>Enter Quantity:</strong>
+          Enter Quantity:
         </label>
         <input
+          className='MainCheckoutViewProductInventoryInput'
           type='number'
           min='1'
           max={this.state.scannedProduct.inventory_count}
           value={this.state.checkoutQuantity}
           onChange={this.handleUpdateCheckoutQuantity}
         />
-        <p className='MainCheckoutViewProductDetailsLabel'>
+        <p className='CheckoutViewTotalPriceLabel'>
           Total Price: ${this.computeTotalPrice()}
         </p>
       </div>
@@ -293,18 +300,17 @@ class CheckoutView extends React.Component {
   }
 
   renderQRScanner() {
+    if (this.state.scannedProduct && this.state.view === 'checkoutDetails') {
+      return null;
+    }
     return (
       <div className='CheckoutViewQRScannerContainer'>
-        {/* NOTE: LEFTOFFHERE...Due to browser implementations the camera can only be accessed over https or localhost. */}
+        {/* NOTE: Due to browser implementations the camera can only be accessed over https or localhost. */}
         <QrReader
           delay={300}
           onError={this.handleScanError}
           onScan={this.handleScanSuccess}
-          style={{
-            width: '300px',
-            padding: '0',
-            margin: '0',
-          }}
+          style={this.state.QrReaderStyle}
           facingMode={'environment'}
         />
       </div>
