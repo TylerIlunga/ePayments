@@ -17,6 +17,7 @@ const options = {
 
 module.exports = (sequelize) => {
   // NOTE: Drop tables to change longitude,latitude change
+  // TODO: Normalize Table to include BusinessProduct.label
   let BusinessTransaction = sequelize.define(
     'businesstransactions',
     {

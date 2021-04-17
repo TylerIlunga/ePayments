@@ -19,6 +19,10 @@ Router.get('/healthcheck', (req, res) => res.sendStatus(200));
 /** API Endpoints related to handling user sessions */
 Router.post('/api/v1/session/signup', SessionController.signUp);
 Router.post('/api/v1/session/login', SessionController.logIn);
+Router.get(
+  '/api/v1/session/fetch/user',
+  SessionController.fetchUserSessionData,
+);
 Router.get('/api/v1/session/logout', SessionController.logOut);
 
 /** API Endpoints related to handling user accounts */

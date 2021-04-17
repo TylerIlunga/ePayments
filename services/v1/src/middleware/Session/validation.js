@@ -22,4 +22,7 @@ module.exports = {
     }),
     password: Joi.string().pattern(VALIDATION.genericPasswordPattern),
   }).with('email', 'password'),
+  fetchUserSessionData: Joi.object({
+    ut: Joi.string().required(),
+  }),
 };

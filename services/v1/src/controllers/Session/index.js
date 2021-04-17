@@ -5,13 +5,19 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const generalConfig = require('../../config');
-const { User } = require('../../dal/config');
-const { Errors, Generators, Tokens, Validation } = require('../../utils');
-const {
-  tokenHasExpired,
-  signUpLogInBodySchema,
-} = require('../../middleware/Session/validation');
+const dalConfig = require('../../dal/config');
 const EmailSender = require('../../email');
+const {
+  signUpLogInBodySchema,
+  fetchUserSessionData,
+} = require('../../middleware/Session/validation');
+const {
+  Errors,
+  Generators,
+  Tokens,
+  Strings,
+  Validation,
+} = require('../../utils');
 
 // NOTE: Use .mjs for new syntax? Or newer version of Node.js
 
@@ -44,7 +50,7 @@ module.exports = {
     }
     try {
       let { email, password } = validationResult.value;
-      let user = await User.findOne({ where: { email } });
+      let user = await dalConfig.User.findOne({ where: { email } });
       if (user !== null) {
         throw { error: 'Account exists for the given email.' };
       }
@@ -53,7 +59,7 @@ module.exports = {
       activationToken = activationToken.toString('hex');
 
       password = await Generators.generatePassword(password);
-      user = await User.create({
+      user = await dalConfig.User.create({
         email,
         password,
         activation_token: activationToken,
@@ -91,7 +97,7 @@ module.exports = {
     try {
       const { email, password } = validationResult.value;
       // Check if user exists via email
-      const user = await User.findOne({ where: { email } });
+      const user = await dalConfig.User.findOne({ where: { email } });
       if (user === null) {
         throw { error: 'Account does not exist for the given email.' };
       }
@@ -120,6 +126,56 @@ module.exports = {
         });
         // Return user data not profile.
         return res.json({ user: removeSensitiveUserData(user), error: null });
+      });
+    } catch (error) {
+      return Errors.General.serveResponse(error, res);
+    }
+  },
+  /**
+   * Fetches a user account and profile data given their session token cookie.
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {number} HTTP Status Code
+   */
+  fetchUserSessionData(req, res) {
+    const validationResult = Validation.validateRequestBody(
+      fetchUserSessionData,
+      req.cookies,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    try {
+      const { ut } = validationResult.value;
+      // Verify JWT in our session cookie
+      Tokens.verifyToken(ut, async (vTRes) => {
+        if (vTRes.error) {
+          return res.json({ error: vTRes.error });
+        }
+        // Verify that the user ID within the JWT maps to a user in our DB
+        const user = await dalConfig.User.findOne({
+          where: { id: vTRes.data.userID },
+        });
+        if (user === null) {
+          return Errors.General.serveResponse(
+            { error: 'User does not exist.' },
+            res,
+          );
+        }
+        // Verify that the user ID maps to a profile in our DB
+        const profile = await dalConfig[
+          `${Strings.capitalize(user.type)}Profile`
+        ].findOne({ where: { user_id: user.id } });
+        if (profile === null) {
+          return Errors.General.serveResponse(
+            { error: 'Profile does not exist for the given user' },
+            res,
+          );
+        }
+        // Respond
+        return res.json({ user, profile });
       });
     } catch (error) {
       return Errors.General.serveResponse(error, res);

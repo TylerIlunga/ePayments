@@ -24,12 +24,15 @@ module.exports = {
       // Verify that the user ID within the JWT maps to a user in our DB
       User.findOne({ where: { id: vTRes.data.userID } })
         .then((res) => {
+          if (res === null) {
+            res.json({ error: 'User does not exist.' });
+          }
           next();
         })
         .catch((error) => {
           Errors.General.logError('evaluateSession() User.findOne({})');
           Errors.General.logError(error);
-          res.json({ error: 'User does not exist.' });
+          res.json({ error: 'Error fetching user data for the given ID.' });
         });
     });
   },
