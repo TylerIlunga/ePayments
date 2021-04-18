@@ -146,9 +146,8 @@ class TransactionsView extends React.Component {
     return <p className='StdContentHeaderLabel'>Transactions</p>;
   }
 
-  handleOnChangeRowsPerPage(pageSize, e) {
-    // TODO: Solve double call issue
-    console.log('handleOnChangeRowsPerPage()', pageSize, e);
+  handleOnChangeRowsPerPage(pageSize) {
+    console.log('handleOnChangeRowsPerPage()', pageSize);
     this.setState({ loadingTableData: true }, () => {
       this.fetchTransactions({
         [`${this.props.user.type}ID`]: this.props.user.id,
@@ -162,7 +161,6 @@ class TransactionsView extends React.Component {
   }
 
   handleOnChangePage(tablePage, pageSize) {
-    // TODO: Solve double call issue
     console.log('handleOnChangeRowsPerPage()');
     let tableOffset = this.state.tableOffset;
     if (tablePage !== tableOffset && tablePage > this.state.tablePage) {

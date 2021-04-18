@@ -128,7 +128,7 @@ class ProductsView extends React.Component {
     this.fetchProducts({
       businessID: this.props.user.id,
       queryAttributes: {
-        limit: 5,
+        limit: 10,
         order: 'DESC',
       },
     });
@@ -238,7 +238,11 @@ class ProductsView extends React.Component {
   }
 
   handleOnChangeRowsPerPage(table, pageSize) {
-    // TODO: Solve double call issue
+    console.log(
+      'handleOnChangeRowsPerPage() table, pageSize:',
+      table,
+      pageSize,
+    );
     let newState = null;
     let cb = null;
     if (table === 'products') {
@@ -273,7 +277,11 @@ class ProductsView extends React.Component {
   }
 
   handleOnChangeProductsTablePage(tablePage, pageSize) {
-    // TODO: Solve double call issue
+    console.log(
+      'handleOnChangeProductsTablePage() tablePage, pageSize:',
+      tablePage,
+      pageSize,
+    );
     let productsTableOffset = this.state.productsTableOffset;
     if (
       tablePage !== productsTableOffset &&
@@ -287,24 +295,10 @@ class ProductsView extends React.Component {
     ) {
       productsTableOffset -= pageSize;
     }
-    return this.setState(
-      {
-        productsTableOffset,
-        productsTablePage: tablePage,
-      },
-      () => {
-        if (this.state.products.length < productsTableOffset + pageSize) {
-          this.fetchProducts({
-            businessID: this.props.user.id,
-            queryAttributes: {
-              offset: productsTableOffset,
-              limit: pageSize,
-              order: 'DESC',
-            },
-          });
-        }
-      },
-    );
+    return this.setState({
+      productsTableOffset,
+      productsTablePage: tablePage,
+    });
   }
 
   handleOnChangeTransactionsTablePage(tablePage, pageSize) {
