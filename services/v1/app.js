@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(config.JWT.secret));
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 // NOTES: Issues with Safari...
 // app.use(
 //   cors({

@@ -129,7 +129,7 @@ module.exports = {
         throw { error: 'Account can not be found for the given information.' };
       }
       // Check to see if reset token expired.
-      if (user.password_reset_expiry >= Date.now()) {
+      if (user.password_reset_expiry <= Date.now()) {
         throw {
           error: 'Password Reset Token expired. Please request a new one.',
         };
