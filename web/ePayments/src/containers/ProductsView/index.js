@@ -126,8 +126,7 @@ class ProductsView extends React.Component {
 
   componentDidMount() {
     this.fetchProducts({
-      // TODO: (UNCOMMENT) businessID: this.props.user.id,
-      businessID: 9,
+      businessID: this.props.user.id,
       queryAttributes: {
         limit: 5,
         order: 'DESC',
@@ -142,7 +141,12 @@ class ProductsView extends React.Component {
         if (res.error) {
           throw res.error;
         }
-        this.setState({ loadingProducts: false, products: res.products });
+        this.setState({
+          loadingProducts: false,
+          products: res.products,
+          selectedProduct: null,
+          view: 'list',
+        });
       })
       .catch((error) => {
         console.log('this.BusinessProductService.listProducts error:', error);
@@ -234,14 +238,14 @@ class ProductsView extends React.Component {
   }
 
   handleOnChangeRowsPerPage(table, pageSize) {
+    // TODO: Solve double call issue
     let newState = null;
     let cb = null;
     if (table === 'products') {
       newState = { loadingProducts: true };
       cb = () => {
         this.fetchProducts({
-          // TODO: (UNCOMMENT) businessID: this.props.user.id,
-          businessID: 9,
+          businessID: this.props.user.id,
           queryAttributes: {
             offset: this.state.productsTableOffset,
             limit: pageSize,
@@ -253,11 +257,9 @@ class ProductsView extends React.Component {
       newState = { loadingProductTransactions: true };
       cb = () => {
         this.fetchProductTransactions({
-          // TODO: (UNCOMMENT) businessID: this.props.user.id,
-          businessID: 9,
+          businessID: this.props.user.id,
           queryAttributes: {
-            // TODO: (UNCOMMENT) businessID: this.props.user.id,
-            businessID: 9,
+            businessID: this.props.user.id,
             productID: this.state.selectedProduct.id,
             offset: this.state.transactionsTableOffset,
             limit: pageSize,
@@ -271,6 +273,7 @@ class ProductsView extends React.Component {
   }
 
   handleOnChangeProductsTablePage(tablePage, pageSize) {
+    // TODO: Solve double call issue
     let productsTableOffset = this.state.productsTableOffset;
     if (
       tablePage !== productsTableOffset &&
@@ -292,8 +295,7 @@ class ProductsView extends React.Component {
       () => {
         if (this.state.products.length < productsTableOffset + pageSize) {
           this.fetchProducts({
-            // TODO: (UNCOMMENT) businessID: this.props.user.id,
-            businessID: 9,
+            businessID: this.props.user.id,
             queryAttributes: {
               offset: productsTableOffset,
               limit: pageSize,
@@ -330,11 +332,9 @@ class ProductsView extends React.Component {
           transactionsTableOffset + pageSize
         ) {
           this.fetchProductTransactions({
-            // TODO: (UNCOMMENT) businessID: this.props.user.id,
-            businessID: 9,
+            businessID: this.props.user.id,
             queryAttributes: {
-              // TODO: (UNCOMMENT) businessID: this.props.user.id,
-              businessID: 9,
+              businessID: this.props.user.id,
               productID: this.state.selectedProduct.id,
               offset: transactionsTableOffset,
               limit: pageSize,
@@ -347,6 +347,7 @@ class ProductsView extends React.Component {
   }
 
   handleOnRowClick(table, evt, rowData, toggleDetailPanel) {
+    evt.preventDefault();
     if (table === 'products') {
       this.setState({ selectedProduct: rowData, view: 'selected' });
     }
@@ -483,14 +484,12 @@ class ProductsView extends React.Component {
         if (res.error) {
           throw res.error;
         }
-        this.setState({ selectedProduct: null }, () => {
-          this.fetchProducts({
-            businessID: this.state.selectedProduct.user_id,
-            queryAttributes: {
-              limit: 5,
-              order: 'DESC',
-            },
-          });
+        this.fetchProducts({
+          businessID: this.state.selectedProduct.user_id,
+          queryAttributes: {
+            limit: 5,
+            order: 'DESC',
+          },
         });
       })
       .catch((error) => {
@@ -510,11 +509,9 @@ class ProductsView extends React.Component {
           className='ProductViewDetailsShowTransactionButton'
           onClick={(evt) =>
             this.fetchProductTransactions({
-              // TODO: (UNCOMMENT) businessID: this.props.user.id,
-              businessID: 9,
+              businessID: this.props.user.id,
               queryAttributes: {
-                // TODO: (UNCOMMENT) businessID: this.props.user.id,
-                businessID: 9,
+                businessID: this.props.user.id,
                 productID: this.state.selectedProduct.id,
                 limit: 5,
                 order: 'DESC',
@@ -581,36 +578,38 @@ class ProductsView extends React.Component {
       return this.displayToastMessage('error', validationResult.error);
     }
 
-    // this.BusinessProductService.createNewProduct(
-    //   this.props.user.id,
-    //   this.state.newProductData,
-    // )
-    this.BusinessProductService.createNewProduct(9, this.state.newProductData)
+    this.BusinessProductService.createNewProduct(
+      this.props.user.id,
+      this.state.newProductData,
+    )
       .then((res) => {
         console.log('this.BusinessProductService.createNewProduct() res:', res);
         if (res.error) {
           throw res.error;
         }
         this.displayToastMessage('success', 'Success');
-        this.fetchProducts({
-          // TODO: (UNCOMMENT) businessID: this.props.user.id,
-          businessID: 9,
-          queryAttributes: {
-            limit: 5,
-            order: 'DESC',
+
+        this.setState(
+          {
+            newProductData: {
+              sku: '',
+              label: '',
+              description: '',
+              price: '',
+              category: '',
+              inventoryCount: 0,
+            },
           },
-        });
-        this.setState({
-          view: 'list',
-          newProductData: {
-            sku: '',
-            label: '',
-            description: '',
-            price: '',
-            category: '',
-            inventoryCount: 0,
+          () => {
+            this.fetchProducts({
+              businessID: this.props.user.id,
+              queryAttributes: {
+                limit: 5,
+                order: 'DESC',
+              },
+            });
           },
-        });
+        );
       })
       .catch((error) => {
         console.log(
