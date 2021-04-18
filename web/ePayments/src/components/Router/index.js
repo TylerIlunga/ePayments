@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { persistor, history } from '../../redux/store';
+import { history } from '../../redux/store';
 import { useCookies, withCookies } from 'react-cookie';
 import { ConnectedRouter } from 'connected-react-router';
 import { Route, Switch } from 'react-router-dom';
@@ -36,40 +36,35 @@ import PageNotFoundView from '../PageNotFoundView';
 
 const getCookieValueForName = (name) => {
   var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  console.log('getCookieValueForName() match:', match);
   if (!match) {
-    return undefined;
+    return null;
   }
   return match[2];
 };
 
 const handleProtectedRoutes = (history, props, cookieData, Component) => {
+  console.log('handleProtectedRoutes()');
   const [cookies] = cookieData;
   console.log('cookies pre:', cookies);
   if (!cookies.ut) {
-    cookies.ut = getCookieValueForName('ut');
+    const utCookie = getCookieValueForName('ut');
+    if (utCookie !== 'undefined' && utCookie !== null) {
+      cookies.ut = utCookie;
+    }
   }
   console.log('cookies post:', cookies);
-  console.log(
-    'props.router.location, history:',
-    props.router.location,
-    history,
-  );
-  const sessionExists =
-    props.router.location &&
-    props.router.location.state &&
-    props.router.location.state.session;
+  console.log('props.router.location:', props.router.location);
+  const sessionDoesNotExist =
+    props.router.location !== undefined &&
+    props.router.location.state !== undefined &&
+    props.router.location.state.session !== undefined &&
+    props.router.location.state.session === false;
 
-  if (!sessionExists && !cookies.ut) {
-    persistor.purge();
+  if (!cookies.ut) {
     return <AuthView {...history} {...props} />;
   }
-  if (props.router.location.pathname === '/profile/create' && !props.user.id) {
-    return <AuthView {...history} {...props} />;
-  }
-  if (
-    props.router.location.pathname === '/payments/connect' &&
-    (!props.user.id || !props.profile.id)
-  ) {
+  if (cookies.ut && sessionDoesNotExist) {
     return <AuthView {...history} {...props} />;
   }
   if (props.router.location.pathname === '/') {
@@ -152,8 +147,8 @@ const Router = (props) => {
 
 const mapStateToProps = (state) => ({
   router: state.router,
-  profile: state.profile,
-  user: state.user,
+  // profile: state.profile,
+  // user: state.user,
 });
 
 export default withCookies(connect(mapStateToProps, null)(Router));

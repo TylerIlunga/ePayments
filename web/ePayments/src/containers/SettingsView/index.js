@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { persistor } from '../../redux/store';
 import config from '../../config';
 import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
@@ -473,13 +474,17 @@ class SettingsView extends React.Component {
     this.displayToastMessage('info', 'Logging out...');
 
     this.SessionService.logOut()
-      .then((res) => {
+      .then(async (res) => {
         console.log('this.SessionService.logOut() res:', res);
         if (res !== 'OK') {
           throw 'Log Out Failure: Please try again';
         }
 
         this.displayToastMessage('success', 'Success');
+
+        await persistor.purge();
+
+        console.log('purged()');
 
         this.props.history.replace('/', { session: false });
       })

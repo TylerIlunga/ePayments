@@ -66,12 +66,7 @@ class TransactionsView extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount()');
-    if (!(this.props.user.id && this.props.profile.id)) {
-      this.displayToastMessage('error', 'Invalid Session: Please log in.');
-      this.props.cookies.remove('ut');
-      return this.props.history.replace('/', { session: false });
-    }
+    console.log('TransactionView: componentDidMount()');
     if (this.state.transactions.length === 0) {
       this.fetchTransactions({
         [`${this.props.user.type}ID`]: this.props.user.id,
@@ -151,9 +146,9 @@ class TransactionsView extends React.Component {
     return <p className='StdContentHeaderLabel'>Transactions</p>;
   }
 
-  handleOnChangeRowsPerPage(pageSize) {
+  handleOnChangeRowsPerPage(pageSize, e) {
     // TODO: Solve double call issue
-    console.log('handleOnChangeRowsPerPage()');
+    console.log('handleOnChangeRowsPerPage()', pageSize, e);
     this.setState({ loadingTableData: true }, () => {
       this.fetchTransactions({
         [`${this.props.user.type}ID`]: this.props.user.id,
@@ -168,6 +163,7 @@ class TransactionsView extends React.Component {
 
   handleOnChangePage(tablePage, pageSize) {
     // TODO: Solve double call issue
+    console.log('handleOnChangeRowsPerPage()');
     let tableOffset = this.state.tableOffset;
     if (tablePage !== tableOffset && tablePage > this.state.tablePage) {
       tableOffset += pageSize;
@@ -175,22 +171,13 @@ class TransactionsView extends React.Component {
     if (tablePage !== tableOffset && tablePage < this.state.tablePage) {
       tableOffset -= pageSize;
     }
-    this.setState({ tablePage, tableOffset }, () => {
-      if (this.state.transactions.length < tableOffset + pageSize) {
-        this.fetchTransactions({
-          [`${this.props.user.type}ID`]: this.props.user.id,
-          queryAttributes: {
-            offset: tableOffset,
-            limit: pageSize,
-            order: 'DESC',
-          },
-        });
-      }
-    });
+    this.setState({ tablePage, tableOffset });
   }
 
   handleOnRowClick(evt, rowData, toggleDetailPanel) {
-    console.log('evt, rowData:', evt, rowData);
+    console.log('handleOnRowClick() evt, rowData:', evt, rowData);
+    evt.preventDefault();
+    evt.stopPropagation();
     rowData.tableData = null;
     delete rowData.tableData;
     this.setState({ selectedTransaction: rowData, view: 'details' });
