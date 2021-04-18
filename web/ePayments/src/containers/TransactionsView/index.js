@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { withCookies } from 'react-cookie';
 import config from '../../config';
 import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
@@ -9,6 +10,8 @@ import stringUtils from '../../utils/Strings';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
 import SessionService from '../../services/SessionService';
+import { setProfile } from '../../redux/actions/profile';
+import { setUser } from '../../redux/actions/user';
 
 class TransactionsView extends React.Component {
   constructor(props) {
@@ -63,44 +66,20 @@ class TransactionsView extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.user.id && this.props.profile.id) {
-      return this.fetchTransactions({
-        // TODO: (UNCOMMENT)  [`${this.props.user.type}ID`]: this.props.user.id,
-        businessID: 7,
-        // customerID: 10,
-        queryAttributes: {
-          limit: 10,
-          order: 'DESC',
-        },
-      });
+    console.log('componentDidMount()');
+    if (!(this.props.user.id && this.props.profile.id)) {
+      this.displayToastMessage('error', 'Invalid Session: Please log in.');
+      this.props.cookies.remove('ut');
+      return this.props.history.replace('/', { session: false });
     }
-    // TODO: TEST (Refresh Page) AFTER LOGGING IN...
-    this.SessionService.fetchUserSessionData()
-      .then((res) => {
-        if (res.error) {
-          throw res.error;
-        }
-        const { user, profile } = res;
 
-        this.props.dispatchSetUser(user);
-        this.props.dispatchSetProfile(profile);
-
-        this.fetchTransactions({
-          [`${user.type}ID`]: user.id,
-          queryAttributes: {
-            limit: 10,
-            order: 'DESC',
-          },
-        });
-      })
-      .catch((error) => {
-        console.log('this.SessionService.fetchUserSessionData() error:', error);
-        if (typeof error !== 'string') {
-          error = 'Loading failure: Please refresh and try again';
-        }
-        this.displayToastMessage('error', error);
-        this.setState({ loadingTableData: false });
-      });
+    return this.fetchTransactions({
+      [`${this.props.user.type}ID`]: this.props.user.id,
+      queryAttributes: {
+        limit: 10,
+        order: 'DESC',
+      },
+    });
   }
 
   fetchTransactions(queryData) {
@@ -352,6 +331,11 @@ const mapStateToProps = (state) => ({
   transaction: state.transaction,
   user: state.user,
 });
-const mapDispatchToProps = (dispatch) => ({});
+const mapDispatchToProps = (dispatch) => ({
+  dispatchSetProfile: (profileData) => dispatch(setProfile(profileData)),
+  dispatchSetUser: (userData) => dispatch(setUser(userData)),
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(TransactionsView);
+export default withCookies(
+  connect(mapStateToProps, mapDispatchToProps)(TransactionsView),
+);

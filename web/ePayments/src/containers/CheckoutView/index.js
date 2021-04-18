@@ -116,6 +116,16 @@ class CheckoutView extends React.Component {
     });
   }
 
+  getActiveTokenSymbolForUser(paymentAccount) {
+    if (paymentAccount['coinbase_ethereum_address'] !== null) {
+      return 'ETH';
+    }
+    if (paymentAccount['coinbase_litecoin_address'] !== null) {
+      return 'LTC';
+    }
+    return 'BTC';
+  }
+
   handleTransaction(evt, status) {
     if (status === 'decline') {
       this.displayToastMessage('error', 'Transaction Denied');
@@ -126,14 +136,12 @@ class CheckoutView extends React.Component {
       this.fetchUsersLocation().then((locationData) => {
         const createNewTransactionData = {
           businessID: this.state.scannedProduct.user_id,
-          // TODO: (UNCOMMENT) customerID: this.props.user.id,
-          customerID: 10,
+          customerID: this.props.user.id,
           productID: this.state.scannedProduct.id,
           sku: this.state.scannedProduct.sku,
           productCategory: this.state.scannedProduct.category,
           quantity: this.state.checkoutQuantity,
-          // NOTE: If we have time, handle BTC, ETH, LTC...
-          currency: 'BTC',
+          currency: this.getActiveTokenSymbolForUser(this.props.paymentAccount),
         };
         if (locationData !== null) {
           createNewTransactionData.latitude = locationData.latitude;
@@ -361,6 +369,7 @@ class CheckoutView extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
+  paymentAccount: state.paymentAccount,
   user: state.user,
 });
 const mapDispatchToProps = (dispatch) => ({});

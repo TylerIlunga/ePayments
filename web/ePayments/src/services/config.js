@@ -3,7 +3,7 @@ const config = {
     reqOptions = {
       ...reqOptions,
       // NOTE: NO CORS
-      // credentials: 'include',
+      credentials: 'include',
     };
     return fetch(url, reqOptions)
       .then((res) => {

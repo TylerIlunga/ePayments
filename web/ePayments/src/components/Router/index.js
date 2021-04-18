@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { history } from '../../redux/store';
-import { withCookies, useCookies } from 'react-cookie';
+import { persistor, history } from '../../redux/store';
+import { withCookies } from 'react-cookie';
 import { ConnectedRouter } from 'connected-react-router';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -13,7 +13,7 @@ import AuthView from '../../containers/AuthView';
 // CreateProfileView
 import CreateProfileView from '../../containers/CreateProfileView';
 
-// ConnectPaymentAccountView
+// ConnectPaymentAccopersistoruntView
 import ConnectPaymentAccountView from '../../containers/ConnectPaymentAccountView';
 
 // TransactionsView
@@ -45,6 +45,7 @@ const handleProtectedRoutes = (history, props, cookies, Component) => {
     !sessionExists &&
     !(cookies && cookies.ut !== undefined && cookies.ut !== null)
   ) {
+    persistor.purge();
     return <AuthView {...history} {...props} />;
   }
   if (props.router.location.pathname === '/profile/create' && !props.user.id) {
@@ -57,7 +58,7 @@ const handleProtectedRoutes = (history, props, cookies, Component) => {
     return <AuthView {...history} {...props} />;
   }
   if (props.router.location.pathname === '/') {
-    return <TransactionsView />;
+    return <TransactionsView {...history} {...props} />;
   }
   return <Component {...history} {...props} />;
 };

@@ -481,6 +481,7 @@ class SettingsView extends React.Component {
 
   renderPaymentsView() {
     // const paymentAccount = this.props.paymentAccount;
+    // TODO: Update Coinbase Bitcoin Adress
     const paymentAccount = this.paymentAccount;
     return (
       <div className='SettingsViewContentContainer col-11'>
@@ -495,6 +496,16 @@ class SettingsView extends React.Component {
             <label>
               <strong>Coinbase Bitcoin Address:</strong>
               {` ${paymentAccount.coinbase_bitcoin_address}`}
+            </label>
+            <br />
+            <label>
+              <strong>Coinbase Ethereum Address:</strong>
+              {` ${paymentAccount.coinbase_ethereum_address}`}
+            </label>
+            <br />
+            <label>
+              <strong>Coinbase LiteCoin Address:</strong>
+              {` ${paymentAccount.coinbase_litcoin_address}`}
             </label>
             <br />
             <label>
