@@ -6,13 +6,13 @@
   padding: 0px 16px;
 }
 
-.ProductsViewCreateProductButtonContainer {
+.ProductsViewActionButtonContainer {
   height: 10%;
   width: 100%;
   padding: 0px 16px;
 }
 
-.ProductsViewCreateProductButtonContainer button {
+.ProductsViewActionButtonContainer button {
   width: 100%;
   height: 75%;
   padding: 10px 0px;
@@ -24,13 +24,13 @@
   color: white;
 }
 
-.ProductsViewCreateProductButtonContainer button:hover {
+.ProductsViewActionButtonContainer button:hover {
   background: #85bb65;
   transition: 300ms;
 }
 
 .ProductsViewTableContainer {
-  height: 80%;
+  height: 70%;
   width: 100%;
   overflow-y: scroll;
   background: linear-gradient(to right, rgb(20, 136, 204), rgb(43, 50, 178));

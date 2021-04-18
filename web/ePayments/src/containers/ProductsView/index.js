@@ -83,6 +83,7 @@ class ProductsView extends React.Component {
         exportButton: true,
         exportFileName: 'ePayment-transactions',
       },
+      importedProducts: null,
     };
 
     this.displayToastMessage = toastUtils.displayToastMessage;
@@ -120,6 +121,15 @@ class ProductsView extends React.Component {
     );
     this.renderCreateProductForm = this.renderCreateProductForm.bind(this);
     this.toggleCreateProductView = this.toggleCreateProductView.bind(this);
+    this.renderImportProductsView = this.renderImportProductsView.bind(this);
+    this.handleImportedProductsFile = this.handleImportedProductsFile.bind(
+      this,
+    );
+    this.renderImportedProductsDetails = this.renderImportedProductsDetails.bind(
+      this,
+    );
+    this.persistImportedProducts = this.persistImportedProducts.bind(this);
+    this.toggleImportProductsView = this.toggleImportProductsView.bind(this);
     this.updateNewProductData = this.updateNewProductData.bind(this);
     this.createNewProduct = this.createNewProduct.bind(this);
   }
@@ -231,6 +241,9 @@ class ProductsView extends React.Component {
     if (this.state.view === 'create') {
       return <p className='StdContentHeaderLabel'>New Product</p>;
     }
+    if (this.state.view === 'import') {
+      return <p className='StdContentHeaderLabel'>Import</p>;
+    }
     if (this.state.products !== null) {
       return <p className='StdContentHeaderLabel'>Products</p>;
     }
@@ -243,11 +256,8 @@ class ProductsView extends React.Component {
       table,
       pageSize,
     );
-    let newState = null;
-    let cb = null;
     if (table === 'products') {
-      newState = { loadingProducts: true };
-      cb = () => {
+      return this.setState({ loadingProducts: true }, () => {
         this.fetchProducts({
           businessID: this.props.user.id,
           queryAttributes: {
@@ -256,24 +266,8 @@ class ProductsView extends React.Component {
             order: 'DESC',
           },
         });
-      };
-    } else {
-      newState = { loadingProductTransactions: true };
-      cb = () => {
-        this.fetchProductTransactions({
-          businessID: this.props.user.id,
-          queryAttributes: {
-            businessID: this.props.user.id,
-            productID: this.state.selectedProduct.id,
-            offset: this.state.transactionsTableOffset,
-            limit: pageSize,
-            order: 'DESC',
-          },
-        });
-      };
+      });
     }
-
-    this.setState(newState, cb);
   }
 
   handleOnChangeProductsTablePage(tablePage, pageSize) {
@@ -410,15 +404,25 @@ class ProductsView extends React.Component {
     });
   }
 
+  toggleImportProductsView(evt) {
+    evt.preventDefault();
+    this.setState({ view: 'import' });
+  }
+
   renderListOfProducts() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12'>
         <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
-        <div className='ProductsViewCreateProductButtonContainer'>
+        <div className='ProductsViewActionButtonContainer '>
           <button onClick={this.toggleCreateProductView}>
             Add to Inventory
+          </button>
+        </div>
+        <div className='ProductsViewActionButtonContainer '>
+          <button onClick={this.toggleImportProductsView}>
+            Import Products
           </button>
         </div>
         <div className='ProductsViewTableContainer'>
@@ -713,6 +717,84 @@ class ProductsView extends React.Component {
     );
   }
 
+  renderImportedProductsDescription() {
+    if (this.state.importedProducts) {
+      return <p>Please review the imported products.</p>;
+    }
+    return <p>Make sure the file is structured as the following...</p>;
+  }
+
+  persistImportedProducts(evt) {
+    // TODO: E2E Implementation
+    evt.preventDefault();
+  }
+
+  renderImportedProductsDetails() {
+    if (this.state.importedProducts) {
+      return (
+        <div className='ProductsViewImportedProductsDetailsContainer'>
+          <div className='ProductsViewImportedProductsTable'>
+            <DataTable
+              title='Inventory'
+              isLoading={this.state.loadingProducts}
+              data={this.state.importedProducts.data}
+              columns={this.state.importedProducts.tableColumns}
+              options={this.state.productsTableOptions}
+            />
+          </div>
+          <div className='ProductsViewImportedProductsImportButtonContainer'>
+            <button onClick={this.persistImportedProducts}>Import</button>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  handleImportedProductsFile(evt) {
+    const csvFile = evt.target.files[0];
+    console.log('handleImportedProductsFile() csvFile', csvFile);
+
+    // TODO: Handle if file is not a csv file
+
+    const fileReader = new FileReader();
+
+    fileReader.onload = () => {
+      const importedProducts = window.$.csv.toObjects(fileReader.result);
+      console.log('importedProducts:,', importedProducts);
+
+      // TODO: Handle if csv file is empty
+
+      const tableColumns = Object.keys(importedProducts[0]).map((field) => {
+        return { field, title: stringUtils.capitalize(field) };
+      });
+      this.setState({
+        importedProducts: {
+          tableColumns,
+          data: importedProducts,
+        },
+      });
+    };
+
+    fileReader.readAsBinaryString(csvFile);
+  }
+
+  renderImportProductsView() {
+    return (
+      <div className='StdViewContentContainer col-sm-11 col-12'>
+        <div className='ProductsViewHeaderContainer'>
+          {this.renderViewHeader()}
+        </div>
+        <div className='ProductsViewImportNotesContainer'>
+          {this.renderImportedProductsDescription()}
+        </div>
+        <div className='ProductsViewImportDetailsContainer'>
+          <input type='file' onChange={this.handleImportedProductsFile} />
+          {this.renderImportedProductsDetails()}
+        </div>
+      </div>
+    );
+  }
+
   handleDisplayQRCodeModal(evt) {
     evt.preventDefault();
     this.setState({ displayQRCodeModal: !this.state.displayQRCodeModal });
@@ -779,6 +861,9 @@ class ProductsView extends React.Component {
     }
     if (this.state.view === 'create') {
       return this.renderCreateProductForm();
+    }
+    if (this.state.view === 'import') {
+      return this.renderImportProductsView();
     }
     if (this.state.displayQRCodeModal) {
       return this.renderSelectedProductQRCode(true);
