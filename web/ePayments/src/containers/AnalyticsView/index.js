@@ -89,8 +89,7 @@ class AnalyticsView extends React.Component {
     const todaysDate = this.state.selectedPeriodToDaysAgo['Today'];
     const dateAWeekAgo = this.state.selectedPeriodToDaysAgo['This Week'];
     this.fetchTransactions({
-      // businessID: this.props.user.id
-      businessID: 7,
+      businessID: this.props.user.id,
       betweenDates: {
         start: dateAWeekAgo.getTime(),
         end: todaysDate.getTime(),
@@ -564,12 +563,15 @@ class AnalyticsView extends React.Component {
   handlePeriodChangeType(selectedPeriod) {
     console.log('handlePeriodChangeType() selectedPeriod:', selectedPeriod);
     const todaysDate = this.state.selectedPeriodToDaysAgo['Today'];
+    if (selectedPeriod === 'Today') {
+      // NOTE: To transaction's within the day itself
+      selectedPeriod = 'Yesterday';
+    }
     const dateDaysAgoFromToday = this.state.selectedPeriodToDaysAgo[
       selectedPeriod
     ];
     this.fetchTransactions({
-      // businessID: this.props.user.id
-      businessID: 7,
+      businessID: this.props.user.id,
       betweenDates: {
         start: dateDaysAgoFromToday.getTime(),
         end: todaysDate.getTime(),

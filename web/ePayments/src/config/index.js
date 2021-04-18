@@ -1,8 +1,10 @@
+const todaysDate = new Date();
+
 const getDateDaysAgoFromToday = (daysAgo) => {
   return new Date(todaysDate - daysAgo * 24 * 60 * 60 * 1000);
 };
 
-const todaysDate = new Date();
+const dayAgo = getDateDaysAgoFromToday(1);
 const dateAWeekAgoFromToday = getDateDaysAgoFromToday(7);
 const dateAMonthAgoFromToday = getDateDaysAgoFromToday(31);
 
@@ -10,6 +12,7 @@ const config = {
   getDateDaysAgoFromToday,
   dateReferences: {
     Today: todaysDate,
+    Yesterday: dayAgo,
     'This Week': dateAWeekAgoFromToday,
     'This Month': dateAMonthAgoFromToday,
     // TODO: Change temp launch date to actual launch date
