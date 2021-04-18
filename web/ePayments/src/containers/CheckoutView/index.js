@@ -104,15 +104,21 @@ class CheckoutView extends React.Component {
           longitude: position.coords.longitude,
         });
       }
-      function error() {
+      function error(error) {
+        console.log('getCurrentPosition error:', error);
         return resolve(null);
       }
 
       if (!window.navigator.geolocation) {
         return resolve(null);
       }
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 4000,
+        maximumAge: 0,
+      };
 
-      window.navigator.geolocation.getCurrentPosition(success, error);
+      window.navigator.geolocation.getCurrentPosition(success, error, options);
     });
   }
 
@@ -140,6 +146,7 @@ class CheckoutView extends React.Component {
           productID: this.state.scannedProduct.id,
           sku: this.state.scannedProduct.sku,
           productCategory: this.state.scannedProduct.category,
+          productLabel: this.state.scannedProduct.label,
           quantity: this.state.checkoutQuantity,
           currency: this.getActiveTokenSymbolForUser(this.props.paymentAccount),
         };
@@ -159,10 +166,7 @@ class CheckoutView extends React.Component {
               throw res.error;
             }
 
-            this.displayToastMessage(
-              'success',
-              "Success: Click/Tap 'Exit' to review your recent transaction.",
-            );
+            this.displayToastMessage('success', 'Success');
             this.setState({
               loading: false,
               view: 'scan',

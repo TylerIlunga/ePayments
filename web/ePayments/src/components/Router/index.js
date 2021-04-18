@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { persistor, history } from '../../redux/store';
-import { withCookies } from 'react-cookie';
+import { useCookies, withCookies } from 'react-cookie';
 import { ConnectedRouter } from 'connected-react-router';
 import { Route, Switch } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -34,17 +34,32 @@ import SettingsView from '../../containers/SettingsView';
 // 404 PageNotFound View
 import PageNotFoundView from '../PageNotFoundView';
 
-const handleProtectedRoutes = (history, props, cookies, Component) => {
-  console.log('cookies:', cookies, props.router.location, history);
+const getCookieValueForName = (name) => {
+  var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  if (!match) {
+    return undefined;
+  }
+  return match[2];
+};
+
+const handleProtectedRoutes = (history, props, cookieData, Component) => {
+  const [cookies] = cookieData;
+  console.log('cookies pre:', cookies);
+  if (!cookies.ut) {
+    cookies.ut = getCookieValueForName('ut');
+  }
+  console.log('cookies post:', cookies);
+  console.log(
+    'props.router.location, history:',
+    props.router.location,
+    history,
+  );
   const sessionExists =
     props.router.location &&
     props.router.location.state &&
     props.router.location.state.session;
 
-  if (
-    !sessionExists &&
-    !(cookies && cookies.ut !== undefined && cookies.ut !== null)
-  ) {
+  if (!sessionExists && !cookies.ut) {
     persistor.purge();
     return <AuthView {...history} {...props} />;
   }
@@ -64,6 +79,7 @@ const handleProtectedRoutes = (history, props, cookies, Component) => {
 };
 
 const Router = (props) => {
+  const cookies = useCookies(['ut']);
   return (
     <ConnectedRouter history={history}>
       <div className='main'>
@@ -71,19 +87,14 @@ const Router = (props) => {
           <Route
             path='/'
             component={(h) =>
-              handleProtectedRoutes(h, props, props.allCookies, AuthView)
+              handleProtectedRoutes(h, props, cookies, AuthView)
             }
             exact
           />
           <Route
             path='/profile/create'
             component={(h) =>
-              handleProtectedRoutes(
-                h,
-                props,
-                props.allCookies,
-                CreateProfileView,
-              )
+              handleProtectedRoutes(h, props, cookies, CreateProfileView)
             }
             exact
           />
@@ -93,7 +104,7 @@ const Router = (props) => {
               handleProtectedRoutes(
                 h,
                 props,
-                props.allCookies,
+                cookies,
                 ConnectPaymentAccountView,
               )
             }
@@ -102,38 +113,33 @@ const Router = (props) => {
           <Route
             path='/h/transactions'
             component={(h) =>
-              handleProtectedRoutes(
-                h,
-                props,
-                props.allCookies,
-                TransactionsView,
-              )
+              handleProtectedRoutes(h, props, cookies, TransactionsView)
             }
             exact
           />
           <Route
             path='/h/products*'
             component={(h) =>
-              handleProtectedRoutes(h, props, props.allCookies, ProductsView)
+              handleProtectedRoutes(h, props, cookies, ProductsView)
             }
             exact
           />
           <Route
             path='/h/checkout*'
             component={(h) =>
-              handleProtectedRoutes(h, props, props.allCookies, CheckoutView)
+              handleProtectedRoutes(h, props, cookies, CheckoutView)
             }
           />
           <Route
             path='/h/analytics*'
             component={(h) =>
-              handleProtectedRoutes(h, props, props.allCookies, AnalyticsView)
+              handleProtectedRoutes(h, props, cookies, AnalyticsView)
             }
           />
           <Route
             path='/h/settings*'
             component={(h) =>
-              handleProtectedRoutes(h, props, props.allCookies, SettingsView)
+              handleProtectedRoutes(h, props, cookies, SettingsView)
             }
           />
           <Route component={PageNotFoundView} />

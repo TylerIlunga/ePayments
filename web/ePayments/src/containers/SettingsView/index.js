@@ -17,60 +17,14 @@ class SettingsView extends React.Component {
   constructor(props) {
     super(props);
 
-    // // Test Business User
-    this.user = {
-      type: 'business',
-      email: 'w@xyz.com',
-    };
-    this.profile = {
-      id: 1,
-      user_id: 9,
-      address: '123 First Street',
-      phone_number: '2012109600',
-      public_email: 'w@xyz.com',
-      created_at: '1617549020305',
-    };
-
-    // Test Customer User
-    // this.user = {
-    //   id: 10,
-    //   type: 'customer',
-    //   email: 'tyler@mizudev.com',
-    // };
-    // this.profile = {
-    //   id: 1,
-    //   user_id: 10,
-    //   country: 'US',
-    //   username: 'cguy',
-    //   created_at: '1617549020309',
-    // };
-    this.paymentAccount = {
-      id: 6,
-      user_id: 9,
-      profile_id: 1,
-      coinbase_account_id: '18275233-09bb-5d7e-9836-2a440612bb24',
-      coinbase_bitcoin_address: '3DzkAuMw57LvveRZgPA9rdcCfRmMrJM1h1',
-      coinbase_access_token:
-        '8d26d498228dd8f9e91981916b6972004f8728b2baa38832e24cc9e1620f51f9',
-      coinbase_access_token_expiry: '1617560640508',
-      coinbase_refresh_token:
-        '75107907a45dc81ee400fef59bc41c61d9e0dd544e47484645aed32488fd5fe6',
-      auto_convert_to_fiat: true,
-      created_at: '1617553457903',
-    };
-
     this.state = {
       displayMobileMenuModal: false,
       activeOption: 'Profile',
       options: ['Profile', 'Payments', 'Log Out'],
       updatingProfile: false,
-      // updatedUserProfile: { ...this.props.profile },
-      updatedUserProfile: { ...this.profile },
-      // updatedPaymentAccount: {
-      //   autoConvertToFiat: this.props.paymentAccount.auto_convert_to_fiat
-      // },
+      updatedUserProfile: { ...this.props.profile },
       updatedPaymentAccount: {
-        autoConvertToFiat: this.paymentAccount.auto_convert_to_fiat,
+        autoConvertToFiat: this.props.paymentAccount.auto_convert_to_fiat,
       },
     };
 
@@ -182,18 +136,12 @@ class SettingsView extends React.Component {
 
     this.displayToastMessage('info', 'Updating...');
 
-    // this.PaymentAccountService.toggleAutoConvertToFiatFeature({
-    //   id: this.props.paymentAccount.id,
-    //   userID: this.props.paymentAccount.user_id,
-    //   profileID: this.props.paymentAccount.profile_id,
-    //   autoConvertToFiatStatus: evt.target.value
-    // })
     const autoConvertToFiatStatus = evt.target.value;
     this.PaymentAccountService.toggleAutoConvertToFiatFeature({
       autoConvertToFiatStatus,
-      id: this.paymentAccount.id,
-      userID: this.paymentAccount.user_id,
-      profileID: this.paymentAccount.profile_id,
+      id: this.props.paymentAccount.id,
+      userID: this.props.paymentAccount.user_id,
+      profileID: this.props.paymentAccount.profile_id,
     })
       .then((res) => {
         console.log(
@@ -255,9 +203,9 @@ class SettingsView extends React.Component {
 
     this.ProfileService.updateProfile({
       updates,
-      type: this.user.type,
-      userID: this.profile.user_id,
-      profileID: this.profile.id,
+      type: this.props.user.type,
+      userID: this.props.profile.user_id,
+      profileID: this.props.profile.id,
     })
       .then((res) => {
         console.log('this.ProfileService.updateProfile res:', res);
@@ -329,8 +277,7 @@ class SettingsView extends React.Component {
       <div className='SettingsViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
-          {/* <label>Type: {this.props.user.type}</label> */}
-          <label>Type: {this.user.type}</label>
+          <label>Type: {this.props.user.type}</label>
           <label>Email Address: </label>
           <input
             className='SettingsViewInput'
@@ -369,8 +316,7 @@ class SettingsView extends React.Component {
       <div className='SettingsViewContentContainer col-12'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
-          {/* <label>Type: {this.props.user.type}</label> */}
-          <label>Type: {this.user.type}</label>
+          <label>Type: {this.props.user.type}</label>
           <label>Username: </label>
           <input
             className='SettingsViewInput'
@@ -401,10 +347,7 @@ class SettingsView extends React.Component {
   }
 
   renderProfileView() {
-    // if (this.props.user.type === 'customer') {
-    //   return this.renderCustomerProfileView();
-    // }
-    if (this.user.type === 'customer') {
+    if (this.props.user.type === 'customer') {
       return this.renderCustomerProfileView();
     }
     return this.renderBusinessProfileView();
@@ -442,17 +385,10 @@ class SettingsView extends React.Component {
 
   startCoinbaseOAuth(evt) {
     evt.preventDefault();
-
-    // this.PaymentAccountService.fetchCoinbaseOauthLink({
-    //   userID: this.props.user.id,
-    //   email: this.props.user.email,
-    //   profileID: this.props.profile.id,
-    //   replaceAccount: true,
-    // })
     this.PaymentAccountService.fetchCoinbaseOauthLink({
-      userID: this.user.id,
-      email: this.user.email,
-      profileID: this.profile.id,
+      userID: this.props.user.id,
+      email: this.props.user.email,
+      profileID: this.props.profile.id,
       replaceAccount: true,
     })
       .then((res) => {
@@ -480,9 +416,7 @@ class SettingsView extends React.Component {
   }
 
   renderPaymentsView() {
-    // const paymentAccount = this.props.paymentAccount;
-    // TODO: Update Coinbase Bitcoin Adress
-    const paymentAccount = this.paymentAccount;
+    const paymentAccount = this.props.paymentAccount;
     return (
       <div className='SettingsViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
@@ -505,7 +439,7 @@ class SettingsView extends React.Component {
             <br />
             <label>
               <strong>Coinbase LiteCoin Address:</strong>
-              {` ${paymentAccount.coinbase_litcoin_address}`}
+              {` ${paymentAccount.coinbase_litecoin_address}`}
             </label>
             <br />
             <label>
@@ -513,8 +447,7 @@ class SettingsView extends React.Component {
             </label>
             <select
               className='SettingsViewInput'
-              // value={String(this.props.paymentAccount.auto_convert_to_fiat)}
-              value={String(this.paymentAccount.auto_convert_to_fiat)}
+              value={String(this.props.paymentAccount.auto_convert_to_fiat)}
               onChange={(evt) => this.toggleAutoConvertToFiat(evt)}
             >
               <option value='true'>Enabled</option>

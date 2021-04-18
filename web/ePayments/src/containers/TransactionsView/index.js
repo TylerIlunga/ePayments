@@ -72,14 +72,15 @@ class TransactionsView extends React.Component {
       this.props.cookies.remove('ut');
       return this.props.history.replace('/', { session: false });
     }
-
-    return this.fetchTransactions({
-      [`${this.props.user.type}ID`]: this.props.user.id,
-      queryAttributes: {
-        limit: 10,
-        order: 'DESC',
-      },
-    });
+    if (this.state.transactions.length === 0) {
+      this.fetchTransactions({
+        [`${this.props.user.type}ID`]: this.props.user.id,
+        queryAttributes: {
+          limit: 10,
+          order: 'DESC',
+        },
+      });
+    }
   }
 
   fetchTransactions(queryData) {
@@ -151,11 +152,11 @@ class TransactionsView extends React.Component {
   }
 
   handleOnChangeRowsPerPage(pageSize) {
+    // TODO: Solve double call issue
+    console.log('handleOnChangeRowsPerPage()');
     this.setState({ loadingTableData: true }, () => {
       this.fetchTransactions({
-        // TODO: (UNCOMMENT) [`${this.props.user.type}ID`]: this.props.user.id,
-        businessID: 7,
-        // customerID: 10,
+        [`${this.props.user.type}ID`]: this.props.user.id,
         queryAttributes: {
           offset: this.state.tableOffset,
           limit: pageSize,
@@ -166,6 +167,7 @@ class TransactionsView extends React.Component {
   }
 
   handleOnChangePage(tablePage, pageSize) {
+    // TODO: Solve double call issue
     let tableOffset = this.state.tableOffset;
     if (tablePage !== tableOffset && tablePage > this.state.tablePage) {
       tableOffset += pageSize;
@@ -176,9 +178,7 @@ class TransactionsView extends React.Component {
     this.setState({ tablePage, tableOffset }, () => {
       if (this.state.transactions.length < tableOffset + pageSize) {
         this.fetchTransactions({
-          // TODO: (UNCOMMENT) [`${this.props.user.type}ID`]: this.props.user.id,
-          businessID: 7,
-          // customerID: 10,
+          [`${this.props.user.type}ID`]: this.props.user.id,
           queryAttributes: {
             offset: tableOffset,
             limit: pageSize,
