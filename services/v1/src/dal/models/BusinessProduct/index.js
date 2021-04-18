@@ -7,6 +7,11 @@ const Sequelize = require('sequelize');
 const options = {
   freezeTableName: true,
   timestamps: false,
+  indexes: [
+    {
+      fields: ['user_id', 'sku'],
+    },
+  ],
 };
 
 module.exports = (sequelize) => {

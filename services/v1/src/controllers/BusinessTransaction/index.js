@@ -47,6 +47,7 @@ module.exports = {
         productID,
         sku,
         productCategory,
+        productLabel,
         quantity,
         currency,
       } = validationResult.value;
@@ -59,6 +60,7 @@ module.exports = {
         product_id: productID,
         coinbase_transaction_id: 'cbTransactionResult.id',
         product_category: productCategory,
+        product_label: productLabel,
         quantity: quantity,
         amount: 1.5 * quantity,
         token_amount: '${cbTransactionResult.amount.amount}',
@@ -176,6 +178,7 @@ module.exports = {
         product_id: productID,
         coinbase_transaction_id: cbTransactionResult.id,
         product_category: productCategory,
+        product_label: productLabel,
         quantity: quantity,
         amount: businessProduct.price * quantity,
         token_amount: `${cbTransactionResult.amount.amount}`,

@@ -40,8 +40,8 @@ module.exports = {
     audience: process.env.JWT_AUDIENCE || 'urn:localhost',
     issuer: process.env.JWT_ISSUER || 'urn:local_service',
     secret: process.env.JWT_SECRET || 'secret',
-    expiration: process.env.JWT_EXPIRATION || '30m',
-    expirationInSecs: 30 * 60 * 1000, // 30 minutes
+    expiration: process.env.JWT_EXPIRATION || '59m',
+    expirationInSecs: 59 * 60 * 1000, // 59 minutes
   },
   PORT: process.env.PORT || 7777,
   SERVICE_NAME: 'API (V1)',

@@ -7,17 +7,14 @@ const Sequelize = require('sequelize');
 const options = {
   freezeTableName: true,
   timestamps: false,
-  // indexes: [
-  //   {
-  //     unique: true,
-  //     fields: ['customer_id', 'product_id'],
-  //   },
-  // ],
+  indexes: [
+    {
+      fields: ['business_id', 'customer_id', 'product_id'],
+    },
+  ],
 };
 
 module.exports = (sequelize) => {
-  // NOTE: Drop tables to change longitude,latitude change
-  // TODO: Normalize Table to include BusinessProduct.label
   let BusinessTransaction = sequelize.define(
     'businesstransactions',
     {
@@ -31,13 +28,15 @@ module.exports = (sequelize) => {
       },
       customer_id: {
         allowNull: false,
-        unique: true,
         type: Sequelize.INTEGER,
       },
       product_id: {
         allowNull: false,
-        unique: true,
         type: Sequelize.INTEGER,
+      },
+      product_label: {
+        allowNull: false,
+        type: Sequelize.STRING,
       },
       coinbase_transaction_id: {
         allowNull: false,
