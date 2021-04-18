@@ -1,13 +1,14 @@
 import config from '../config';
 
 class ProfileService {
-  constructor() {
+  constructor(jwtSessionToken = '') {
     this.url = process.env.REACT_APP_EPAYMENTS_API_URL;
     this.businessURL =
       process.env.REACT_APP_EPAYMENTS_BUSINESS_PROFILE_SERVICE_URL;
     this.customerURL =
       process.env.REACT_APP_EPAYMENTS_CUSTOMER_PROFILE_SERVICE_URL;
     this.networkRequest = config.networkRequest;
+    this.jwtSessionToken = jwtSessionToken;
   }
 
   fetchProfile(userID) {

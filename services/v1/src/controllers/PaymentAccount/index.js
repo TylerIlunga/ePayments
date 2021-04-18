@@ -36,9 +36,9 @@ module.exports = {
       return res.json({ error: validationResult.error });
     }
     try {
-      const { id, userID, profileID } = validationResult.value;
+      const { userID, profileID } = validationResult.value;
       const paymentAccount = await dbConfig.PaymentAccount.findOne({
-        where: { id, user_id: userID, profile_id: profileID },
+        where: { user_id: userID, profile_id: profileID },
       });
       if (paymentAccount === null) {
         throw { error: 'Payment account does not exist for the given data.' };
@@ -92,7 +92,6 @@ module.exports = {
     if (validationResult.error) {
       return res.json({ error: validationResult.error });
     }
-    let transaction = null;
     try {
       const { code, state } = req.query;
       const { email, userID, profileID, replaceAccount } = JSON.parse(state);
@@ -129,47 +128,67 @@ module.exports = {
       const cbAccountData = await coinbaseAPI.getAccountData(
         accessTokenData.access_token,
       );
-      const cbBitcoinWalletData = await coinbaseAPI.createNewWalletAddress(
+      const cbWalletAddressData = await coinbaseAPI.createNewWalletAddress(
         accessTokenData.access_token,
-        cbAccountData.accountID,
-        'bitcoin',
+        cbAccountData,
       );
-      if (replaceAccount) {
+
+      let transaction;
+      if (!replaceAccount) {
+        console.log('creating a transaction...');
         transaction = await dbConfig.getConnection().transaction();
         await dbConfig.PaymentAccount.destroy({
           transaction,
           where: { user_id: userID, profile_id: profileID },
         });
       }
-      const newPaymentAccount = await dbConfig.PaymentAccount.create(
-        {
-          user_id: userID,
-          profile_id: profileID,
-          coinbase_account_id: cbAccountData.accountID,
-          coinbase_bitcoin_address: cbBitcoinWalletData.bitcoinAddress,
-          coinbase_access_token: accessTokenData.access_token,
-          coinbase_access_token_expiry: accessTokenData.expires_in,
-          coinbase_refresh_token: accessTokenData.refresh_token,
-        },
-        { transaction },
-      );
-      console.log('New Payment Account created!', newPaymentAccount.id);
+      const paymentAccountData = {
+        user_id: userID,
+        profile_id: profileID,
+        coinbase_account_id: cbAccountData.accountID,
+        coinbase_access_token: accessTokenData.access_token,
+        coinbase_access_token_expiry: accessTokenData.expires_in,
+        coinbase_refresh_token: accessTokenData.refresh_token,
+      };
+
+      paymentAccountData[`coinbase_${cbWalletAddressData.token}_address`] =
+        cbWalletAddressData.address;
+      console.log('paymentAccountData:', paymentAccountData);
+
+      let newPaymentAccountData;
+      if (transaction) {
+        newPaymentAccountData = await dbConfig.PaymentAccount.create(
+          paymentAccountData,
+          { transaction },
+        );
+        await transaction.commit();
+      } else {
+        newPaymentAccountData = await dbConfig.PaymentAccount.create(
+          paymentAccountData,
+        );
+      }
+
+      console.log('New Payment Account created!', newPaymentAccountData.id);
+
+      paymentAccountData.id = newPaymentAccountData.id;
+      paymentAccountData.coinbase_access_token = null;
+      paymentAccountData.coinbase_access_token_expiry = null;
+      paymentAccountData.coinbase_refresh_token = null;
+
+      delete paymentAccountData.coinbase_access_token;
+      delete paymentAccountData.coinbase_access_token_expiry;
+      delete paymentAccountData.coinbase_refresh_token;
+
       return res.send(
         broadcastChannel({
           error: null,
           success: true,
-          paymentAccount: {
-            id: newPaymentAccount.id,
-            user_id: newPaymentAccount.user_id,
-            profile_id: newPaymentAccount.profile_id,
-            coinbase_account_id: newPaymentAccount.coinbase_account_id,
-            coinbase_bitcoin_address:
-              newPaymentAccount.coinbase_bitcoin_address,
-          },
+          paymentAccount: paymentAccountData,
         }),
       );
     } catch (error) {
-      if (transaction !== null) {
+      if (transaction) {
+        console.log('rolling back transaction:', error);
         await transaction.rollback();
       }
       return Errors.General.serveResponse(error, res);

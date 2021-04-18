@@ -1,9 +1,31 @@
 import config from '../config';
 
 class PaymentAccountService {
-  constructor() {
+  constructor(jwtSessionToken = '') {
     this.url = process.env.REACT_APP_EPAYMENTS_PAYMENT_ACCOUNT_SERVICE_URL;
     this.networkRequest = config.networkRequest;
+    this.jwtSessionToken = jwtSessionToken;
+  }
+
+  fetchPaymentAccount(userData) {
+    return new Promise((resolve, reject) => {
+      this.networkRequest(`${this.url}/fetch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      })
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('fetchPaymentAccount() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('fetchPaymentAccount() error:', error);
+          reject(error);
+        });
+    });
   }
 
   fetchCoinbaseOauthLink(userData) {
@@ -28,12 +50,6 @@ class PaymentAccountService {
 
   toggleAutoConvertToFiatFeature(paymentAccountData) {
     return new Promise((resolve, reject) => {
-      // const {
-      //   id,
-      //   userID,
-      //   profileID,
-      //   autoConvertToFiatStatus,
-      // } = paymentAccountData;
       console.log('paymentAccountData:', paymentAccountData);
       this.networkRequest(`${this.url}/conversion/toggle`, {
         method: 'PUT',

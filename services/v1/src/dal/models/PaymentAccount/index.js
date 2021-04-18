@@ -26,7 +26,15 @@ module.exports = (sequelize) => {
         type: Sequelize.STRING,
       },
       coinbase_bitcoin_address: {
-        allowNull: false,
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
+      coinbase_ethereum_address: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
+      coinbase_litecoin_address: {
+        allowNull: true,
         type: Sequelize.STRING,
       },
       coinbase_access_token: {

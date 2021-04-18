@@ -19,22 +19,16 @@ module.exports = {
       'http://localhost:7777/api/v1/payment/accounts/create/oauthcallback/code',
     SCOPES: [
       'wallet:accounts:read',
-      'wallet:accounts:update',
       'wallet:addresses:read',
       'wallet:addresses:create',
       'wallet:buys:read',
       'wallet:buys:create',
       'wallet:deposits:read',
-      'wallet:payment-methods:read',
-      'wallet:payment-methods:limits',
-      'wallet:transactions:send', // **
-      'wallet:transactions:request', //**
-      'wallet:transactions:transfer', //**
+      'wallet:transactions:send',
+      'wallet:transactions:transfer',
       'wallet:sells:create',
       'wallet:user:read',
       'wallet:user:email',
-      'wallet:withdrawals:read', // **
-      'wallet:withdrawals:create', //**
     ],
     currentTransferMinimum: 0.0001,
     currentTransactionSendLimitAmount: 1,

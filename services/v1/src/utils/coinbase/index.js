@@ -14,6 +14,11 @@ class CoinbaseAPIHelper {
     this.authcode_redirectURI = coinbaseConfig.AUTHCODE_REDIRECT_URI;
     this.oauth_url = 'https://www.coinbase.com/oauth';
     this.api_url = 'https://api.coinbase.com/v2';
+    this.tokenSymbolToName = {
+      btc: 'bitcoin',
+      eth: 'ethereum',
+      ltc: 'litecoin',
+    };
 
     this.authorizeUser = this.authorizeUser.bind(this);
     this.getAccessToken = this.getAccessToken.bind(this);
@@ -130,8 +135,9 @@ class CoinbaseAPIHelper {
     });
   }
 
-  createNewWalletAddress(accessToken, accountID, currencyType) {
+  createNewWalletAddress(accessToken, accountData) {
     // https://api.coinbase.com/v2/accounts/:account_id/addresses
+    const { accountID, tokenSymbol } = accountData;
     return new Promise((resolve, reject) => {
       this.request({
         method: 'POST',
@@ -142,7 +148,7 @@ class CoinbaseAPIHelper {
           'Content-Type': 'application/json',
         }),
         body: {
-          name: `ePayments ${currencyType} receive address`,
+          name: `ePayments bitcoin receive address`,
         },
       })
         .then((res) => {
@@ -151,7 +157,11 @@ class CoinbaseAPIHelper {
             'createNewWalletAddress() newAddressData:',
             newAddressData,
           );
-          resolve({ bitcoinAddress: newAddressData.address });
+
+          resolve({
+            token: this.tokenSymbolToName[tokenSymbol],
+            address: newAddressData.address,
+          });
         })
         .catch((error) => {
           console.log('createNewWalletAddress() error:', error);
@@ -175,18 +185,27 @@ class CoinbaseAPIHelper {
           console.log('getAccountData() accounts:', accounts);
           const accountData = {};
           for (let i = 0; i < accounts.length; i++) {
+            console.log('account currency:', accounts[i].currency);
+            const tokenSymbol = accounts[i].currency.toLowerCase();
             if (
               accounts[i].type == 'wallet' &&
-              accounts[i].currency.toLowerCase() == 'btc'
+              (tokenSymbol == 'btc' ||
+                tokenSymbol == 'eth' ||
+                tokenSymbol == 'ltc')
             ) {
               accountData['accountID'] = accounts[i].id;
+              accountData['tokenSymbol'] = tokenSymbol;
               break;
             }
           }
-          console.log(
-            'getAccountData() accountData[accountID]:',
-            accountData['accountID'],
-          );
+          console.log('getAccountData() accountData:', accountData);
+          if (!accountData['accountID']) {
+            // NOTE: Why the fuck does CB only let you choose one right now...
+            return reject({
+              error:
+                'Please choose BTC (Bitcoin), ETH (Ethereum), or LTC (LTC)',
+            });
+          }
           resolve(accountData);
         })
         .catch((error) => {

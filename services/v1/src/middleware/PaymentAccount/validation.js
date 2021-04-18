@@ -6,7 +6,6 @@ const Joi = require('joi');
 
 module.exports = {
   fetchPaymentAccountSchema: Joi.object({
-    id: Joi.number().required(),
     userID: Joi.number().required(),
     profileID: Joi.number().required(),
   }),

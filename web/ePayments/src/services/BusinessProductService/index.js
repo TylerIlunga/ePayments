@@ -1,9 +1,13 @@
 import config from '../config';
 
+// TODO: Get 'ut' cookie of our JWT SESSION token and pass it into
+// our headers 'Authorization' field as a value
+
 class BusinessProductService {
-  constructor() {
+  constructor(jwtSessionToken = '') {
     this.url = process.env.REACT_APP_EPAYMENTS_BUSINESS_PRODUCT_SERVICE_URL;
     this.networkRequest = config.networkRequest;
+    this.jwtSessionToken = jwtSessionToken;
   }
 
   fetchProduct(queryData) {

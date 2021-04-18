@@ -16,12 +16,14 @@ module.exports = {
     Tokens.verifyToken(tRes.token, (rsp) => cb(rsp));
   },
   signUpLogInBodySchema: Joi.object({
-    email: Joi.string().email({
-      minDomainSegments: 2,
-      tlds: { allow: ['com', 'net', 'org', 'edu'] },
-    }),
-    password: Joi.string().pattern(VALIDATION.genericPasswordPattern),
-  }).with('email', 'password'),
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: { allow: ['com', 'net', 'org', 'edu'] },
+      })
+      .required(),
+    password: Joi.string().required(),
+  }),
   fetchUserSessionData: Joi.object({
     ut: Joi.string().required(),
   }),

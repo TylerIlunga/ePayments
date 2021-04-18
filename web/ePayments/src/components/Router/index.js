@@ -34,37 +34,35 @@ import SettingsView from '../../containers/SettingsView';
 // 404 PageNotFound View
 import PageNotFoundView from '../PageNotFoundView';
 
-const handleProtectedRoutes = (history, props, cookieOpts, Component) => {
-  // TODO: Use props.allCookies instead of cookieOpts?
-  const [cookies] = cookieOpts;
-  // const sessionExists =
-  //   props.router.location !== undefined ||
-  //   props.router.location.state !== undefined ||
-  //   props.router.location.state.session !== undefined ||
-  //   !props.router.location.state.session;
+const handleProtectedRoutes = (history, props, cookies, Component) => {
+  console.log('cookies:', cookies, props.router.location, history);
   const sessionExists =
     props.router.location &&
     props.router.location.state &&
-    props.router.location.state.session &&
-    !props.router.location.state.session;
-  // TODO: Make sure to set state.session to false for logging out...
-  //   if (
-  //     !(
-  //       sessionExists ||
-  //       (cookies && cookies.ut !== undefined && cookies.ut !== null)
-  //     )
-  //   ) {
-  //     return <AuthView {...history} {...props} />;
-  //   }
-  //   if (history.location.pathname === '/') {
-  //     // TODO: Make sure to check in "ComponentDidMount" that valid user data exists in our global (user) redux store
-  //     return <TransactionsView />;
-  //   }
+    props.router.location.state.session;
+
+  if (
+    !sessionExists &&
+    !(cookies && cookies.ut !== undefined && cookies.ut !== null)
+  ) {
+    return <AuthView {...history} {...props} />;
+  }
+  if (props.router.location.pathname === '/profile/create' && !props.user.id) {
+    return <AuthView {...history} {...props} />;
+  }
+  if (
+    props.router.location.pathname === '/payments/connect' &&
+    (!props.user.id || !props.profile.id)
+  ) {
+    return <AuthView {...history} {...props} />;
+  }
+  if (props.router.location.pathname === '/') {
+    return <TransactionsView />;
+  }
   return <Component {...history} {...props} />;
 };
 
 const Router = (props) => {
-  const cookieOpts = useCookies(['ut']);
   return (
     <ConnectedRouter history={history}>
       <div className='main'>
@@ -72,14 +70,19 @@ const Router = (props) => {
           <Route
             path='/'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, AuthView)
+              handleProtectedRoutes(h, props, props.allCookies, AuthView)
             }
             exact
           />
           <Route
             path='/profile/create'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, CreateProfileView)
+              handleProtectedRoutes(
+                h,
+                props,
+                props.allCookies,
+                CreateProfileView,
+              )
             }
             exact
           />
@@ -89,7 +92,7 @@ const Router = (props) => {
               handleProtectedRoutes(
                 h,
                 props,
-                cookieOpts,
+                props.allCookies,
                 ConnectPaymentAccountView,
               )
             }
@@ -98,33 +101,38 @@ const Router = (props) => {
           <Route
             path='/h/transactions'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, TransactionsView)
+              handleProtectedRoutes(
+                h,
+                props,
+                props.allCookies,
+                TransactionsView,
+              )
             }
             exact
           />
           <Route
             path='/h/products*'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, ProductsView)
+              handleProtectedRoutes(h, props, props.allCookies, ProductsView)
             }
             exact
           />
           <Route
             path='/h/checkout*'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, CheckoutView)
+              handleProtectedRoutes(h, props, props.allCookies, CheckoutView)
             }
           />
           <Route
             path='/h/analytics*'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, AnalyticsView)
+              handleProtectedRoutes(h, props, props.allCookies, AnalyticsView)
             }
           />
           <Route
             path='/h/settings*'
             component={(h) =>
-              handleProtectedRoutes(h, props, cookieOpts, SettingsView)
+              handleProtectedRoutes(h, props, props.allCookies, SettingsView)
             }
           />
           <Route component={PageNotFoundView} />
@@ -137,9 +145,8 @@ const Router = (props) => {
 
 const mapStateToProps = (state) => ({
   router: state.router,
+  profile: state.profile,
+  user: state.user,
 });
-const mapDispatchToProps = (dispatch) => ({});
 
-export default withCookies(
-  connect(mapStateToProps, mapDispatchToProps)(Router),
-);
+export default withCookies(connect(mapStateToProps, null)(Router));

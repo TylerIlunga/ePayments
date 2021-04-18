@@ -94,7 +94,7 @@ class CreateProfileView extends React.Component {
         // Segue to ConnectPaymentAccountView
         this.displayToastMessage('success', 'Success!');
 
-        this.props.history.replace('/payments/connect');
+        this.props.history.replace('/payments/connect', { session: true });
       })
       .catch((error) => {
         console.log('create profile error:', error);

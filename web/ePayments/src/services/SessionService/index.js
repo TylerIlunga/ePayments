@@ -1,9 +1,10 @@
 import config from '../config';
 
 class SessionService {
-  constructor() {
+  constructor(jwtSessionToken = '') {
     this.url = process.env.REACT_APP_EPAYMENTS_SESSION_SERVICE_URL;
     this.networkRequest = config.networkRequest;
+    this.jwtSessionToken = jwtSessionToken;
   }
 
   signUp(userData) {
@@ -45,6 +46,23 @@ class SessionService {
         })
         .catch((error) => {
           console.log('login() error:', error);
+          reject(error);
+        });
+    });
+  }
+
+  fetchUserSessionData() {
+    return new Promise((resolve, reject) => {
+      this.networkRequest(`${this.url}/fetch/user`)
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('fetchUserSessionData() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('fetchUserSessionData() error:', error);
           reject(error);
         });
     });

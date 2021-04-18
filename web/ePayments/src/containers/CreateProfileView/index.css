@@ -5,6 +5,7 @@
   justify-content: center;
   align-items: center;
   margin: 0px;
+  background-color: white;
 }
 
 .MainCreateProfileViewRow {
@@ -35,7 +36,6 @@
   width: 100%;
   display: flex;
   align-items: center;
-  /* background-color: red; */
 }
 
 .CreateProfileViewFormOption {
@@ -118,4 +118,5 @@
 .CreateProfileViewFormButton:hover {
   background: black;
   color: white;
+  transition: 300ms;
 }

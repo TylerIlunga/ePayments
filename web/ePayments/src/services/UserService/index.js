@@ -1,9 +1,10 @@
 import config from '../config';
 
 class UserService {
-  constructor() {
+  constructor(jwtSessionToken = '') {
     this.url = process.env.REACT_APP_EPAYMENTS_USER_SERVICE_URL;
     this.networkRequest = config.networkRequest;
+    this.jwtSessionToken = jwtSessionToken;
   }
 
   activateAccount(activationData) {

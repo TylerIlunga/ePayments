@@ -101,10 +101,6 @@ module.exports = {
       if (user === null) {
         throw { error: 'Account does not exist for the given email.' };
       }
-      // Check if user activated their account.
-      if (!user.active) {
-        throw { error: 'Please check your email and activate your account.' };
-      }
       // Check if password matches
       bcrypt.compare(password, user.password, async (error, isMatch) => {
         if (error) {
@@ -112,6 +108,13 @@ module.exports = {
         }
         if (!isMatch) {
           return res.json({ error: 'Incorrect password. Please try again.' });
+        }
+        // Check if user activated their account.
+        if (!user.active) {
+          return res.json({
+            error:
+              'Please check your email for your token to activate your account.',
+          });
         }
         // Create session token (JWT)
         const sessionToken = Tokens.signToken({ userID: user.id });

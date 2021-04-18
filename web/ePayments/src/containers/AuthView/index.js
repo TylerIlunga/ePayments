@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { setPaymentAccount } from '../../redux/actions/paymentAccount';
+import { setProfile } from '../../redux/actions/profile';
 import { setUser } from '../../redux/actions/user';
+import PaymentAccountService from '../../services/PaymentAccountService';
 import ProfileService from '../../services/ProfileService';
 import SessionService from '../../services/SessionService';
 import UserService from '../../services/UserService';
@@ -33,8 +36,9 @@ class AuthView extends React.Component {
       },
     };
 
-    this.SessionService = new SessionService();
+    this.PaymentAccountService = new PaymentAccountService();
     this.ProfileService = new ProfileService();
+    this.SessionService = new SessionService();
     this.UserService = new UserService();
     this.displayToastMessage = toastUtils.displayToastMessage;
 
@@ -233,6 +237,7 @@ class AuthView extends React.Component {
         // Update Redux State with User Data
         this.props.dispatchSetUser(res.user);
 
+        // Did the current user activate their account?
         if (!res.user.active) {
           // Segue to Activate Account View
           this.displayToastMessage(
@@ -242,20 +247,48 @@ class AuthView extends React.Component {
           return this.setState({ view: 'activateAccount' });
         }
 
+        // Did the current user create a profile?
         const pRes = await this.ProfileService.fetchProfile(res.user.id);
         console.log('this.ProfileService.fetchProfile() pRes:', pRes);
         if (pRes.error) {
           throw pRes.error;
         }
 
-        this.displayToastMessage('success', 'Success: Redirecting...');
-
         if (pRes.profile === null) {
           // Segue to CreateProfileView
-          return this.props.history.replace('/profile/create');
+          this.displayToastMessage('success', 'Success: Redirecting...');
+          return this.props.history.replace('/profile/create', {
+            session: true,
+          });
         }
 
+        // Update Redux State with Profile Data
+        this.props.dispatchSetProfile(pRes.profile);
+
+        // Did the current user create a payment account?
+        const paRes = await this.PaymentAccountService.fetchPaymentAccount({
+          userID: res.user.id,
+          profileID: pRes.profile.id,
+        });
+        console.log('this.ProfileService.fetchProfile() paRes:', paRes);
+        if (paRes.error) {
+          if (
+            paRes.error !== 'Payment account does not exist for the given data.'
+          ) {
+            throw paRes.error;
+          }
+          // Segue to ConnectPaymentAccountView
+          this.displayToastMessage('success', 'Success: Redirecting...');
+          return this.props.history.replace('/payments/connect', {
+            session: true,
+          });
+        }
+
+        // Update Redux State with PaymentAccount Data
+        this.props.dispatchSetPaymentAccount(paRes.paymentAccount);
+
         // Segue to TransactionView (Home)
+        this.displayToastMessage('success', 'Success: Redirecting...');
         this.props.history.replace('/h/transactions', {
           session: true,
         });
@@ -265,7 +298,15 @@ class AuthView extends React.Component {
         if (typeof error !== 'string') {
           error = 'Log In Failed: Please try again';
         }
+
         this.displayToastMessage('error', error);
+
+        if (
+          error ===
+          'Please check your email for your token to activate your account.'
+        ) {
+          this.setState({ view: 'activateAccount' });
+        }
       });
   }
 
@@ -688,9 +729,14 @@ class AuthView extends React.Component {
 
 const mapStateToProps = (state) => ({
   toast: state.toast,
+  paymentAccount: state.paymentAccount,
+  profile: state.profile,
   user: state.user,
 });
 const mapDispatchToProps = (dispatch) => ({
+  dispatchSetPaymentAccount: (paymentAccountData) =>
+    dispatch(setPaymentAccount(paymentAccountData)),
+  dispatchSetProfile: (profileData) => dispatch(setProfile(profileData)),
   dispatchSetUser: (userData) => dispatch(setUser(userData)),
 });
 

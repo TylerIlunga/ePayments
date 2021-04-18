@@ -1,9 +1,10 @@
 import config from '../config';
 
 class BusinessTransactionService {
-  constructor() {
+  constructor(jwtSessionToken = '') {
     this.url = process.env.REACT_APP_EPAYMENTS_BUSINESS_TRANSACTION_SERVICE_URL;
     this.networkRequest = config.networkRequest;
+    this.jwtSessionToken = jwtSessionToken;
   }
 
   listTransactions(queryData) {

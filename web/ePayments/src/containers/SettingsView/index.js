@@ -537,7 +537,7 @@ class SettingsView extends React.Component {
 
         this.displayToastMessage('success', 'Success');
 
-        this.props.history.replace('/');
+        this.props.history.replace('/', { session: false });
       })
       .catch((error) => {
         console.log(

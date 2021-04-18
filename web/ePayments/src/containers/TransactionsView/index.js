@@ -8,6 +8,7 @@ import BusinessTransactionService from '../../services/BusinessTransactionServic
 import stringUtils from '../../utils/Strings';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
+import SessionService from '../../services/SessionService';
 
 class TransactionsView extends React.Component {
   constructor(props) {
@@ -43,6 +44,7 @@ class TransactionsView extends React.Component {
 
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessTransactionService = new BusinessTransactionService();
+    this.SessionService = new SessionService(props.allCookies.ut);
     this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
       this,
     );
@@ -61,15 +63,44 @@ class TransactionsView extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchTransactions({
-      // TODO: (UNCOMMENT)  [`${this.user.props.type}ID`]: this.props.user.id,
-      businessID: 7,
-      // customerID: 10,
-      queryAttributes: {
-        limit: 10,
-        order: 'DESC',
-      },
-    });
+    if (this.props.user.id && this.props.profile.id) {
+      return this.fetchTransactions({
+        // TODO: (UNCOMMENT)  [`${this.props.user.type}ID`]: this.props.user.id,
+        businessID: 7,
+        // customerID: 10,
+        queryAttributes: {
+          limit: 10,
+          order: 'DESC',
+        },
+      });
+    }
+    // TODO: TEST (Refresh Page) AFTER LOGGING IN...
+    this.SessionService.fetchUserSessionData()
+      .then((res) => {
+        if (res.error) {
+          throw res.error;
+        }
+        const { user, profile } = res;
+
+        this.props.dispatchSetUser(user);
+        this.props.dispatchSetProfile(profile);
+
+        this.fetchTransactions({
+          [`${user.type}ID`]: user.id,
+          queryAttributes: {
+            limit: 10,
+            order: 'DESC',
+          },
+        });
+      })
+      .catch((error) => {
+        console.log('this.SessionService.fetchUserSessionData() error:', error);
+        if (typeof error !== 'string') {
+          error = 'Loading failure: Please refresh and try again';
+        }
+        this.displayToastMessage('error', error);
+        this.setState({ loadingTableData: false });
+      });
   }
 
   fetchTransactions(queryData) {
@@ -143,7 +174,7 @@ class TransactionsView extends React.Component {
   handleOnChangeRowsPerPage(pageSize) {
     this.setState({ loadingTableData: true }, () => {
       this.fetchTransactions({
-        // TODO: (UNCOMMENT) [`${this.user.props.type}ID`]: this.props.user.id,
+        // TODO: (UNCOMMENT) [`${this.props.user.type}ID`]: this.props.user.id,
         businessID: 7,
         // customerID: 10,
         queryAttributes: {
@@ -166,7 +197,7 @@ class TransactionsView extends React.Component {
     this.setState({ tablePage, tableOffset }, () => {
       if (this.state.transactions.length < tableOffset + pageSize) {
         this.fetchTransactions({
-          // TODO: (UNCOMMENT) [`${this.user.props.type}ID`]: this.props.user.id,
+          // TODO: (UNCOMMENT) [`${this.props.user.type}ID`]: this.props.user.id,
           businessID: 7,
           // customerID: 10,
           queryAttributes: {

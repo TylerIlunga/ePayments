@@ -29,11 +29,7 @@ module.exports = {
       })
       .required(),
     resetPasswordToken: Joi.string().required(),
-    oldPassword: Joi.string()
-      .pattern(new RegExp(VALIDATION.genericPasswordPattern))
-      .required(),
-    newPassword: Joi.string()
-      .pattern(new RegExp(VALIDATION.genericPasswordPattern))
-      .required(),
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().required(),
   }),
 };

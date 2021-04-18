@@ -66,7 +66,7 @@ Router.delete(
 );
 
 /** API Endpoints related to handling connected payment accounts */
-Router.get(
+Router.post(
   '/api/v1/payment/accounts/fetch',
   PaymentAccountController.fetchPaymentAccount,
 );
