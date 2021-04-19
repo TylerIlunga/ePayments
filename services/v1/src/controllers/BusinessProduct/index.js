@@ -4,6 +4,7 @@
  */
 const {
   getSqlizeModule,
+  getConnection,
   BusinessProduct,
   BusinessTransaction,
   User,
@@ -16,6 +17,7 @@ const {
   fetchBusinessProductSchema,
   updateBusinessProductSchema,
   deleteBusinessProductSchema,
+  importBusinessProductsSchema,
 } = require('../../middleware/BusinessProduct/validation');
 const Op = getSqlizeModule().Op;
 
@@ -70,6 +72,78 @@ module.exports = {
       console.log('new business product created! ID: ', newBusinessProduct.id);
       return res.json({ error: null, success: true });
     } catch (error) {
+      return Errors.General.serveResponse(error, res);
+    }
+  },
+  /**
+   * Imports/Persists a list of business products
+   *
+   * @param {object} req - Express.js Request
+   * @param {object} res - Express.js Response
+   *
+   * @return {Array} list of JSON objects
+   */
+  async importBusinessProducts(req, res) {
+    // Validate Input
+    const validationResult = Validation.validateRequestBody(
+      importBusinessProductsSchema,
+      req.body,
+    );
+    if (validationResult.error) {
+      return res.json({ error: validationResult.error });
+    }
+    let transaction;
+    try {
+      const { businessID, products } = validationResult.value;
+      // Verify User
+      const businessUser = await User.findOne({ where: { id: businessID } });
+      if (businessUser === null) {
+        throw { error: 'Account not found for the given user ID.' };
+      }
+
+      transaction = await getConnection().transaction();
+
+      const createBusinessProductPromises = [];
+      products.forEach((product) => {
+        createBusinessProductPromises.push(
+          new Promise(async (resolve, reject) => {
+            try {
+              // Verify unique sku (generated)
+              const persistedSku = await BusinessProduct.findOne({
+                where: { sku: product.sku },
+              });
+              if (persistedSku !== null) {
+                throw {
+                  error: `Product for the sku ${product.sku} already exists.`,
+                };
+              }
+
+              // Create new Product
+              await BusinessProduct.create(
+                { ...product, user_id: businessID },
+                { transaction },
+              );
+
+              resolve(null);
+            } catch (error) {
+              reject(error);
+            }
+          }),
+        );
+      });
+
+      await Promise.all(createBusinessProductPromises);
+
+      await transaction.commit();
+
+      console.log('import completed successfully!');
+
+      return res.json({ error: null, success: true });
+    } catch (error) {
+      if (transaction) {
+        await transaction.rollback();
+      }
+
       return Errors.General.serveResponse(error, res);
     }
   },

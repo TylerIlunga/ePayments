@@ -15,6 +15,20 @@ module.exports = {
     category: Joi.string().required(),
     inventoryCount: Joi.number().required(),
   }),
+  importBusinessProductsSchema: Joi.object({
+    businessID: Joi.number().required(),
+    products: Joi.array()
+      .min(1)
+      .items({
+        sku: Joi.string().length(16).required(),
+        label: Joi.string().required(),
+        description: Joi.string().required(),
+        price: Joi.number().required(),
+        category: Joi.string().required(),
+        inventory_count: Joi.number().required(),
+      })
+      .required(),
+  }),
   listBusinessProductsSchema: Joi.object({
     businessID: Joi.number().required(),
     queryAttributes: Joi.object()

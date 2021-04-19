@@ -49,6 +49,10 @@ Router.post(
   BusinessProductController.createBusinessProduct,
 );
 Router.post(
+  '/api/v1/products/business/import',
+  BusinessProductController.importBusinessProducts,
+);
+Router.post(
   '/api/v1/products/business/list',
   BusinessProductController.listBusinessProducts,
 );
