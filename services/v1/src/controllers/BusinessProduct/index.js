@@ -114,7 +114,7 @@ module.exports = {
               });
               if (persistedSku !== null) {
                 throw {
-                  error: `Product for the sku ${product.sku} already exists.`,
+                  error: `Product with the sku ${product.sku} already exists.`,
                 };
               }
 

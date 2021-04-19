@@ -26,6 +26,7 @@ module.exports = {
         price: Joi.number().required(),
         category: Joi.string().required(),
         inventory_count: Joi.number().required(),
+        tableData: Joi.object().keys({ id: Joi.number().required() }),
       })
       .required(),
   }),
