@@ -418,6 +418,9 @@ class SettingsView extends React.Component {
 
   renderPaymentsView() {
     const paymentAccount = this.props.paymentAccount;
+    const displayAddress = (address) => {
+      return address === null ? '' : address;
+    };
     return (
       <div className='SettingsViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
@@ -430,17 +433,17 @@ class SettingsView extends React.Component {
             <br />
             <label>
               <strong>Coinbase Bitcoin Address:</strong>
-              {` ${paymentAccount.coinbase_bitcoin_address}`}
+              {` ${displayAddress(paymentAccount.coinbase_bitcoin_address)}`}
             </label>
             <br />
             <label>
               <strong>Coinbase Ethereum Address:</strong>
-              {` ${paymentAccount.coinbase_ethereum_address}`}
+              {` ${displayAddress(paymentAccount.coinbase_ethereum_address)}`}
             </label>
             <br />
             <label>
               <strong>Coinbase LiteCoin Address:</strong>
-              {` ${paymentAccount.coinbase_litecoin_address}`}
+              {` ${displayAddress(paymentAccount.coinbase_litecoin_address)}`}
             </label>
             <br />
             <label>

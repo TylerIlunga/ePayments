@@ -93,6 +93,27 @@ class BusinessProductService {
         });
     });
   }
+
+  importProducts(businessID, products) {
+    return new Promise((resolve, reject) => {
+      this.networkRequest(`${this.url}/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessID, products }),
+      })
+        .then((res) => {
+          if (res.error) {
+            throw res.error;
+          }
+          console.log('importProducts() res.data:', res.data);
+          resolve(res.data);
+        })
+        .catch((error) => {
+          console.log('importProducts() error:', error);
+          reject(error);
+        });
+    });
+  }
 }
 
 export default BusinessProductService;

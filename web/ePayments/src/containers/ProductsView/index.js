@@ -4,7 +4,6 @@ import BrandHeader from '../../components/BrandHeader';
 import DashboardMenu from '../../components/DashboardMenu';
 import DataTable from '../../components/DataTable';
 import BusinessProductService from '../../services/BusinessProductService';
-import BusinessTransactionService from '../../services/BusinessTransactionService';
 import toastUtils from '../../utils/Toasts';
 import stringUtils from '../../utils/Strings';
 import './index.css';
@@ -61,46 +60,19 @@ class ProductsView extends React.Component {
         exportButton: true,
         exportFileName: 'ePayment-products',
       },
-      loadingProductTransactions: false,
-      transactionsTableOffset: 0,
-      transactionsTablePage: 1,
-      transactionsTableColumns: [
-        { title: 'ID', field: 'id' },
-        { title: 'Date', field: 'created_at' },
-        { title: 'Product', field: 'product_id' },
-        { title: 'Category', field: 'product_category' },
-        { title: 'Quantity', field: 'quantity' },
-        { title: 'Currency', field: 'currency' },
-        { title: 'Token Amount', field: 'token_amount' },
-        { title: 'Fiat Price', field: 'amount' },
-        { title: 'Latitude', field: 'latitude' },
-        { title: 'Longitude', field: 'longitude' },
-      ],
-      transactionsTableOptions: {
-        search: true,
-        paging: true,
-        filtering: false,
-        exportButton: true,
-        exportFileName: 'ePayment-transactions',
-      },
       importedProducts: null,
     };
 
     this.displayToastMessage = toastUtils.displayToastMessage;
     this.BusinessProductService = new BusinessProductService();
-    this.BusinessTransactionService = new BusinessTransactionService();
     this.handleToggleMobileMenuModal = this.handleToggleMobileMenuModal.bind(
       this,
     );
     this.fetchProducts = this.fetchProducts.bind(this);
-    this.fetchProductTransactions = this.fetchProductTransactions.bind(this);
     this.renderViewHeader = this.renderViewHeader.bind(this);
     this.renderProductsTable = this.renderProductsTable.bind(this);
     this.handleOnChangeRowsPerPage = this.handleOnChangeRowsPerPage.bind(this);
     this.handleOnChangeProductsTablePage = this.handleOnChangeProductsTablePage.bind(
-      this,
-    );
-    this.handleOnChangeTransactionsTablePage = this.handleOnChangeTransactionsTablePage.bind(
       this,
     );
     this.handleOnRowClick = this.handleOnRowClick.bind(this);
@@ -165,38 +137,6 @@ class ProductsView extends React.Component {
         }
         this.displayToastMessage('error', error);
         this.setState({ loadingProducts: false });
-      });
-  }
-
-  fetchProductTransactions(queryData) {
-    this.BusinessTransactionService.listTransactions(queryData)
-      .then((res) => {
-        console.log(
-          'this.BusinessTransactionService.listTransactions res:',
-          res,
-        );
-        if (res.error) {
-          throw res.error;
-        }
-        this.setState({
-          loadingProductTransactions: false,
-          showProductTransactions: true,
-          selectedProduct: {
-            ...this.state.selectedProduct,
-            transactions: res.businessTransactions,
-          },
-        });
-      })
-      .catch((error) => {
-        console.log(
-          'this.BusinessTransactionService.listTransactions error:',
-          error,
-        );
-        if (typeof error !== 'string') {
-          error = 'Loading failure: Please refresh and try again';
-        }
-        this.displayToastMessage('error', error);
-        this.setState({ loadingProductTransactions: false });
       });
   }
 
@@ -293,45 +233,6 @@ class ProductsView extends React.Component {
       productsTableOffset,
       productsTablePage: tablePage,
     });
-  }
-
-  handleOnChangeTransactionsTablePage(tablePage, pageSize) {
-    let transactionsTableOffset = this.state.transactionsTableOffset;
-    if (
-      tablePage !== transactionsTableOffset &&
-      tablePage > this.state.transactionsTablePage
-    ) {
-      transactionsTableOffset += pageSize;
-    }
-    if (
-      tablePage !== transactionsTableOffset &&
-      tablePage < this.state.transactionsTablePage
-    ) {
-      transactionsTableOffset -= pageSize;
-    }
-    this.setState(
-      {
-        transactionsTableOffset,
-        transactionsTablePage: tablePage,
-      },
-      () => {
-        if (
-          this.state.transactions.length <
-          transactionsTableOffset + pageSize
-        ) {
-          this.fetchProductTransactions({
-            businessID: this.props.user.id,
-            queryAttributes: {
-              businessID: this.props.user.id,
-              productID: this.state.selectedProduct.id,
-              offset: transactionsTableOffset,
-              limit: pageSize,
-              order: 'DESC',
-            },
-          });
-        }
-      },
-    );
   }
 
   handleOnRowClick(table, evt, rowData, toggleDetailPanel) {
@@ -498,47 +399,6 @@ class ProductsView extends React.Component {
         this.displayToastMessage('error', error);
         this.setState({ loadingProducts: false });
       });
-  }
-
-  renderSelectedProductTransactions() {
-    if (!this.state.showProductTransactions) {
-      return (
-        <button
-          className='ProductViewDetailsShowTransactionButton'
-          onClick={(evt) =>
-            this.fetchProductTransactions({
-              businessID: this.props.user.id,
-              queryAttributes: {
-                businessID: this.props.user.id,
-                productID: this.state.selectedProduct.id,
-                limit: 5,
-                order: 'DESC',
-              },
-            })
-          }
-        >
-          Show Transactional Data
-        </button>
-      );
-    }
-    return (
-      <DataTable
-        title='Transactions'
-        isLoading={this.state.loadingProductTransactions}
-        data={this.state.selectedProduct.transactions}
-        columns={this.state.transactionsTableColumns}
-        options={this.state.transactionsTableOptions}
-        onChangeRowsPerPage={(ps) =>
-          this.handleOnChangeRowsPerPage('transactions', ps)
-        }
-        onChangePage={(tp, ps) =>
-          this['handleOnChangeTransactionsTablePage'](tp, ps)
-        }
-        onRowClick={(e, rd, tdp) =>
-          this.handleOnRowClick('transactions', e, rd, tdp)
-        }
-      />
-    );
   }
 
   newProductDataIsValid(newProductData) {
@@ -719,14 +579,73 @@ class ProductsView extends React.Component {
 
   renderImportedProductsDescription() {
     if (this.state.importedProducts) {
-      return <p>Please review the imported products.</p>;
+      return (
+        <div className='ProductsViewImportDescContainer'>
+          <p>Please review the imported products.</p>
+        </div>
+      );
     }
-    return <p>Make sure the file is structured as the following...</p>;
+    return (
+      <div className='ProductsViewImportDescContainer'>
+        <p className='ProductsViewImportDescHeader'>
+          Make sure the CSV file has each exact header below and the
+          apprioritate value for that column.
+        </p>
+        <ol>
+          <li>"sku": String with exactly 16 alphanumeric characters</li>
+          <li>"label": String</li>
+          <li>"description": String</li>
+          <li>"price": Number</li>
+          <li>"category": String</li>
+          <li>"inventory_count": Number</li>
+        </ol>
+      </div>
+    );
   }
 
   persistImportedProducts(evt) {
-    // TODO: E2E Implementation
     evt.preventDefault();
+
+    this.displayToastMessage('info', 'Loading...');
+
+    this.BusinessProductService.importProducts(
+      this.props.user.id,
+      this.state.importedProducts.data,
+    )
+      .then((res) => {
+        console.log('this.BusinessProductService.importProducts res:', res);
+        if (res.error) {
+          throw res.error;
+        }
+
+        this.resetImportFileInputField();
+        this.displayToastMessage('success', 'Success');
+
+        this.setState(
+          {
+            importedProducts: null,
+            selectedProduct: null,
+            view: 'list',
+          },
+          () => {
+            this.fetchProducts({
+              businessID: this.props.user.id,
+              queryAttributes: {
+                limit: 10,
+                order: 'DESC',
+              },
+            });
+          },
+        );
+      })
+      .catch((error) => {
+        console.log('this.BusinessProductService.importProducts error:', error);
+        if (typeof error !== 'string') {
+          error = 'Import failure: Please review your CSV file and try again';
+        }
+        this.resetImportFileInputField();
+        this.displayToastMessage('error', error);
+      });
   }
 
   renderImportedProductsDetails() {
@@ -750,23 +669,59 @@ class ProductsView extends React.Component {
     }
   }
 
+  resetImportFileInputField() {
+    document.getElementById('ProductsViewImportField').value = '';
+  }
+
   handleImportedProductsFile(evt) {
     const csvFile = evt.target.files[0];
     console.log('handleImportedProductsFile() csvFile', csvFile);
-
-    // TODO: Handle if file is not a csv file
+    if (csvFile.type !== 'text/csv') {
+      this.resetImportFileInputField();
+      return this.displayToastMessage(
+        'error',
+        "Import failure: File type must be 'text/csv'",
+      );
+    }
 
     const fileReader = new FileReader();
 
     fileReader.onload = () => {
+      this.displayToastMessage('info', 'Parsing CSV file...');
+
       const importedProducts = window.$.csv.toObjects(fileReader.result);
-      console.log('importedProducts:,', importedProducts);
+      console.log('importedProducts:', importedProducts);
+      if (importedProducts.length === 0) {
+        this.resetImportFileInputField();
+        return this.displayToastMessage(
+          'error',
+          'Import failure: CSV File has no entries.',
+        );
+      }
 
-      // TODO: Handle if csv file is empty
-
+      const validColumns = {
+        sku: true,
+        label: true,
+        description: true,
+        price: true,
+        category: true,
+        inventory_count: true,
+      };
+      const invalidColumns = [];
       const tableColumns = Object.keys(importedProducts[0]).map((field) => {
+        if (!validColumns[field]) invalidColumns.push(field);
         return { field, title: stringUtils.capitalize(field) };
       });
+      if (invalidColumns.length !== 0) {
+        this.resetImportFileInputField();
+        return this.displayToastMessage(
+          'error',
+          `Import failure: CSV headers (${invalidColumns.toString()}) do not found the rules above`,
+        );
+      }
+
+      this.displayToastMessage('success', 'Success');
+
       this.setState({
         importedProducts: {
           tableColumns,
@@ -784,11 +739,13 @@ class ProductsView extends React.Component {
         <div className='ProductsViewHeaderContainer'>
           {this.renderViewHeader()}
         </div>
-        <div className='ProductsViewImportNotesContainer'>
-          {this.renderImportedProductsDescription()}
-        </div>
+        {this.renderImportedProductsDescription()}
         <div className='ProductsViewImportDetailsContainer'>
-          <input type='file' onChange={this.handleImportedProductsFile} />
+          <input
+            id='ProductsViewImportField'
+            type='file'
+            onChange={this.handleImportedProductsFile}
+          />
           {this.renderImportedProductsDetails()}
         </div>
       </div>
@@ -821,9 +778,6 @@ class ProductsView extends React.Component {
               />
             </div>
           </div>
-          {/* <div className='ProductsViewTransactionsContainer'>
-          {this.renderSelectedProductTransactions()}
-        </div> */}
         </div>
       );
     }
@@ -848,9 +802,6 @@ class ProductsView extends React.Component {
           {this.renderSelectedProduct()}
           {this.renderSelectedProductQRCode(false)}
         </div>
-        {/* <div className='ProductsViewTransactionsContainer'>
-          {this.renderSelectedProductTransactions()}
-        </div> */}
       </div>
     );
   }
