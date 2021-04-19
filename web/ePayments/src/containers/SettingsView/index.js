@@ -275,7 +275,7 @@ class SettingsView extends React.Component {
 
   renderBusinessProfileView() {
     return (
-      <div className='SettingsViewContentContainer col-11'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           <label>Type: {this.props.user.type}</label>
@@ -314,7 +314,7 @@ class SettingsView extends React.Component {
 
   renderCustomerProfileView() {
     return (
-      <div className='SettingsViewContentContainer col-12'>
+      <div className='StdViewContentContainer col-12'>
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           <label>Type: {this.props.user.type}</label>
@@ -422,7 +422,7 @@ class SettingsView extends React.Component {
       return address === null ? '' : address;
     };
     return (
-      <div className='SettingsViewContentContainer col-11'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewPaymentsViewInfoContainer'>
           <form className='SettingsViewPaymentsViewInfoConvertForm'>
@@ -505,7 +505,7 @@ class SettingsView extends React.Component {
 
   renderLogOutView() {
     return (
-      <div className='SettingsViewContentContainer col-11'>
+      <div className='StdViewContentContainer col-11'>
         {this.renderActiveOptionContentHeader()}
         <div className='SettingsViewLogOutViewAYSContainer'>
           <p>Are you sure you want to log out? We don't want you to go :(</p>
@@ -543,7 +543,7 @@ class SettingsView extends React.Component {
 
   renderSettingsView() {
     return (
-      <div className='StdViewContentContainer col-sm-11 col-12 row'>
+      <div className='SettingsViewContentContainer col-sm-11 col-12 row'>
         <div className='SettingsViewOptionsContainer col-12'>
           {this.state.options.map((option, i) => (
             <div

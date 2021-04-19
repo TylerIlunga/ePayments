@@ -1,9 +1,92 @@
-.ProductsViewHeaderContainer {
-  height: 10%;
+.ProductsViewImportDescContainer {
+  height: 35%;
+  width: 100%;
+  /* background-color: blue; */
+}
+
+.ProductsViewImportDescContainer p {
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+}
+
+.ProductsViewImportDescContainer li {
+  font-size: 14px;
+  padding: 2px 0px;
+  color: white;
+}
+
+.ProductsViewImportDescContainer-PostParse {
+  height: 5%;
+  width: 100%;
+}
+
+.ProductsViewImportDescContainer-PostParse p {
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+}
+
+.ProductsViewImportDetailsContainer {
+  height: 55%;
+  width: 100%;
+  overflow-y: scroll;
+  /* background-color: red; */
+}
+
+.ProductsViewImportDetailsContainer input {
+  padding-top: 5px;
+  color: white;
+}
+
+.ProductsViewImportDetailsContainer-PostParse {
+  height: 85%;
+  width: 100%;
+  /* background-color: red; */
+}
+
+.ProductsViewImportDetailsContainer-PostParse input {
+  padding-top: 0px;
+}
+
+.ProductsViewImportDetailsContainer-PostParse input::placeholder {
+  color: white;
+}
+
+.ProductsViewImportPPInputContainer {
+  height: 5%;
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 0px 16px;
+}
+
+.ProductsViewImportPPDataTableContainer {
+  height: 80%;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.ProductsViewImportPPButtonContainer {
+  height: 15%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ProductsViewImportPPButtonContainer button {
+  width: 100%;
+  padding: 10px 0px;
+  border: none;
+  border: solid 2px white;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 15px;
+  color: white;
+}
+
+.ProductsViewImportPPButtonContainer button:hover {
+  background: #85bb65;
+  transition: 300ms;
 }
 
 .ProductsViewActionButtonContainer {
@@ -40,7 +123,6 @@
 .ProductsViewCreateFormContainer {
   height: 90%;
   width: 100%;
-  padding: 0px 16px;
 }
 
 .ProductsViewCreateForm {
@@ -129,6 +211,9 @@
 }
 
 @media screen and (max-width: 1100px) {
+  .ProductsViewContentContainer {
+    width: 100%;
+  }
   .ProductsViewProductQRContainer {
     padding-bottom: 100px;
   }

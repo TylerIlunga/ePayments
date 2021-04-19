@@ -834,6 +834,5 @@ class AnalyticsView extends React.Component {
 const mapStateToProps = (state) => ({
   user: state.user,
 });
-const mapDispatchToProps = (dispatch) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsView);
+export default connect(mapStateToProps, null)(AnalyticsView);

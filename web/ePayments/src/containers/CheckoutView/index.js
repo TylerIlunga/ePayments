@@ -376,6 +376,5 @@ const mapStateToProps = (state) => ({
   paymentAccount: state.paymentAccount,
   user: state.user,
 });
-const mapDispatchToProps = (dispatch) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(CheckoutView);
+export default connect(mapStateToProps, null)(CheckoutView);

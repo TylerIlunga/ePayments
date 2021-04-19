@@ -15,6 +15,7 @@
   width: 90%;
   background: linear-gradient(to right, rgb(20, 136, 204), rgb(43, 50, 178));
   /* background: linear-gradient(to right, rgb(116, 116, 191), rgb(52, 138, 199)); */
+  padding: 0px 28px;
 }
 
 .StdViewContentHeaderContainer {
@@ -22,7 +23,6 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 0px 16px;
 }
 
 .StdContentHeaderLabel {
@@ -42,7 +42,6 @@
 .TransactionViewDetailsContainer {
   height: 90%;
   width: 100%;
-  padding: 0px 16px;
 }
 
 .TransactionViewDetailsLabelContainer p {

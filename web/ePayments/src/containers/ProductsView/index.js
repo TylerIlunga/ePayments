@@ -313,7 +313,7 @@ class ProductsView extends React.Component {
   renderListOfProducts() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12'>
-        <div className='ProductsViewHeaderContainer'>
+        <div className='StdViewContentHeaderContainer'>
           {this.renderViewHeader()}
         </div>
         <div className='ProductsViewActionButtonContainer '>
@@ -484,7 +484,7 @@ class ProductsView extends React.Component {
   renderCreateProductForm() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12'>
-        <div className='ProductsViewHeaderContainer'>
+        <div className='StdViewContentHeaderContainer'>
           {this.renderViewHeader()}
         </div>
         <div className='ProductsViewCreateFormContainer'>
@@ -580,25 +580,38 @@ class ProductsView extends React.Component {
   renderImportedProductsDescription() {
     if (this.state.importedProducts) {
       return (
-        <div className='ProductsViewImportDescContainer'>
-          <p>Please review the imported products.</p>
+        <div className='ProductsViewImportDescContainer-PostParse'>
+          <p>Review import</p>
         </div>
       );
     }
     return (
       <div className='ProductsViewImportDescContainer'>
-        <p className='ProductsViewImportDescHeader'>
+        <p>
           Make sure the CSV file has each exact header below and the
-          apprioritate value for that column.
+          apprioritate value for that column
         </p>
-        <ol>
-          <li>"sku": String with exactly 16 alphanumeric characters</li>
-          <li>"label": String</li>
-          <li>"description": String</li>
-          <li>"price": Number</li>
-          <li>"category": String</li>
-          <li>"inventory_count": Number</li>
-        </ol>
+        <ul>
+          <li>
+            <strong>"sku"</strong>: String with exactly 16 alphanumeric
+            characters
+          </li>
+          <li>
+            <strong>"label"</strong>: String
+          </li>
+          <li>
+            <strong>"description"</strong>: String
+          </li>
+          <li>
+            <strong>"price"</strong>: Number
+          </li>
+          <li>
+            <strong>"category"</strong>: String
+          </li>
+          <li>
+            <strong>"inventory_count"</strong>: Number
+          </li>
+        </ul>
       </div>
     );
   }
@@ -649,24 +662,40 @@ class ProductsView extends React.Component {
   }
 
   renderImportedProductsDetails() {
-    if (this.state.importedProducts) {
+    if (!this.state.importedProducts) {
       return (
-        <div className='ProductsViewImportedProductsDetailsContainer'>
-          <div className='ProductsViewImportedProductsTable'>
-            <DataTable
-              title='Inventory'
-              isLoading={this.state.loadingProducts}
-              data={this.state.importedProducts.data}
-              columns={this.state.importedProducts.tableColumns}
-              options={this.state.productsTableOptions}
-            />
-          </div>
-          <div className='ProductsViewImportedProductsImportButtonContainer'>
-            <button onClick={this.persistImportedProducts}>Import</button>
-          </div>
+        <div className='ProductsViewImportDetailsContainer'>
+          <input
+            id='ProductsViewImportField'
+            type='file'
+            onChange={this.handleImportedProductsFile}
+          />
         </div>
       );
     }
+    return (
+      <div className='ProductsViewImportDetailsContainer-PostParse'>
+        <div className='ProductsViewImportPPInputContainer'>
+          <input
+            id='ProductsViewImportField'
+            type='file'
+            onChange={this.handleImportedProductsFile}
+          />
+        </div>
+        <div className='ProductsViewImportPPDataTableContainer'>
+          <DataTable
+            title='Inventory'
+            isLoading={this.state.loadingProducts}
+            data={this.state.importedProducts.data}
+            columns={this.state.importedProducts.tableColumns}
+            options={this.state.productsTableOptions}
+          />
+        </div>
+        <div className='ProductsViewImportPPButtonContainer'>
+          <button onClick={this.persistImportedProducts}>Import</button>
+        </div>
+      </div>
+    );
   }
 
   resetImportFileInputField() {
@@ -723,6 +752,7 @@ class ProductsView extends React.Component {
       this.displayToastMessage('success', 'Success');
 
       this.setState({
+        loadingProducts: false,
         importedProducts: {
           tableColumns,
           data: importedProducts,
@@ -736,18 +766,12 @@ class ProductsView extends React.Component {
   renderImportProductsView() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12'>
-        <div className='ProductsViewHeaderContainer'>
+        <div className='StdViewContentHeaderContainer'>
           {this.renderViewHeader()}
         </div>
         {this.renderImportedProductsDescription()}
-        <div className='ProductsViewImportDetailsContainer'>
-          <input
-            id='ProductsViewImportField'
-            type='file'
-            onChange={this.handleImportedProductsFile}
-          />
-          {this.renderImportedProductsDetails()}
-        </div>
+
+        {this.renderImportedProductsDetails()}
       </div>
     );
   }
@@ -766,7 +790,7 @@ class ProductsView extends React.Component {
     if (fillView) {
       return (
         <div className='StdViewContentContainer col-sm-11 col-12'>
-          <div className='ProductsViewHeaderContainer'>
+          <div className='StdViewContentHeaderContainer'>
             {this.renderViewHeader()}
           </div>
           <div className='ProductsViewDetailsContainer row'>
@@ -795,7 +819,7 @@ class ProductsView extends React.Component {
   renderSelectedProductDetails() {
     return (
       <div className='StdViewContentContainer col-sm-11 col-12'>
-        <div className='ProductsViewHeaderContainer'>
+        <div className='StdViewContentHeaderContainer'>
           {this.renderViewHeader()}
         </div>
         <div className='ProductsViewDetailsContainer row'>
@@ -848,6 +872,5 @@ class ProductsView extends React.Component {
 const mapStateToProps = (state) => ({
   user: state.user,
 });
-const mapDispatchToProps = (dispatch) => ({});
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductsView);
+export default connect(mapStateToProps, null)(ProductsView);
