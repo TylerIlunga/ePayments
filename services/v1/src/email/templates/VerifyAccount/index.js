@@ -4,12 +4,12 @@
  */
 module.exports = ({ user }) => {
   return `
-    Welcome to DigiCard!
+    Welcome to ePayments!
     <br/><br/>
-    We are really excited to give you more insight on your audience!
+    We are really excited to help you dive deeper into the world of digital finance :)
 	  <br/><br/>
     <p><strong>Copy and Paste</strong> this Activation Token: <strong>${user.activation_token}</strong></p>
     <br/><br/>
-    <b>Mizu Team</b>
+    <b>ePayments</b>
   `;
 };

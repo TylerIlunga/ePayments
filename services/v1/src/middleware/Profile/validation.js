@@ -42,6 +42,9 @@ module.exports = {
     profileID: Joi.number().required(),
     updates: Joi.object()
       .keys({
+        legalName: Joi.string(),
+        industry: Joi.string(),
+        country: Joi.string(),
         address: Joi.string(),
         phoneNumber: Joi.string(),
         publicEmail: Joi.string().email({
