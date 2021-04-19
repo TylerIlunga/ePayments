@@ -33,12 +33,11 @@ class ProfileService {
   }
 
   createNewCustomerProfile(profileData) {
-    const { profileImage, country, username, userID } = profileData;
     return new Promise((resolve, reject) => {
       this.networkRequest(`${this.customerURL}/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profileImage, country, username, userID }),
+        body: JSON.stringify(profileData),
       })
         .then((res) => {
           if (res.error) {
@@ -55,24 +54,11 @@ class ProfileService {
   }
 
   createNewBusinessProfile(profileData) {
-    const {
-      profileImage,
-      address,
-      phoneNumber,
-      publicEmail,
-      userID,
-    } = profileData;
     return new Promise((resolve, reject) => {
       this.networkRequest(`${this.businessURL}/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          profileImage,
-          address,
-          phoneNumber,
-          publicEmail,
-          userID,
-        }),
+        body: JSON.stringify(profileData),
       })
         .then((res) => {
           if (res.error) {

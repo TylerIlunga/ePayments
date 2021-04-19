@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import config from '../../config';
 import { setProfile } from '../../redux/actions/profile';
+import { updateUser } from '../../redux/actions/user';
 import ProfileService from '../../services/ProfileService';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
@@ -12,9 +13,12 @@ class CreateProfileView extends React.Component {
     this.state = {
       view: 'customer',
       businessProfileForm: {
+        industry: '',
+        legalName: '',
         publicEmail: '',
-        phoneNumber: '',
+        country: '',
         address: '',
+        phoneNumber: '',
       },
       customerProfileForm: {
         country: '',
@@ -47,11 +51,23 @@ class CreateProfileView extends React.Component {
     profileType = profileType.toLowerCase();
     if (profileType === 'business') {
       const {
+        industry,
+        legalName,
+        publicEmail,
+        country,
         address,
         phoneNumber,
-        publicEmail,
       } = this.state.businessProfileForm;
-      if (!(address && phoneNumber && publicEmail)) {
+      if (
+        !(
+          industry &&
+          legalName &&
+          publicEmail &&
+          country &&
+          address &&
+          phoneNumber
+        )
+      ) {
         return { error: 'Please provide values for every field.' };
       }
     }
@@ -86,6 +102,9 @@ class CreateProfileView extends React.Component {
         );
         if (res.error) {
           throw res.error;
+        }
+        if (profileType === 'Business') {
+          this.props.dispatchUpdateUser({ key: 'type', value: 'business' });
         }
 
         // Update Redux store
@@ -148,6 +167,40 @@ class CreateProfileView extends React.Component {
     return (
       <div className='CreateProfileViewFormContainer'>
         <form className='CreateProfileViewForm'>
+          <label className='CreateProfileViewFormLabel'>Country:</label>
+          <select
+            className='CreateProfileViewFormSelectInput'
+            value={this.state.businessProfileForm.country}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'country')
+            }
+          >
+            {config.countries.map((countryData, i) => (
+              <option key={i} value={countryData.code}>
+                {`${countryData.name} (${countryData.code})`}
+              </option>
+            ))}
+          </select>
+          <label className='CreateProfileViewFormLabel'>Industry:</label>
+          <input
+            className='CreateProfileViewFormInput'
+            type='text'
+            value={this.state.businessProfileForm.industry}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'industry')
+            }
+            placeholder='Goods and Services'
+          />
+          <label className='CreateProfileViewFormLabel'>Legal Name:</label>
+          <input
+            className='CreateProfileViewFormInput'
+            type='text'
+            value={this.state.businessProfileForm.legalName}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'legalName')
+            }
+            placeholder='Sesame Street Inc.'
+          />
           <label className='CreateProfileViewFormLabel'>
             Public Email Address:
           </label>
@@ -160,6 +213,16 @@ class CreateProfileView extends React.Component {
             }
             placeholder={'w@xyz.com'}
           />
+          <label className='CreateProfileViewFormLabel'>Public Address:</label>
+          <input
+            className='CreateProfileViewFormInput'
+            type='text'
+            value={this.state.businessProfileForm.address}
+            onChange={(evt) =>
+              this.updateProfileForm(evt, 'businessProfileForm', 'address')
+            }
+            placeholder={'123 Sesame Street New York, NY 10036'}
+          />
           <label className='CreateProfileViewFormLabel'>
             Public Phone Number:
           </label>
@@ -171,16 +234,6 @@ class CreateProfileView extends React.Component {
               this.updateProfileForm(evt, 'businessProfileForm', 'phoneNumber')
             }
             placeholder={'+1 123-456-7890'}
-          />
-          <label className='CreateProfileViewFormLabel'>Public Address:</label>
-          <input
-            className='CreateProfileViewFormInput'
-            type='text'
-            value={this.state.businessProfileForm.address}
-            onChange={(evt) =>
-              this.updateProfileForm(evt, 'businessProfileForm', 'address')
-            }
-            placeholder={'123 First Street Applewood, CA 90001'}
           />
           <input
             className='CreateProfileViewFormButton'
@@ -259,6 +312,7 @@ const mapStateToProps = (state) => ({
 });
 const mapDispatchToProps = (dispatch) => ({
   dispatchSetProfile: (profileData) => dispatch(setProfile(profileData)),
+  dispatchUpdateUser: (updates) => dispatch(updateUser(updates)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateProfileView);

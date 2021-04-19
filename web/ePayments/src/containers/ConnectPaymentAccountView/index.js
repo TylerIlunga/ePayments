@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { setPaymentAccount } from '../../redux/actions/paymentAccount';
 import PaymentAccountService from '../../services/PaymentAccountService';
 import toastUtils from '../../utils/Toasts';
 import './index.css';
@@ -46,10 +47,8 @@ class ConnectPaymentAccountView extends React.Component {
         throw '!messageJSON.success';
       }
       if (messageJson.paymentAccount) {
-        this.displayToastMessage(
-          'success',
-          'Success: Please log again to verify your account',
-        );
+        this.displayToastMessage('success', 'Success');
+        this.props.dispatchSetPaymentAccount(messageJson.paymentAccount);
         this.props.history.replace('/h/transactions');
       }
     } catch (error) {
@@ -114,6 +113,15 @@ class ConnectPaymentAccountView extends React.Component {
 const mapStateToProps = (state) => ({
   user: state.user,
   profile: state.profile,
+  paymentAccount: state.paymentAccount,
 });
 
-export default connect(mapStateToProps, null)(ConnectPaymentAccountView);
+const mapDispatchToProps = (dispatch) => ({
+  dispatchSetPaymentAccount: (paymentAccount) =>
+    dispatch(setPaymentAccount(paymentAccount)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ConnectPaymentAccountView);

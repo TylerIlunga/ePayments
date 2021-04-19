@@ -107,13 +107,15 @@ class ProductsView extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchProducts({
-      businessID: this.props.user.id,
-      queryAttributes: {
-        limit: 10,
-        order: 'DESC',
-      },
-    });
+    if (this.state.products.length === 0) {
+      this.fetchProducts({
+        businessID: this.props.user.id,
+        queryAttributes: {
+          limit: 10,
+          order: 'DESC',
+        },
+      });
+    }
   }
 
   fetchProducts(queryData) {

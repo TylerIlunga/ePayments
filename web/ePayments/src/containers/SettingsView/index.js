@@ -279,6 +279,38 @@ class SettingsView extends React.Component {
         {this.renderActiveOptionContentHeader()}
         <form className='SettingsViewProfileViewInfoForm'>
           <label>Type: {this.props.user.type}</label>
+          <label>Country: </label>
+          <select
+            className='SettingsViewInput'
+            value={this.state.updatedUserProfile.country}
+            onChange={(evt) =>
+              this.handleUpdatingUserProfileField(evt, 'country')
+            }
+          >
+            {config.countries.map((countryData, i) => (
+              <option key={i} value={countryData.code}>
+                {`${countryData.name} (${countryData.code})`}
+              </option>
+            ))}
+          </select>
+          <label>Industry: </label>
+          <input
+            className='SettingsViewInput'
+            type='text'
+            value={this.state.updatedUserProfile.industry}
+            onChange={(evt) =>
+              this.handleUpdatingUserProfileField(evt, 'industry')
+            }
+          />
+          <label>Legal Name: </label>
+          <input
+            className='SettingsViewInput'
+            type='text'
+            value={this.state.updatedUserProfile.legal_name}
+            onChange={(evt) =>
+              this.handleUpdatingUserProfileField(evt, 'legal_name')
+            }
+          />
           <label>Email Address: </label>
           <input
             className='SettingsViewInput'
@@ -419,7 +451,9 @@ class SettingsView extends React.Component {
   renderPaymentsView() {
     const paymentAccount = this.props.paymentAccount;
     const displayAddress = (address) => {
-      return address === null ? '' : address;
+      return !address || address === null || address === 'undefined'
+        ? ''
+        : address;
     };
     return (
       <div className='StdViewContentContainer col-11'>

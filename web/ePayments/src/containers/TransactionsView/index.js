@@ -220,6 +220,9 @@ class TransactionsView extends React.Component {
       const headingSplit = field.split('_');
       if (headingSplit.length === 1) {
         heading = stringUtils.capitalize(field);
+        if (field === 'amount') {
+          transaction[field] = `$${transaction[field]}`;
+        }
       } else {
         headingSplit.forEach((word) => {
           heading += `${stringUtils.capitalize(word)} `;

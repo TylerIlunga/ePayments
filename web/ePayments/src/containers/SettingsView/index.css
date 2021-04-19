@@ -49,6 +49,7 @@
 .SettingsViewProfileViewInfoForm {
   height: 65%;
   width: 100%;
+  overflow-y: scroll;
 }
 
 .SettingsViewProfileViewInfoForm label {
