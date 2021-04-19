@@ -2,8 +2,7 @@
  * Controller module for user Profile endpoints.
  * @module src/controllers/Profile/validation.js
  */
-const { BusinessProfile, CustomerProfile } = require('../../dal/config');
-const User = require('../../dal/models/User');
+const { BusinessProfile, CustomerProfile, User } = require('../../dal/config');
 const {
   fetchProfileSchema,
   customerCreationSchema,
@@ -55,6 +54,17 @@ module.exports = {
     }
     try {
       const { country, username, userID } = validationResult.value;
+      // Verify if a user and business profile already exists
+      const customerUser = await User.findOne({ where: { id: userID } });
+      if (customerUser === null) {
+        throw { error: 'User does not exist for the given ID.' };
+      }
+      const customerProfile = await CustomerProfile.findOne({
+        where: { user_id: userID },
+      });
+      if (customerProfile !== null) {
+        throw { error: 'Profile already exists for the given ID.' };
+      }
       // Persist a new customer profile
       const newCustomerProfile = await CustomerProfile.create({
         country,
@@ -82,14 +92,31 @@ module.exports = {
     }
     try {
       const {
+        legalName,
+        industry,
+        country,
         address,
         phoneNumber,
         publicEmail,
         userID,
       } = validationResult.value;
+      // Verify if a user and business profile already exists
+      const businessUser = await User.findOne({ where: { id: userID } });
+      if (businessUser === null) {
+        throw { error: 'User does not exist for the given ID.' };
+      }
+      const businessProfile = await BusinessProfile.findOne({
+        where: { user_id: userID },
+      });
+      if (businessProfile !== null) {
+        throw { error: 'Profile already exists for the given ID.' };
+      }
       // Persist a new business profile
       const newBusinessProfile = await BusinessProfile.create({
         address,
+        industry,
+        country,
+        legal_name: legalName,
         phone_number: phoneNumber,
         public_email: publicEmail,
         user_id: userID,
@@ -97,8 +124,6 @@ module.exports = {
       console.log('new business profile created! ID:', newBusinessProfile.id);
 
       // Update User Account
-      const businessUser = await User.findOne({ where: { id: userID } });
-
       businessUser.type = 'business';
 
       await businessUser.save();

@@ -14,6 +14,9 @@ module.exports = {
     userID: Joi.number().required(),
   }),
   businessCreationSchema: Joi.object({
+    legalName: Joi.string().required(),
+    industry: Joi.string().required(),
+    country: Joi.string().required(),
     address: Joi.string().required(),
     phoneNumber: Joi.string().required(),
     publicEmail: Joi.string()

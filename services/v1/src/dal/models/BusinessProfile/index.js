@@ -17,9 +17,30 @@ module.exports = (sequelize) => {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      address: Sequelize.STRING,
-      phone_number: Sequelize.STRING,
-      public_email: Sequelize.STRING,
+      legal_name: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      industry: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      country: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      address: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      phone_number: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      public_email: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
       created_at: {
         type: Sequelize.BIGINT,
         defaultValue: Date.now(),
