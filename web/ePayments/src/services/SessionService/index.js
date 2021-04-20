@@ -51,23 +51,6 @@ class SessionService {
     });
   }
 
-  fetchUserSessionData() {
-    return new Promise((resolve, reject) => {
-      this.networkRequest(`${this.url}/fetch/user`)
-        .then((res) => {
-          if (res.error) {
-            throw res.error;
-          }
-          console.log('fetchUserSessionData() res.data:', res.data);
-          resolve(res.data);
-        })
-        .catch((error) => {
-          console.log('fetchUserSessionData() error:', error);
-          reject(error);
-        });
-    });
-  }
-
   logOut() {
     return new Promise((resolve, reject) => {
       this.networkRequest(`${this.url}/logout`, {}, 'text')

@@ -135,56 +135,6 @@ module.exports = {
     }
   },
   /**
-   * Fetches a user account and profile data given their session token cookie.
-   *
-   * @param {object} req - Express.js Request
-   * @param {object} res - Express.js Response
-   *
-   * @return {number} HTTP Status Code
-   */
-  fetchUserSessionData(req, res) {
-    const validationResult = Validation.validateRequestBody(
-      fetchUserSessionData,
-      req.cookies,
-    );
-    if (validationResult.error) {
-      return res.json({ error: validationResult.error });
-    }
-    try {
-      const { ut } = validationResult.value;
-      // Verify JWT in our session cookie
-      Tokens.verifyToken(ut, async (vTRes) => {
-        if (vTRes.error) {
-          return res.json({ error: vTRes.error });
-        }
-        // Verify that the user ID within the JWT maps to a user in our DB
-        const user = await dalConfig.User.findOne({
-          where: { id: vTRes.data.userID },
-        });
-        if (user === null) {
-          return Errors.General.serveResponse(
-            { error: 'User does not exist.' },
-            res,
-          );
-        }
-        // Verify that the user ID maps to a profile in our DB
-        const profile = await dalConfig[
-          `${Strings.capitalize(user.type)}Profile`
-        ].findOne({ where: { user_id: user.id } });
-        if (profile === null) {
-          return Errors.General.serveResponse(
-            { error: 'Profile does not exist for the given user' },
-            res,
-          );
-        }
-        // Respond
-        return res.json({ user, profile });
-      });
-    } catch (error) {
-      return Errors.General.serveResponse(error, res);
-    }
-  },
-  /**
    * Logs a user out by destoying their session token cookie.
    *
    * @param {object} req - Express.js Request

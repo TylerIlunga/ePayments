@@ -242,7 +242,7 @@ class CoinbaseAPIHelper {
         Authorization: `Bearer ${transactionData.from.coinbase_access_token}`,
         'Content-Type': 'application/json',
       });
-      // NOTE: (NOT IN V1) [Requires two seperate requests]
+      // NOTE: (NOT IN V1) [Requires two seperate requests for type: 'send' requests to CB]
       // Reference: https://developers.coinbase.com/docs/wallet/coinbase-connect/two-factor-authentication
       // if (
       //   transactionData.twoFactorAuthToken !== null &&
@@ -256,13 +256,11 @@ class CoinbaseAPIHelper {
         path: `/accounts/${transactionData.from.coinbase_account_id}/transactions`,
         headers: reqHeaders,
         body: {
-          // NOTE: For external accounts, but in v1 it's internal (Coinbase)
+          // NOTE: For external accounts, but in v1 we're addressing only Coinbase wallets (internal)
           // type: 'send',
           type: 'transfer',
-          // TODO: UNCOMMENT THIS to: transactionData.to.coinbase_bitcoin_address,
-          to: 'bc1qegu60t0n6npt7vam36mur60zpyudz62pd3f4za',
-          // TODO: UNCOMMENT THIS to: transactionData.tokenPrice,
-          amount: '0.00010003',
+          to: transactionData.to.coinbase_bitcoin_address,
+          amount: transactionData.tokenPrice,
           currency: transactionData.currency,
         },
       })
