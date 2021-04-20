@@ -52,7 +52,7 @@ class UserService {
   }
 
   resetPassword(resetData) {
-    const { email, resetPasswordToken, oldPassword, newPassword } = resetData;
+    const { email, resetPasswordToken, newPassword } = resetData;
     return new Promise((resolve, reject) => {
       this.networkRequest(`${this.url}/resetPassword`, {
         method: 'POST',
@@ -60,7 +60,6 @@ class UserService {
         body: JSON.stringify({
           email,
           resetPasswordToken,
-          oldPassword,
           newPassword,
         }),
       })

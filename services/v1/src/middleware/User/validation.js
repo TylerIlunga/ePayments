@@ -29,7 +29,6 @@ module.exports = {
       })
       .required(),
     resetPasswordToken: Joi.string().required(),
-    oldPassword: Joi.string().required(),
     newPassword: Joi.string().required(),
   }),
 };

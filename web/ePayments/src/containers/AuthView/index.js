@@ -14,7 +14,7 @@ class AuthView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'signUp',
+      view: 'logIn',
       signUpLogInForm: {
         email: '',
         password: '',
@@ -29,7 +29,6 @@ class AuthView extends React.Component {
       resetPasswordForm: {
         email: '',
         resetPasswordToken: '',
-        oldPassword: '',
         newPassword: '',
         confirmPassword: '',
         passwordPattern: /^[a-zA-Z0-9]{10,30}$/,
@@ -152,20 +151,11 @@ class AuthView extends React.Component {
       const {
         email,
         resetPasswordToken,
-        oldPassword,
         newPassword,
         confirmPassword,
         passwordPattern,
       } = this.state.resetPasswordForm;
-      if (
-        !(
-          email &&
-          resetPasswordToken &&
-          oldPassword &&
-          newPassword &&
-          confirmPassword
-        )
-      ) {
+      if (!(email && resetPasswordToken && newPassword && confirmPassword)) {
         return { error: 'Please enter a value for each field.' };
       }
       if (newPassword !== confirmPassword) {
@@ -575,15 +565,6 @@ class AuthView extends React.Component {
                 this.updateResetPasswordForm(evt, 'resetPasswordToken')
               }
               placeholder='Reset Token'
-            />
-            <input
-              className='AuthViewFormInput'
-              type='password'
-              value={this.state.resetPasswordForm.oldPassword}
-              onChange={(evt) =>
-                this.updateResetPasswordForm(evt, 'oldPassword')
-              }
-              placeholder='Old Password'
             />
             <input
               className='AuthViewFormInput'

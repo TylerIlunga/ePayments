@@ -116,12 +116,7 @@ module.exports = {
 
     try {
       // Check to see if email and password reset token exists for the given user.
-      const {
-        email,
-        resetPasswordToken,
-        oldPassword,
-        newPassword,
-      } = validationResult.value;
+      const { email, resetPasswordToken, newPassword } = validationResult.value;
       const user = await User.findOne({
         where: { email, password_reset_token: resetPasswordToken },
       });
@@ -134,23 +129,14 @@ module.exports = {
           error: 'Password Reset Token expired. Please request a new one.',
         };
       }
-      // Check if oldPassword matches stored password
-      bcrypt.compare(oldPassword, user.password, async (error, isMatch) => {
-        if (error) {
-          return res.json({ error: 'Error comparing passwords:' + error });
-        }
-        if (!isMatch) {
-          return res.json({ error: 'Incorrect password. Please try again.' });
-        }
-        // Update Password and remove Reset Data
-        user.password = await Generators.generatePassword(newPassword);
-        user.password_reset_token = null;
-        user.password_reset_expiry = null;
-        await user.save();
+      // Update Password and remove Reset Data
+      user.password = await Generators.generatePassword(newPassword);
+      user.password_reset_token = null;
+      user.password_reset_expiry = null;
+      await user.save();
 
-        // Return user data not profile.
-        return res.json({ error: null, success: true });
-      });
+      // Return user data not profile.
+      return res.json({ error: null, success: true });
     } catch (error) {
       return Errors.General.serveResponse(error, res);
     }
