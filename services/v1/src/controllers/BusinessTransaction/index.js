@@ -52,24 +52,23 @@ module.exports = {
         currency,
       } = validationResult.value;
 
-      // TODO: FOR TESTING...REMOVE
-      const nbt = await BusinessTransaction.create({
-        id: uuid.v4(),
-        business_id: businessID,
-        customer_id: customerID,
-        product_id: productID,
-        coinbase_transaction_id: 'cbTransactionResult.id',
-        product_category: productCategory,
-        product_label: productLabel,
-        quantity: quantity,
-        amount: 1.5 * quantity,
-        token_amount: '${cbTransactionResult.amount.amount}',
-        currency: currency,
-        latitude: 0.0,
-        longitude: 0.0,
-      });
-
-      return res.json({ success: true });
+      // NOTE: For testing...uncomment this
+      // const nbt = await BusinessTransaction.create({
+      //   id: uuid.v4(),
+      //   business_id: businessID,
+      //   customer_id: customerID,
+      //   product_id: productID,
+      //   coinbase_transaction_id: 'cbTransactionResult.id',
+      //   product_category: productCategory,
+      //   product_label: productLabel,
+      //   quantity: quantity,
+      //   amount: 1.5 * quantity,
+      //   token_amount: '${cbTransactionResult.amount.amount}',
+      //   currency: currency,
+      //   latitude: 0.0,
+      //   longitude: 0.0,
+      // });
+      // return res.json({ success: true });
 
       // Validate Business Account
       const businessAccount = await User.findOne({ where: { id: businessID } });
@@ -144,7 +143,7 @@ module.exports = {
       // Convert Product Price to current currency buy price
       const cbCurrentBTCBuyPrice = await coinbaseAPIHelper.getCurrentBuyPriceFor(
         businessPaymentAccount.coinbase_access_token,
-        'BTC-USD',
+        'BTC-USD', // TODO: Handle appriorate currency being accepted
       );
 
       const businessProductTokenPrice =

@@ -27,8 +27,6 @@ module.exports = (emailMetaData) => {
     <br/><br/>
     <strong>To:</strong> ${emailMetaData.conversionData.total.amount} ${emailMetaData.conversionData.total.currency} (Total) | ${emailMetaData.conversionData.subtotal.amount} ${emailMetaData.conversionData.subtotal.currency} (SubTotal)
     <br/><br/>
-    <strong>Fee:</strong> ${emailMetaData.conversionData.fee.amount} ${emailMetaData.conversionData.fee.currency} 
-    <br/><br/>
     Please contact support@mizudev.com if you require additional information regarding the conversion process.
     <br/><br/>
     <b>Mizu Team</b>
