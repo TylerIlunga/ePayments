@@ -1,4 +1,4 @@
-Senior project
+Spring 2021 LMU Project
 
 Features
 
