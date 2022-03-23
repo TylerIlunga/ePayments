@@ -1,8 +1,0 @@
-FE
-1) Create view for "Analytics" which is a general overview report aggregating business activities such as
-* new vs returning customers this week, new vs returning this month, 
-* total revenue this week, total revenue this month, 
-* total sales per product this week, total sales per product this month,
-* total revenue per product this week, total revenue per product this month
-* etc.
-* NOTE: Map on the FE to show where each transaction took place using long,lat data?
