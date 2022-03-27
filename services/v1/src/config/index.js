@@ -3,17 +3,15 @@
  * @module src/config/index.js
  */
 module.exports = {
-  API_KEY: process.env.API_KEY || 'API_KEY',
+  API_KEY: process.env.API_KEY,
   AWS: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'AKIAJFFJCL3B2QQR2MPQ',
-    secretAccessKey:
-      process.env.AWS_SECRET_ACCESS_KEY ||
-      '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',
-    region: process.env.AWS_REGION || 'us-west-1',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
   },
   COINBASE: {
-    API_KEY: process.env.COINBASE_CLIENT_ID || 'CB_API_KEY',
-    API_SECRET_KEY: process.env.COINBASE_CLIENT_SECRET || 'CB_API_SECRET_KEY',
+    API_KEY: process.env.COINBASE_CLIENT_ID,
+    API_SECRET_KEY: process.env.COINBASE_CLIENT_SECRET,
     AUTHCODE_REDIRECT_URI:
       process.env.COINBASE_AUTHCODE_REDIRECT_URI ||
       'http://localhost:7777/api/v1/payment/accounts/create/oauthcallback/code',
@@ -49,19 +47,15 @@ module.exports = {
     resetExpiry: 5 * 60 * 1000, // 5 minutes
   },
   RECAPTCHA: {
-    secretkey:
-      process.env.RECAPTCHA_SECRET ||
-      '6LezEsEUAAAAACL7Zk4UPGB7v4Vlt9OMWtHGUGlV',
+    secretkey: process.env.RECAPTCHA_SECRET,
     submitUrl(secretkey, recaptchaToken, ip) {
       return `https://www.google.com/recaptcha/api/siteverify?secret=${secretkey}&response=${recaptchaToken}&remoteip=${ip}`;
     },
   },
   SENDGRID: {
-    API_KEY:
-      process.env.SENDGRID_API_KEY ||
-      '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',
-    supportEmail: process.env.SUPPORT_EMAIL_ADDRESS || 'support@mizudev.com',
-    teamEmail: process.env.TEAM_EMAIL_ADDRESS || 'team@mizudev.com',
+    API_KEY: process.env.SENDGRID_API_KEY,
+    supportEmail: process.env.SUPPORT_EMAIL_ADDRESS,
+    teamEmail: process.env.TEAM_EMAIL_ADDRESS,
   },
   VALIDATION: {
     genericPasswordPattern: new RegExp('^[a-zA-Z0-9]{10,30}$'),
